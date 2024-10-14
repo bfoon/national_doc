@@ -1,0 +1,223 @@
+{% include 'docs/header.html' %}
+<style>
+    /* Make sure the page takes the full height of the viewport */
+    html, body {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Body content should grow to take up available space */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        flex-grow: 1;
+    }
+
+    /* Container flex-grow allows the content to stretch and push footer down */
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        flex-grow: 1; /* Ensures the container stretches */
+    }
+
+    header {
+        background-color: #3498db;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+        display: flex;
+    }
+
+    nav ul li {
+        margin-right: 20px;
+    }
+
+    nav ul li a {
+        color: white;
+        text-decoration: none;
+    }
+
+    h1, h2 {
+        color: #2c3e50;
+    }
+
+    .upload-form {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        color: #34495e;
+    }
+
+    select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    .document-upload {
+        border: 2px dashed #bdc3c7;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+
+    .upload-button {
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .upload-button:hover {
+        background-color: #2980b9;
+    }
+
+    .upload-list {
+        margin-top: 20px;
+    }
+
+    .upload-item {
+        background-color: #ecf0f1;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .upload-item .remove-button {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .back-to-dashboard {
+        display: inline-block;
+        margin-top: 20px;
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    /* Footer should be at the bottom of the page */
+    footer {
+        background-color: #3498db;
+        color: white;
+        text-align: center;
+        padding: 1rem;
+        width: 100%;
+        margin-top: auto; /* Ensures footer is at the bottom */
+    }
+</style>
+
+<div class="container">
+    <div class="upload-form">
+        <h2>Upload Document for {{ application.full_name }}</h2>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="document-type">Document Type</label>
+                <select id="document-type" name="document_type" required>
+                    <option value="">Select Document Type</option>
+                    <option value="passport">Passport</option>
+                    <option value="drivers-license">Driver's License</option>
+                    <option value="utility-bill">Utility Bill</option>
+                    <option value="bank-statement">Bank Statement</option>
+                    <option value="employment-letter">Employment Letter</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="document-file">Upload Document</label>
+                <div class="document-upload" id="document-upload-area">
+                    <p>Click to upload or drag and drop your document here</p>
+                    <input type="file" id="document-file" name="document-file" accept=".pdf,.jpg,.png,.doc,.docx" style="display: none;" required>
+                </div>
+            </div>
+
+            <button type="submit" class="upload-button">Upload Document</button>
+        </form>
+    </div>
+
+ <div class="upload-list">
+    <h2>Uploaded Documents</h2>
+    <div id="uploaded-documents">
+        {% for document in uploaded_documents %}
+            <div class="upload-item">
+                <span>{{ document.document_type }}: <a href="{{ document.document_file.url }}">{{ document.document_file.name }}</a></span>
+                <a href="{{ document.document_file.url }}" download class="btn btn-primary">Download</a>
+            </div>
+        {% empty %}
+            <p>No documents uploaded yet.</p>
+        {% endfor %}
+    </div>
+</div>
+    <a href="{% url 'dashboard' %}" class="back-to-dashboard">← Back to Dashboard</a>
+</div>
+
+<script>
+    // JavaScript for handling file upload interactions
+    const uploadArea = document.getElementById('document-upload-area');
+    const fileInput = document.getElementById('document-file');
+
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.style.backgroundColor = '#e8f4fc';
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.style.backgroundColor = 'transparent';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.style.backgroundColor = 'transparent';
+        fileInput.files = e.dataTransfer.files;
+        updateUploadText(e.dataTransfer.files[0].name);
+    });
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            updateUploadText(fileInput.files[0].name);
+        }
+    });
+
+    function updateUploadText(fileName) {
+        uploadArea.querySelector('p').textContent = `File selected: ${fileName}`;
+    }
+</script>
+
+{% include 'docs/footer.html' %}

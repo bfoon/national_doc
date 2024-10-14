@@ -1,0 +1,15 @@
+<div class="modal-body">
+    <h5 class="modal-title">{{ application_type }} Application Details</h5>
+
+    <div class="card">
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Full Name:</strong> {{ application.full_name }}</li>
+                <li class="list-group-item"><strong>Date of Birth:</strong> {{ application.date_of_birth }}</li>
+                <li class="list-group-item"><strong>Place of Birth:</strong> {{ application.place_of_birth }}</li>
+                <li class="list-group-item"><strong>Status:</strong> {{ application.application.status|capfirst }}</li>
+                <li class="list-group-item"><strong>Application Date:</strong> {{ application.created_at|date:"Y-m-d" }}</li>
+            </ul>
+        </div>
+    </div>
+</div>

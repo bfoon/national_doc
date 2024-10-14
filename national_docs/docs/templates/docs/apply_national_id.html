@@ -1,0 +1,175 @@
+{% include 'docs/header.html' %}
+
+<style>
+    html, body {
+        height: 100%;  /* Make sure the body takes full height */
+        margin: 0;
+    }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        display: flex;
+        flex-direction: column;  /* Use flexbox to structure the layout */
+    }
+    header {
+        background-color: #3498db;
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    nav ul {
+        list-style-type: none;
+        padding: 0;
+        display: flex;
+    }
+    nav ul li {
+        margin-right: 20px;
+    }
+    nav ul li a {
+        color: white;
+        text-decoration: none;
+    }
+    h1, h2 {
+        color: #2c3e50;
+    }
+    .container {
+        flex: 1;  /* Allow the container to take up available space */
+        padding: 20px;
+    }
+    .application-form {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .document-upload {
+        border: 2px dashed #bdc3c7;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+    }
+    .submit-button {
+        background-color: #3498db;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .submit-button:hover {
+        background-color: #2980b9;
+    }
+</style>
+
+<div class="container">
+    <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Apply for National ID</li>
+        </ol>
+    </nav>
+
+    <div class="application-form">
+        <h2>National ID Card Application</h2>
+        <form id="national-id-form" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="full-name">Full Name</label>
+                <input type="text" id="full-name" name="full-name" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="date-of-birth">Date of Birth</label>
+                <input type="date" id="date-of-birth" name="date-of-birth" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="place-of-birth">Place of Birth</label>
+                <input type="text" id="place-of-birth" name="place-of-birth" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" class="form-control" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="address">Current Address</label>
+                <textarea id="address" name="address" class="form-control" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+
+            <h2>Document Upload</h2>
+            <div class="form-group">
+                <label for="birth-certificate">Birth Certificate</label>
+                <div class="document-upload" id="birth-certificate-upload">
+                    <p>Click to upload or drag and drop your Birth Certificate here</p>
+                    <input type="file" id="birth-certificate" name="birth-certificate" accept=".pdf,.jpg,.png" style="display: none;" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="passport-photo">Passport-sized Photograph</label>
+                <div class="document-upload" id="passport-photo-upload">
+                    <p>Click to upload or drag and drop your Passport Photo here</p>
+                    <input type="file" id="passport-photo" name="passport-photo" accept=".jpg,.png" style="display: none;" required>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-button">Submit Application</button>
+        </form>
+    </div>
+</div>
+
+{% include 'docs/footer.html' %}
+
+<script>
+    // Handle document upload UI
+    function setupFileUpload(uploadAreaId, fileInputId) {
+        const uploadArea = document.getElementById(uploadAreaId);
+        const fileInput = document.getElementById(fileInputId);
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = '#e8f4fc';
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.backgroundColor = 'transparent';
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.backgroundColor = 'transparent';
+            fileInput.files = e.dataTransfer.files;
+            updateUploadText(uploadArea, e.dataTransfer.files[0].name);
+        });
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                updateUploadText(uploadArea, fileInput.files[0].name);
+            }
+        });
+    }
+
+    function updateUploadText(uploadArea, fileName) {
+        uploadArea.querySelector('p').textContent = `File selected: ${fileName}`;
+    }
+
+    setupFileUpload('birth-certificate-upload', 'birth-certificate');
+    setupFileUpload('passport-photo-upload', 'passport-photo');
+</script>

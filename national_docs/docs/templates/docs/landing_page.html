@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National ID and Permit Services</title>
+    <title>National Document Services</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body, html {
             margin: 0;
@@ -35,13 +37,18 @@
             background-color: #1e5799;
             border-color: #1e5799;
         }
+        .icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #2989d8;
+        }
     </style>
 </head>
 <body>
 
     <!-- Header -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-        <a class="navbar-brand" href="#">National ID & Permit</a>
+        <a class="navbar-brand" href="#">National Documents</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -66,7 +73,7 @@
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-content text-white">
-            <h2>Seamless Identity and Permit Solutions</h2>
+            <h2>Seamless National Documents Solutions</h2>
             <p>Simplifying your documentation process for a smoother life experience.</p>
             <a href="/login" class="btn btn-primary">Apply Now</a>
         </div>
@@ -80,6 +87,7 @@
                 <div class="col-md-3">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
+                            <div class="icon"><i class="fas fa-id-card"></i></div>
                             <h5 class="card-title">National ID Card</h5>
                             <p class="card-text">Obtain your official national identification card quickly and efficiently.</p>
                         </div>
@@ -88,6 +96,7 @@
                 <div class="col-md-3">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
+                            <div class="icon"><i class="fas fa-home"></i></div>
                             <h5 class="card-title">Resident Permit</h5>
                             <p class="card-text">Secure your residency status with our streamlined permit process.</p>
                         </div>
@@ -96,6 +105,7 @@
                 <div class="col-md-3">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
+                            <div class="icon"><i class="fas fa-briefcase"></i></div>
                             <h5 class="card-title">Work Permit</h5>
                             <p class="card-text">Get authorized to work legally with our hassle-free work permit service.</p>
                         </div>
@@ -104,6 +114,7 @@
                 <div class="col-md-3">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
+                            <div class="icon"><i class="fas fa-file-invoice"></i></div>
                             <h5 class="card-title">TIN Number</h5>
                             <p class="card-text">Register for your Taxpayer Identification Number with ease.</p>
                         </div>
@@ -113,9 +124,28 @@
         </div>
     </section>
 
+    <!-- About Section -->
+    <section id="about" class="py-5 bg-light text-center">
+        <div class="container">
+            <h2>About Us</h2>
+            <p class="mt-4">We are a government-backed agency dedicated to simplifying the process of obtaining essential documentation, including national identification cards, work and residency permits, and TIN numbers. Our mission is to offer efficient, streamlined, and secure services that benefit citizens and residents.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-5 text-center">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <p class="mt-4">For any inquiries, feel free to reach out to us. We are here to assist you in the best way possible.</p>
+            <p><i class="fas fa-phone"></i> +220 3930160</p>
+            <p><i class="fas fa-envelope"></i> support@nationalid-portal.gov</p>
+            <p><i class="fas fa-map-marker-alt"></i> 1234 Government St., Banjul, Gambia</p>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer class="bg-dark text-white text-center py-3">
-        <p>&copy; 2023 National ID and Permit Services. All rights reserved.</p>
+        <p>&copy; 2024 National ID and Permit Services. All rights reserved.</p>
     </footer>
 
     <!-- Bootstrap JS and dependencies -->
