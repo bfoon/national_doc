@@ -1,43 +1,6 @@
 {% include 'docs/header.html' %}
 
 <style>
-    html, body {
-        height: 100%;  /* Make sure the body takes full height */
-        margin: 0;
-    }
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
-        display: flex;
-        flex-direction: column;  /* Use flexbox to structure the layout */
-    }
-    header {
-        background-color: #3498db;
-        color: white;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    nav ul {
-        list-style-type: none;
-        padding: 0;
-        display: flex;
-    }
-    nav ul li {
-        margin-right: 20px;
-    }
-    nav ul li a {
-        color: white;
-        text-decoration: none;
-    }
-    h1, h2 {
-        color: #2c3e50;
-    }
-    .container {
-        flex: 1;  /* Allow the container to take up available space */
-        padding: 20px;
-    }
     .application-form {
         background-color: white;
         border-radius: 8px;
@@ -67,10 +30,40 @@
     .submit-button:hover {
         background-color: #2980b9;
     }
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover, .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
 </style>
 
 <div class="container">
-    <!-- Breadcrumbs -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
@@ -137,6 +130,16 @@
     </div>
 </div>
 
+<!-- Disclaimer Modal -->
+<div id="disclaimerModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Important Disclaimer</h3>
+        <p>By submitting this application, I confirm that the information provided is accurate and truthful. I understand that providing false information for national documents is punishable by the laws of The Gambia under the legal code governing national documents.</p>
+        <button class="btn btn-primary" onclick="closeModal()">I Understand</button>
+    </div>
+</div>
+
 {% include 'docs/footer.html' %}
 
 <script>
@@ -172,4 +175,20 @@
 
     setupFileUpload('birth-certificate-upload', 'birth-certificate');
     setupFileUpload('passport-photo-upload', 'passport-photo');
+
+    // Show modal before form submission
+    const form = document.getElementById('national-id-form');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();  // Prevent immediate submission
+        showModal();
+    });
+
+    function showModal() {
+        document.getElementById('disclaimerModal').style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('disclaimerModal').style.display = 'none';
+        form.submit();  // Submit the form after the disclaimer is acknowledged
+    }
 </script>

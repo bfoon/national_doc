@@ -1,51 +1,5 @@
 {% include 'docs/header.html' %}
 <style>
-    /* Make sure the page takes the full height of the viewport */
-    html, body {
-        height: 100%;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-    }
-
-    /* Body content should grow to take up available space */
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
-        flex-grow: 1;
-    }
-
-    /* Container flex-grow allows the content to stretch and push footer down */
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-        flex-grow: 1; /* Ensures the container stretches */
-    }
-
-    header {
-        background-color: #3498db;
-        color: white;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    nav ul {
-        list-style-type: none;
-        padding: 0;
-        display: flex;
-    }
-
-    nav ul li {
-        margin-right: 20px;
-    }
-
-    nav ul li a {
-        color: white;
-        text-decoration: none;
-    }
 
     h1, h2 {
         color: #2c3e50;
@@ -130,18 +84,15 @@
         text-decoration: none;
     }
 
-    /* Footer should be at the bottom of the page */
-    footer {
-        background-color: #3498db;
-        color: white;
-        text-align: center;
-        padding: 1rem;
-        width: 100%;
-        margin-top: auto; /* Ensures footer is at the bottom */
-    }
 </style>
 
 <div class="container">
+     <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Upload Document</li>
+        </ol>
+    </nav>
     <div class="upload-form">
         <h2>Upload Document for {{ application.full_name }}</h2>
         <form method="POST" enctype="multipart/form-data">

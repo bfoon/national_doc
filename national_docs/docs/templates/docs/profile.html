@@ -1,0 +1,45 @@
+{% include 'docs/header.html' %}
+
+<div class="container mt-4">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Profile</li>
+        </ol>
+    </nav>
+
+    <!-- Profile Header -->
+    <h2 class="mb-4">User Profile</h2>
+
+    <!-- Profile Card -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>
+        </div>
+        <div class="card-body">
+            <p><strong>Username:</strong> {{ request.user.username }}</p>
+            <p><strong>Email:</strong> {{ request.user.email }}</p>
+            <p><strong>Phone Numebr:</strong> {{ profile.phone }}</p>
+            <p><strong>Date of Birth:</strong> {{ profile.date_of_birth|date:"F d, Y" }}</p>
+            <p><strong>Nationality:</strong> {{ profile.nationality|capfirst }}</p>
+        </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="text-center">
+        <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+{% include 'docs/footer.html' %}

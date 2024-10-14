@@ -4,10 +4,16 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import (NationalIDApplication,
                      UploadedDocument, Application,
-                     ResidentPermitApplication, WorkPermitApplication)
+                     ResidentPermitApplication, WorkPermitApplication, Profile)
 from django.core.files.storage import FileSystemStorage
 from django.db import transaction
 from django.http import JsonResponse
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
+from django.utils import timezone
+from django.contrib.auth.models import User
+from .models import Profile
+from django.db import IntegrityError
 
 def landing_page(request):
     return render(request, 'docs/landing_page.html')
@@ -29,18 +35,79 @@ def login_page(request):
 
     return render(request, 'docs/login_page.html')
 
+@transaction.atomic  # Atomic transaction to ensure rollback if something goes wrong
+def register(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        date_of_birth = request.POST.get('dateOfBirth')
+        nationality = request.POST.get('nationality')
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirmPassword')
+
+        # Validate email format
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, 'Invalid email address.')
+            return redirect('register')
+
+        # Ensure passwords match
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match.")
+            return redirect('register')
+
+        try:
+            # Begin atomic transaction
+            with transaction.atomic():
+                # Check if the user already exists before creating
+                if User.objects.filter(username=username).exists():
+                    messages.error(request, "Username already exists.")
+                    return redirect('register')
+
+                # Create the user
+                user = User.objects.create_user(
+                    username=username,
+                    password=password,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name
+                )
+
+                # Check if the profile already exists for the user before creating
+                if not Profile.objects.filter(user=user).exists():
+                    # Create and save the profile
+                    Profile.objects.create(
+                        user=user,
+                        date_of_birth=date_of_birth,
+                        nationality=nationality
+                    )
+                else:
+                    messages.error(request, "Profile already exists for this user.")
+                    return redirect('register')
+
+            # Automatically log the user in after registration
+            login(request, user)
+            messages.success(request, 'Registration successful! You are now logged in.')
+            return redirect('/dashboard')
+
+        except IntegrityError as e:
+            messages.error(request, f"An error occurred: {str(e)}")
+            return redirect('register')
+
+    return render(request, 'docs/registration.html')
+
 def logout_view(request):
     logout(request)  # This will log out the user
     return redirect('landing_page')  # Redirect to the landing page after logout
 
-@login_required  # Ensure only authenticated users can access this view
+# Dashboard View
 @login_required
 def dashboard(request):
-    # Get the National ID application for the user, if it exists
     try:
         national_id_application = NationalIDApplication.objects.get(application__user=request.user)
-
-        # Check if the application is expired
         is_expired = national_id_application.application.status == 'complete' and national_id_application.application.is_expired()
 
         if is_expired:
@@ -52,7 +119,6 @@ def dashboard(request):
             applicatiion_date = national_id_application.created_at
             application_exists = True
     except NationalIDApplication.DoesNotExist:
-        # If no application exists
         status = 'Not Applied'
         application_exists = False
         applicatiion_date = False
@@ -64,8 +130,52 @@ def dashboard(request):
         'national_id_application': national_id_application if application_exists else None,
     })
 
+@login_required
+def profile_view(request):
+    # Get the user's profile
+    profile = get_object_or_404(Profile, user=request.user)
 
-# Apply for National ID
+    return render(request, 'docs/profile.html', {
+        'profile': profile
+    })
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+
+        # Validate email format
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, 'Invalid email address.')
+            return redirect('/edit_profile')
+
+        # Update user info
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.save()
+
+        # Update profile phone number
+        profile, created = Profile.objects.get_or_create(user=user)
+        profile.phone = phone
+        profile.save()
+
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('/profile')
+
+    else:
+        profile, created = Profile.objects.get_or_create(user=request.user)
+        return render(request, 'docs/edit_profile.html', {
+            'user': request.user,
+            'profile': profile,
+        })
+
 @login_required
 @transaction.atomic
 def apply_national_id(request):
@@ -76,17 +186,22 @@ def apply_national_id(request):
         messages.warning(request, "You already have an ongoing application. Please complete or cancel it before applying for another service.")
         return redirect('dashboard')
 
+    # Prevent foreign nationals from applying for a National ID
+    if request.user.profile.nationality.lower() == 'foreigner':
+        messages.warning(request, "Foreign nationals cannot apply for a National ID.")
+        return redirect('dashboard')
+
     if request.method == 'POST':
         try:
-            full_name = request.POST.get('full_name')
-            date_of_birth = request.POST.get('date_of_birth')
-            place_of_birth = request.POST.get('place_of_birth')
+            full_name = request.POST.get('full-name')
+            date_of_birth = request.POST.get('date-of-birth')
+            place_of_birth = request.POST.get('place-of-birth')
             gender = request.POST.get('gender')
             address = request.POST.get('address')
             phone = request.POST.get('phone')
             email = request.POST.get('email')
-            birth_certificate = request.FILES.get('birth_certificate')
-            passport_photo = request.FILES.get('passport_photo')
+            birth_certificate = request.FILES.get('birth-certificate')
+            passport_photo = request.FILES.get('passport-photo')
 
             # Create the Application and National ID Application atomically
             application = Application.objects.create(
@@ -108,9 +223,10 @@ def apply_national_id(request):
                 passport_photo=passport_photo,
             )
 
+            messages.success(request, "Your National ID application has been submitted.")
             return redirect('dashboard')
+
         except Exception as e:
-            # Handle exception and roll back transaction
             transaction.set_rollback(True)
             messages.error(request, "An error occurred while processing your application. Please try again.")
             return render(request, 'docs/apply_national_id.html')
@@ -118,17 +234,16 @@ def apply_national_id(request):
     return render(request, 'docs/apply_national_id.html')
 
 
-# View National ID Application
-@login_required
-def view_national_id(request, id):
-    national_id_application = get_object_or_404(NationalIDApplication, id=id, application__user=request.user)
-    return render(request, 'docs/view_national_id.html', {'application': national_id_application})
-
-
 # Apply for Resident Permit
 @login_required
 @transaction.atomic
 def apply_resident_permit(request):
+    profile = Profile.objects.get(user=request.user)
+
+    if profile.nationality == 'national':
+        messages.warning(request, "Nationals cannot apply for a resident permit.")
+        return redirect('dashboard')
+
     existing_application = Application.objects.filter(user=request.user, status__in=['pending', 'processing', 'waiting', 'interview']).exists()
 
     if existing_application:
@@ -144,7 +259,6 @@ def apply_resident_permit(request):
             passport_photo = request.FILES.get('passport_photo')
             resident_permit_document = request.FILES.get('resident_permit_document')
 
-            # Create the Application and Resident Permit Application atomically
             application = Application.objects.create(
                 user=request.user,
                 application_type='new',
@@ -170,17 +284,16 @@ def apply_resident_permit(request):
     return render(request, 'docs/apply_resident_permit.html')
 
 
-# View Resident Permit Application
-@login_required
-def view_resident_permit(request, id):
-    resident_permit_application = get_object_or_404(ResidentPermitApplication, id=id, application__user=request.user)
-    return render(request, 'docs/view_resident_permit.html', {'application': resident_permit_application})
-
-
 # Apply for Work Permit
 @login_required
 @transaction.atomic
 def apply_work_permit(request):
+    profile = Profile.objects.get(user=request.user)
+
+    if profile.nationality == 'national':
+        messages.warning(request, "Nationals cannot apply for a work permit.")
+        return redirect('dashboard')
+
     existing_application = Application.objects.filter(user=request.user, status__in=['pending', 'processing', 'waiting', 'interview']).exists()
 
     if existing_application:
@@ -197,7 +310,6 @@ def apply_work_permit(request):
             work_contract = request.FILES.get('work_contract')
             passport_photo = request.FILES.get('passport_photo')
 
-            # Create the Application and Work Permit Application atomically
             application = Application.objects.create(
                 user=request.user,
                 application_type='new',
@@ -222,14 +334,6 @@ def apply_work_permit(request):
             return render(request, 'docs/apply_work_permit.html')
 
     return render(request, 'docs/apply_work_permit.html')
-
-
-# View Work Permit Application
-@login_required
-def view_work_permit(request, id):
-    work_permit_application = get_object_or_404(WorkPermitApplication, id=id, application__user=request.user)
-    return render(request, 'docs/view_work_permit.html', {'application': work_permit_application})
-
 @login_required
 def fetch_application_details(request):
     application_id = request.GET.get('application_id')

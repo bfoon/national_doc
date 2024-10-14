@@ -117,7 +117,7 @@
 
 
 <div class="container">
-    <h4>Welcome, <span id="user-name">{{ user.first_name }}</span></h4>
+    <h4>Welcome, <span>{{ user.first_name }}</span></h4>
     {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -304,7 +304,7 @@
 <script>
         // Simulating user data
         const userData = {
-            name: "John Doe",
+
             idCardStatus: "Document Verification",
             idCardApplicationDate: "2023-05-15",
             idCardProgress: 60,
