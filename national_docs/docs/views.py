@@ -103,31 +103,63 @@ def logout_view(request):
     logout(request)  # This will log out the user
     return redirect('landing_page')  # Redirect to the landing page after logout
 
-# Dashboard View
 @login_required
 def dashboard(request):
+    # National ID Application
     try:
         national_id_application = NationalIDApplication.objects.get(application__user=request.user)
         is_expired = national_id_application.application.status == 'complete' and national_id_application.application.is_expired()
 
         if is_expired:
-            status = 'Not Applied'
-            applicatiion_date = False
-            application_exists = False
+            national_id_status = 'Not Applied'
+            national_id_application_date = False
+            national_id_application_exists = False
         else:
-            status = national_id_application.application.status
-            applicatiion_date = national_id_application.created_at
-            application_exists = True
+            national_id_status = national_id_application.application.status
+            national_id_application_date = national_id_application.created_at
+            national_id_application_exists = True
     except NationalIDApplication.DoesNotExist:
-        status = 'Not Applied'
-        application_exists = False
-        applicatiion_date = False
+        national_id_status = 'Not Applied'
+        national_id_application_exists = False
+        national_id_application_date = False
+
+    # Resident Permit Application
+    try:
+        resident_permit_application = ResidentPermitApplication.objects.get(application__user=request.user)
+        resident_permit_status = resident_permit_application.application.status
+        resident_permit_application_date = resident_permit_application.created_at
+        resident_permit_application_exists = True
+    except ResidentPermitApplication.DoesNotExist:
+        resident_permit_status = 'Not Applied'
+        resident_permit_application_exists = False
+        resident_permit_application_date = False
+
+    # Work Permit Application
+    try:
+        work_permit_application = WorkPermitApplication.objects.get(application__user=request.user)
+        work_permit_status = work_permit_application.application.status
+        work_permit_application_date = work_permit_application.created_at
+        work_permit_application_exists = True
+    except WorkPermitApplication.DoesNotExist:
+        work_permit_status = 'Not Applied'
+        work_permit_application_exists = False
+        work_permit_application_date = False
 
     return render(request, 'docs/dashboard.html', {
-        'status': status,
-        'applicatiion_date': applicatiion_date,
-        'application_exists': application_exists,
-        'national_id_application': national_id_application if application_exists else None,
+        'national_id_status': national_id_status,
+        'national_id_application_date': national_id_application_date,
+        'national_id_application_exists': national_id_application_exists,
+        'national_id_application': national_id_application if national_id_application_exists else None,
+
+        'resident_permit_status': resident_permit_status,
+        'resident_permit_application_date': resident_permit_application_date,
+        'resident_permit_application_exists': resident_permit_application_exists,
+        'resident_permit_application': resident_permit_application if resident_permit_application_exists else None,
+
+        'work_permit_status': work_permit_status,
+        'work_permit_application_date': work_permit_application_date,
+        'work_permit_application_exists': work_permit_application_exists,
+        'work_permit_application': work_permit_application if work_permit_application_exists else None,
     })
 
 @login_required
@@ -187,7 +219,9 @@ def apply_national_id(request):
         return redirect('dashboard')
 
     # Prevent foreign nationals from applying for a National ID
-    if request.user.profile.nationality.lower() == 'foreigner':
+    nationality = getattr(request.user.profile, 'nationality', None)
+
+    if nationality and nationality.lower() == 'foreigner':
         messages.warning(request, "Foreign nationals cannot apply for a National ID.")
         return redirect('dashboard')
 
@@ -228,11 +262,10 @@ def apply_national_id(request):
 
         except Exception as e:
             transaction.set_rollback(True)
-            messages.error(request, "An error occurred while processing your application. Please try again.")
+            messages.warning(request, "An error occurred while processing your application. Please try again.")
             return render(request, 'docs/apply_national_id.html')
 
     return render(request, 'docs/apply_national_id.html')
-
 
 # Apply for Resident Permit
 @login_required
@@ -240,11 +273,15 @@ def apply_national_id(request):
 def apply_resident_permit(request):
     profile = Profile.objects.get(user=request.user)
 
+    # Restrict nationals from applying for resident permits
     if profile.nationality == 'national':
         messages.warning(request, "Nationals cannot apply for a resident permit.")
         return redirect('dashboard')
 
-    existing_application = Application.objects.filter(user=request.user, status__in=['pending', 'processing', 'waiting', 'interview']).exists()
+    # Check if there is an ongoing application
+    existing_application = Application.objects.filter(
+        user=request.user, status__in=['pending', 'processing', 'waiting', 'interview']
+    ).exists()
 
     if existing_application:
         messages.warning(request, "You already have an ongoing application. Please complete or cancel it before applying for another service.")
@@ -252,30 +289,42 @@ def apply_resident_permit(request):
 
     if request.method == 'POST':
         try:
-            full_name = request.POST.get('full_name')
-            date_of_birth = request.POST.get('date_of_birth')
+            full_name = request.POST.get('full-name')
+            date_of_birth = request.POST.get('date-of-birth')
             nationality = request.POST.get('nationality')
+            date_of_entry = request.POST.get('date-of-entry')
+            passport_number = request.POST.get('passport-number')
+            purpose_of_Stay = request.POST.get('purpose-of-stay')
+            phone_number = request.POST.get('phone')
             address = request.POST.get('address')
-            passport_photo = request.FILES.get('passport_photo')
-            resident_permit_document = request.FILES.get('resident_permit_document')
+            passport_photo = request.FILES.get('passport-photo')
+            resident_permit_document = request.FILES.get('resident-permit-document')
 
+            # Create the base Application model instance
             application = Application.objects.create(
                 user=request.user,
                 application_type='new',
                 status='pending',
             )
 
+            # Create the ResidentPermitApplication instance
             ResidentPermitApplication.objects.create(
                 application=application,
                 full_name=full_name,
                 date_of_birth=date_of_birth,
                 nationality=nationality,
+                date_of_entry=date_of_entry,
+                passport_number=passport_number,
+                purpose_of_Stay=purpose_of_Stay,
+                phone_number=phone_number,
                 address=address,
                 passport_photo=passport_photo,
                 resident_permit_document=resident_permit_document,
             )
 
+            messages.success(request, "Your Resident Permit application has been submitted successfully.")
             return redirect('dashboard')
+
         except Exception as e:
             transaction.set_rollback(True)
             messages.error(request, "An error occurred while processing your application. Please try again.")

@@ -6,7 +6,16 @@
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><strong>Full Name:</strong> {{ application.full_name }}</li>
                 <li class="list-group-item"><strong>Date of Birth:</strong> {{ application.date_of_birth }}</li>
+                {% if application.nationality %}
+                <li class="list-group-item"><strong>Nationality:</strong> {{ application.nationality }}</li>
+                <li class="list-group-item"><strong>Purpose of Stay:</strong> {{ application.purpose_of_Stay }}</li>
+                <li class="list-group-item"><strong>Entry Date:</strong> {{ application.date_of_entry  }}</li>
+                <li class="list-group-item"><strong>Passport Number:</strong> {{ application.passport_number  }}</li>
+                <li class="list-group-item"><strong>Address:</strong> {{ application.address  }}</li>
+                <li class="list-group-item"><strong>Contact Number:</strong> {{ application.phone_number  }}</li>
+                {% else %}
                 <li class="list-group-item"><strong>Place of Birth:</strong> {{ application.place_of_birth }}</li>
+                {% endif %}
                 <li class="list-group-item"><strong>Status:</strong> {{ application.application.status|capfirst }}</li>
                 <li class="list-group-item"><strong>Application Date:</strong> {{ application.created_at|date:"Y-m-d" }}</li>
             </ul>

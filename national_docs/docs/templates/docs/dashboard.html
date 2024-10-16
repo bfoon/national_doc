@@ -132,18 +132,24 @@
         <!-- National ID Card Section -->
         <div class="dashboard-item">
     <h3>National ID Card</h3>
-    <p>Status:
-        <span class="status {% if national_id_application %}{% if national_id_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
-            {% if national_id_application %}
-                {{ national_id_application.application.status|capfirst }}
-            {% else %}
-                Not Applied
+        <p>Status:
+            <span class="status {% if national_id_application %}{% if national_id_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
+                {% if national_id_application %}
+                    {{ national_id_application.application.status|capfirst }}
+                {% else %}
+                    Not Applied
+                {% endif %}
+            </span>
+        </p>
+            {% if national_id_application_date %}
+            <p>Application date:
+                {{ national_id_application_date|date:"Y-m-d" }}
+            </p>
             {% endif %}
-        </span>
-    </p>
+
             {% if national_id_application %}
                 <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
-                        data-application-id="{{ national_id_application.id }}"
+                        data-application-id="{{ national_id_application.application.id }}"
                         data-application-type="National ID Card">
                     View Application
                 </a>
@@ -164,12 +170,19 @@
                     {% endif %}
                 </span>
             </p>
+
+            {% if resident_permit_application_date %}
+            <p>Application date:
+                {{ resident_permit_application_date|date:"Y-m-d" }}
+            </p>
+            {% endif %}
+
             {% if resident_permit_application %}
-                <button class="cta-button" data-toggle="modal" data-target="#applicationModal"
-                        data-application-id="{{ resident_permit_application.id }}"
+                <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
+                        data-application-id="{{ resident_permit_application.application.id }}"
                         data-application-type="Resident Permit">
                     View Application
-                </button>
+                </a>
             {% else %}
                 <a href="{% url 'apply_resident_permit' %}" class="cta-button">Apply Now</a>
             {% endif %}
@@ -187,12 +200,19 @@
                     {% endif %}
                 </span>
             </p>
+
+            {% if work_permit_application_date %}
+            <p>Application date:
+                {{ work_permit_application_date|date:"Y-m-d" }}
+            </p>
+            {% endif %}
+
             {% if work_permit_application %}
-                <button class="cta-button" data-toggle="modal" data-target="#applicationModal"
-                        data-application-id="{{ work_permit_application.id }}"
+                <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
+                        data-application-id="{{ work_permit_application.application.id }}"
                         data-application-type="Work Permit">
                     View Application
-                </button>
+                </a>
             {% else %}
                 <a href="{% url 'apply_work_permit' %}" class="cta-button">Apply Now</a>
             {% endif %}
@@ -227,10 +247,19 @@
 
             <div class="dashboard-item">
                 <h3>Upload Document</h3>
+                {% if national_id_application %}
                 <p>Status: <span class="status">{{ national_id_application.application.status }}</span></p>
-
+                {% elif resident_permit_application %}
+                <p>Status: <span class="status">{{ resident_permit_application.application.status }}</span></p>
+                {% elif work_permit_application %}
+                <p>Status: <span class="status">{{ work_permit_application.application.status }}</span></p>
+                {% endif %}
                 {% if national_id_application.application.status == 'waiting' %}
                     <a href="{% url 'upload_document' national_id_application.id %}" class="cta-button">Upload Document</a>
+                {% elif resident_permit_application.application.status == 'waiting' %}
+                    <a href="{% url 'upload_document' resident_permit_application.id %}" class="cta-button">Upload Document</a>
+                {% elif work_permit_application.application.status == 'waiting' %}
+                    <a href="{% url 'upload_document' work_permit_application.id %}" class="cta-button">Upload Document</a>
                 {% else %}
                     <p>Document upload is not available at this stage.</p>
                 {% endif %}
@@ -257,18 +286,20 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="cancelApplicationBtn" style="display:none;">Cancel Application</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
+    <button type="button" class="btn btn-danger" id="cancelApplicationBtn" style="display:none;">Cancel Application</button>
+    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+</div>
+</div>
+</div>
 </div>
 
 <script>
+    let applicationId; // To store the application ID globally
+
     $(document).ready(function() {
         $('#applicationModal').on('show.bs.modal', function (event) {
             const button = $(event.relatedTarget);
-            const applicationId = button.data('application-id');
+            applicationId = button.data('application-id');  // Store application ID when the modal opens
             const applicationType = button.data('application-type');
 
             // AJAX request to fetch the application details
@@ -298,8 +329,34 @@
                 }
             });
         });
+
+        // Cancel Application button click event
+        $('#cancelApplicationBtn').click(function() {
+            if (applicationId) {
+                // AJAX request to cancel the application
+                $.ajax({
+                    url: "{% url 'cancel_application' %}",
+                    data: {
+                        'application_id': applicationId
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            alert('Application successfully cancelled.');
+                            $('#applicationModal').modal('hide');
+                            location.reload();  // Reload the page to reflect the cancellation
+                        } else {
+                            alert(response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error cancelling the application: ' + error);
+                    }
+                });
+            }
+        });
     });
 </script>
+
 
 <script>
         // Simulating user data

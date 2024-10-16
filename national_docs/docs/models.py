@@ -13,7 +13,6 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.user.username}'s Profile"
 
-
 # @receiver(post_save, sender=User)
 # def create_user_profile(sender, instance, created, **kwargs):
 #     if created:
@@ -60,6 +59,20 @@ class Application(models.Model):
     def __str__(self):
         return f"Application {self.id} - {self.application_type} for {self.user.username}"
 
+    def get_service_type(self):
+        """Get the type of service based on the related models."""
+        if hasattr(self, 'national_id_applications'):
+            return "National ID"
+        elif hasattr(self, 'resident_permit_applications'):
+            return "Resident Permit"
+        elif hasattr(self, 'work_permit_applications'):
+            return "Work Permit"
+        elif hasattr(self, 'drivers_license_applications'):
+            return "Driver's License"
+        elif hasattr(self, 'tin_applications'):
+            return "TIN"
+        return "Unknown Service"
+
 class NationalIDApplication(models.Model):
     application = models.ForeignKey(Application, on_delete=models.CASCADE, null=True, related_name='national_id_applications')
     full_name = models.CharField(max_length=255)
@@ -81,9 +94,13 @@ class ResidentPermitApplication(models.Model):
     full_name = models.CharField(max_length=255)
     date_of_birth = models.DateField()
     nationality = models.CharField(max_length=255)
+    date_of_entry = models.CharField(max_length=255, null=True)
+    passport_number = models.CharField(max_length=255, null=True)
+    purpose_of_Stay = models.CharField(max_length=255, null=True)
+    phone_number = models.CharField(max_length=255, null=True)
     address = models.TextField()
-    passport_photo = models.FileField(upload_to='documents/passport_photos/')
-    resident_permit_document = models.FileField(upload_to='documents/resident_permits/')
+    passport_photo = models.FileField(null=True, upload_to='documents/passport_photos/')
+    resident_permit_document = models.FileField(null=True, upload_to='documents/resident_permits/')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -101,7 +118,7 @@ class WorkPermitApplication(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Work Permit Application for {self.application.user.username}"
+        return f"Work Permit Application for {self.application.user.id}"
 
 class DriversLicenseApplication(models.Model):
     application = models.ForeignKey(Application, on_delete=models.CASCADE, null=True, related_name='drivers_license_applications')

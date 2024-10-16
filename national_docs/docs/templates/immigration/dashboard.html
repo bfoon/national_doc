@@ -1,0 +1,119 @@
+{% include 'docs/header.html' %}
+
+<!-- Add the Font Awesome link to the header (if not already included) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<div class="container my-5">
+    <h2>Immigration Dashboard</h2>
+
+    <div class="row">
+        <!-- New Requests Tile -->
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3 shadow">
+                <div class="card-header">
+                    <i class="fas fa-file-alt"></i> New Requests
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ new_requests_count }}</h5>
+                    <p class="card-text">Number of new applications awaiting processing.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Requests Tile -->
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3 shadow">
+                <div class="card-header">
+                    <i class="fas fa-spinner"></i> Pending Requests
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ pending_requests_count }}</h5>
+                    <p class="card-text">Applications currently being processed.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waiting Requests Tile -->
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3 shadow">
+                <div class="card-header">
+                    <i class="fas fa-exclamation-circle"></i> Waiting Requests
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ waiting_requests_count }}</h5>
+                    <p class="card-text">Applications waiting for additional information.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interviews for Today Tile -->
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3 shadow">
+                <div class="card-header">
+                    <i class="fas fa-calendar-check"></i> Interviews Today
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ interview_requests_count }}</h5>
+                    <p class="card-text">Number of interviews scheduled for today.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Items Section -->
+    <div class="row mt-4">
+        <!-- Fulfiller -->
+        <div class="col-md-3">
+            <a href="/immigration/fulfiller" class="text-decoration-none">
+                <div class="card text-center shadow">
+                    <div class="card-body">
+                        <i class="fas fa-tasks fa-2x text-primary mb-3"></i>
+                        <h5 class="card-title">Fulfiller</h5>
+                        <p class="card-text">Manage application fulfillments.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- To-do -->
+        <div class="col-md-3">
+            <a href="#" class="text-decoration-none">
+                <div class="card text-center shadow">
+                    <div class="card-body">
+                        <i class="fas fa-list-check fa-2x text-success mb-3"></i>
+                        <h5 class="card-title">To-do</h5>
+                        <p class="card-text">View your tasks and pending actions.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Interview -->
+        <div class="col-md-3">
+            <a href="#" class="text-decoration-none">
+                <div class="card text-center shadow">
+                    <div class="card-body">
+                        <i class="fas fa-user-clock fa-2x text-warning mb-3"></i>
+                        <h5 class="card-title">Interview</h5>
+                        <p class="card-text">Manage interview schedules.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Schedule Management -->
+        <div class="col-md-3">
+            <a href="#" class="text-decoration-none">
+                <div class="card text-center shadow">
+                    <div class="card-body">
+                        <i class="fas fa-calendar-alt fa-2x text-danger mb-3"></i>
+                        <h5 class="card-title">Schedule Management</h5>
+                        <p class="card-text">Control your scheduling and timelines.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+{% include 'docs/footer.html' %}
