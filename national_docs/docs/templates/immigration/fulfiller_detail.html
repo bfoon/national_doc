@@ -1,134 +1,201 @@
 {% include 'docs/header.html' %}
+
+<style>
+    .form-container {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        border: 1px solid #ccc;
+    }
+
+    h2, h4 {
+        color: #2c3e50;
+    }
+
+    .form-row {
+        margin-bottom: 15px;
+    }
+
+    .list-group-item a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .list-group-item a:hover {
+        text-decoration: underline;
+    }
+
+    .btn-link {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .btn-link:hover {
+        text-decoration: underline;
+    }
+
+    .form-group label {
+        font-weight: 600;
+    }
+
+    .form-group textarea {
+        resize: vertical;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+
+    .form-group textarea {
+        resize: none;
+    }
+</style>
+
 <div class="container my-5">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <h2>Edit Fulfiller Details</h2>
 
-    <form method="POST">
-        {% csrf_token %}
+    <div class="form-container">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="location">Location</label>
+                    <input type="text" class="form-control" id="location" name="location" value="{{ fulfiller.location }}" required>
+                </div>
 
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="location">Location</label>
-                <input type="text" class="form-control" id="location" name="location" value="{{ fulfiller.location }}" required>
+                <div class="form-group col-md-6">
+                    <label for="action">Action (User)</label>
+                    <select class="form-control" id="action" name="action" required>
+                        <option value="">Select User</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}" {% if fulfiller.action.id == user.id %}selected{% endif %}>{{ user.username }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
 
-            <div class="form-group col-md-6">
-                <label for="action">Action (User)</label>
-                <select class="form-control" id="action" name="action" required>
-                    <option value="">Select User</option>
-                    {% for user in users %}
-                        <option value="{{ user.id }}" {% if fulfiller.action.id == user.id %}selected{% endif %}>{{ user.username }}</option>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="schedule">Schedule</label>
+                    <input type="date" class="form-control" id="schedule" name="schedule" value="{{ fulfiller.schedule|date:'Y-m-d' }}" required>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="priority">Priority</label>
+                    <select class="form-control" id="priority" name="priority" required>
+                        <option value="high" {% if fulfiller.priority == 'high' %}selected{% endif %}>High</option>
+                        <option value="medium" {% if fulfiller.priority == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="low" {% if fulfiller.priority == 'low' %}selected{% endif %}>Low</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="status">Status</label>
+                    <select class="form-control" id="status" name="status" required>
+                        <option value="open" {% if fulfiller.status == 'open' %}selected{% endif %}>Open</option>
+                        <option value="closed" {% if fulfiller.status == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+
+                <div class="form-group col-md-6">
+                    <label for="state">State</label>
+                    <select class="form-control" id="state" name="state" required>
+                        <option value="pending" {% if fulfiller.application.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="processing" {% if fulfiller.application.status == 'processing' %}selected{% endif %}>Processing</option>
+                        <option value="waiting" {% if fulfiller.application.status == 'waiting' %}selected{% endif %}>Waiting</option>
+                        <option value="interview" {% if fulfiller.application.status == 'interview' %}selected{% endif %}>Interview</option>
+                        <option value="completed" {% if fulfiller.application.status == 'completed' %}selected{% endif %}>Completed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="progress">Progress (%)</label>
+                    <input type="number" class="form-control" id="progress" name="progress" value="{{ fulfiller.progress }}" min="0" max="100" required>
+                </div>
+            </div>
+
+            <h4>Uploaded Documents</h4>
+            <ul class="list-group mb-3">
+                {% if application.national_id_applications.first %}
+                    <li class="list-group-item">
+                        <a href="{{ application.national_id_applications.first.birth_certificate.url }}" target="_blank">Birth Certificate</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{{ application.national_id_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a>
+                    </li>
+                {% endif %}
+                {% if application.resident_permit_applications.first %}
+                    <li class="list-group-item">
+                        <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">Resident Permit Document</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{{ application.resident_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a>
+                    </li>
+                {% endif %}
+                {% if application.work_permit_applications.first %}
+                    <li class="list-group-item">
+                        <a href="{{ application.work_permit_applications.first.work_contract.url }}" target="_blank">Work Contract</a>
+                    </li>
+                    <li class="list-group-item">
+                        <a href="{{ application.work_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a>
+                    </li>
+                {% endif %}
+            </ul>
+
+            <h4>Additional Documents</h4>
+            <ul class="list-group mb-3">
+                {% if doc_uploads %}
+                    {% for document in doc_uploads %}
+                        <li class="list-group-item">
+                            <a href="{{ document.document_file.url }}" target="_blank">{{ document.document_type }}</a>
+                        </li>
                     {% endfor %}
-                </select>
-            </div>
-        </div>
+                {% else %}
+                    <li class="list-group-item">No documents uploaded.</li>
+                {% endif %}
+            </ul>
 
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="schedule">Schedule</label>
-                <input type="date" class="form-control" id="schedule" name="schedule" value="{{ fulfiller.schedule|date:'Y-m-d' }}" required>
-            </div>
+            <h4>Messages to Requester</h4>
+            <ul class="list-group mb-3">
+                {% if notes %}
+                    {% for note in notes %}
+                        <li class="list-group-item">
+                            <strong>{{ note.user.username }} ({{ note.created_at|date:"Y-m-d H:i" }}):</strong>
+                            <p>{{ note.message }}</p>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li class="list-group-item">No messages yet.</li>
+                {% endif %}
+            </ul>
 
-            <div class="form-group col-md-6">
-                <label for="priority">Priority</label>
-                <select class="form-control" id="priority" name="priority" required>
-                    <option value="high" {% if fulfiller.priority == 'high' %}selected{% endif %}>High</option>
-                    <option value="medium" {% if fulfiller.priority == 'medium' %}selected{% endif %}>Medium</option>
-                    <option value="low" {% if fulfiller.priority == 'low' %}selected{% endif %}>Low</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="status">Status</label>
-                <select class="form-control" id="status" name="status" required>
-                    <option value="open" {% if fulfiller.status == 'open' %}selected{% endif %}>Open</option>
-                    <option value="closed" {% if fulfiller.status == 'closed' %}selected{% endif %}>Closed</option>
-                </select>
+            <div class="form-group">
+                <label for="message">Message to Requester</label>
+                <textarea class="form-control" id="message" name="message" rows="3" placeholder="Type your message here..."></textarea>
             </div>
 
-            <div class="form-group col-md-6">
-                <label for="state">State</label>
-                <select class="form-control" id="state" name="state" required>
-                    <option value="pending" {% if fulfiller.application.status == 'pending' %}selected{% endif %}>Pending</option>
-                    <option value="processing" {% if fulfiller.application.status == 'processing' %}selected{% endif %}>Processing</option>
-                    <option value="waiting" {% if fulfiller.application.status == 'waiting' %}selected{% endif %}>Waiting</option>
-                    <option value="interview" {% if fulfiller.application.status == 'interview' %}selected{% endif %}>Interview</option>
-                    <option value="completed" {% if fulfiller.application.status == 'completed' %}selected{% endif %}>Completed</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="progress">Progress (%)</label>
-                <input type="number" class="form-control" id="progress" name="progress" value="{{ fulfiller.progress }}" min="0" max="100" required>
-            </div>
-        </div>
-
-        <h4>Uploaded Documents</h4>
-        <ul class="list-group mb-3">
-            {% if application.national_id_applications.first %}
-                <li class="list-group-item">
-                    <a href="{{ application.national_id_applications.first.birth_certificate.url }}" target="_blank">Birth Certificate</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="{{ application.national_id_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a>
-                </li>
-            {% endif %}
-            {% if application.resident_permit_applications.first %}
-                <li class="list-group-item">
-                    <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">Resident Permit Document</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="{{ application.resident_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a>
-                </li>
-            {% endif %}
-            {% if application.work_permit_applications.first %}
-                <li class="list-group-item">
-                    <a href="{{ application.work_permit_applications.first.work_contract.url }}" target="_blank">Work Contract</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="{{ application.work_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a>
-                </li>
-            {% endif %}
-        </ul>
-
-        <h4>Additional Documents</h4>
-        <ul class="list-group mb-3">
-            {% if doc_uploads %}
-                {% for document in doc_uploads %}
-                    <li class="list-group-item">
-                        <a href="{{ document.document_file.url }}" target="_blank">{{ document.document_type }}</a>
-                    </li>
-                {% endfor %}
-            {% else %}
-                <li class="list-group-item">No documents uploaded.</li>
-            {% endif %}
-        </ul>
-
-        <h4>Messages to Requester</h4>
-        <ul class="list-group mb-3">
-            {% if notes %}
-                {% for note in notes %}
-                    <li class="list-group-item">
-                        <strong>{{ note.user.username }} ({{ note.created_at|date:"Y-m-d H:i" }}):</strong>
-                        <p>{{ note.message }}</p>
-                    </li>
-                {% endfor %}
-            {% else %}
-                <li class="list-group-item">No messages yet.</li>
-            {% endif %}
-        </ul>
-
-        <div class="form-group">
-            <label for="message">Message to Requester</label>
-            <textarea class="form-control" id="message" name="message" rows="3" placeholder="Type your message here..."></textarea>
-        </div>
-
-
-        <button type="submit" class="btn btn-primary">Update Fulfiller</button>
-    </form>
+            <button type="submit" class="btn btn-primary">Update Fulfiller</button>
+        </form>
+    </div>
 
     <a href="{% url 'fulfiller' %}" class="btn btn-link mt-3">← Back to Fulfiller List</a>
 </div>

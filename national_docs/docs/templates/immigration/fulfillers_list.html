@@ -2,6 +2,36 @@
 <!-- Include Font Awesome for icons and any additional CSS for styling -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
+<style>
+    .state-badge {
+        display: inline-block;
+        padding: 0.25em 0.5em;
+        border-radius: 4px;
+        font-size: 0.875em;
+        color: #fff;
+    }
+
+    .state-pending {
+        background-color: #f39c12; /* orange */
+    }
+
+    .state-processing {
+        background-color: #3498db; /* blue */
+    }
+
+    .state-waiting {
+        background-color: #e67e22; /* darker orange */
+    }
+
+    .state-interview {
+        background-color: #8e44ad; /* purple */
+    }
+
+    .state-completed {
+        background-color: #27ae60; /* green */
+    }
+</style>
+
 <div class="container my-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <!-- Export Dropdown -->
@@ -35,6 +65,9 @@
                 <a class="dropdown-item" href="#">Closed</a>
             </div>
         </div>
+
+        <!-- Button to go back to the Immigration Dashboard -->
+        <a href="{% url 'immigration_dashboard' %}" class="btn btn-secondary">Back to Immigration Dashboard</a>
     </div>
 
     <!-- Filter Options (collapsible) -->
@@ -102,7 +135,11 @@
                 <td>{{ item.action }}</td>
                 <td>{{ item.schedule }}</td>
                 <td>{{ item.priority|capfirst }}</td>
-                <td>{{ item.application.status|capfirst }}</td>
+                <td>
+                    <span class="state-badge state-{{ item.application.status }}">
+                        {{ item.application.status|capfirst }}
+                    </span>
+                </td>
                 <td>{{ item.status|capfirst }}</td>
                 <td>{{ item.created_at|date:"Y-m-d" }}</td>
                 <td>
@@ -113,7 +150,7 @@
             </tr>
             {% empty %}
             <tr>
-                <td colspan="9" class="text-center">No records found.</td>
+                <td colspan="11" class="text-center">No records found.</td>
             </tr>
             {% endfor %}
         </tbody>
