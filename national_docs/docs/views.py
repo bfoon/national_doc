@@ -429,23 +429,32 @@ def cancel_application(request):
 @login_required
 def upload_document(request, id):
     try:
-        # Fetch the application
+        # Fetch the NationalIDApplication for the user
         application = NationalIDApplication.objects.get(id=id, application__user=request.user)
 
         # Only allow document upload if the status is "waiting"
         if application.application.status != 'waiting':
-            return render(request, 'error.html', {'message': 'You can only upload documents when the application is waiting for more information.'})
+            return render(request, 'error.html', {
+                'message': 'You can only upload documents when the application is waiting for more information.'
+            })
 
         if request.method == 'POST':
+            # Ensure document_file is included in the request
             document_type = request.POST.get('document_type')
             document_file = request.FILES.get('document_file')
 
+            if not document_file:
+                messages.error(request, 'Please upload a document.')
+                return redirect('upload_document', id=id)
+
             # Create the document linked to the application
             UploadedDocument.objects.create(
-                application=application.application,  # Link to base Application model
+                application=application.application,  # Link to the base Application model
                 document_type=document_type,
                 document_file=document_file,
             )
+
+            messages.success(request, 'Document uploaded successfully.')
             return redirect('dashboard')  # Redirect after successful upload
 
         # Fetch uploaded documents for this application

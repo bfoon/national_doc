@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from docs.models import Application, UploadedDocument
-from .models import Fulfiller
+from .models import Fulfiller,Note
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -71,6 +71,7 @@ def fulfiller_detail(request, id):
     fulfiller = get_object_or_404(Fulfiller, id=id)
     application = fulfiller.application
     doc_uploads = UploadedDocument.objects.filter(application=application)  # Fetch all documents related to the application
+    notes = Note.objects.filter(application=application).order_by('-created_at')  # Fetch all notes for this application
 
     # If no documents exist, set doc_uploads to None or False
     if not doc_uploads.exists():
@@ -102,7 +103,15 @@ def fulfiller_detail(request, id):
             application.status = application_status
             application.save()
 
-            messages.success(request, 'Fulfiller details updated successfully.')
+            # Capture the message to the requester if provided
+            if message_to_requester:
+                Note.objects.create(
+                    application=application,
+                    user=request.user,
+                    message=message_to_requester
+                )
+
+            messages.success(request, 'Fulfiller details and message updated successfully.')
         except Exception as e:
             messages.error(request, f"Error updating fulfiller details: {e}")
 
@@ -116,4 +125,5 @@ def fulfiller_detail(request, id):
         'application': application,
         'doc_uploads': doc_uploads,  # Pass the documents to the template (False if none)
         'users': users,
+        'notes': notes,  # Pass the notes to the template
     })

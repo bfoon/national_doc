@@ -1,6 +1,5 @@
 {% include 'docs/header.html' %}
 <style>
-
     h1, h2 {
         color: #2c3e50;
     }
@@ -83,16 +82,16 @@
         color: #3498db;
         text-decoration: none;
     }
-
 </style>
 
 <div class="container">
-     <nav aria-label="breadcrumb">
+    <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
             <li class="breadcrumb-item active" aria-current="page">Upload Document</li>
         </ol>
     </nav>
+
     <div class="upload-form">
         <h2>Upload Document for {{ application.full_name }}</h2>
         <form method="POST" enctype="multipart/form-data">
@@ -113,7 +112,7 @@
                 <label for="document-file">Upload Document</label>
                 <div class="document-upload" id="document-upload-area">
                     <p>Click to upload or drag and drop your document here</p>
-                    <input type="file" id="document-file" name="document-file" accept=".pdf,.jpg,.png,.doc,.docx" style="display: none;" required>
+                    <input type="file" id="document-file" name="document_file" accept=".pdf,.jpg,.png,.doc,.docx" style="display: none;" required>
                 </div>
             </div>
 
@@ -121,19 +120,20 @@
         </form>
     </div>
 
- <div class="upload-list">
-    <h2>Uploaded Documents</h2>
-    <div id="uploaded-documents">
-        {% for document in uploaded_documents %}
-            <div class="upload-item">
-                <span>{{ document.document_type }}: <a href="{{ document.document_file.url }}">{{ document.document_file.name }}</a></span>
-                <a href="{{ document.document_file.url }}" download class="btn btn-primary">Download</a>
-            </div>
-        {% empty %}
-            <p>No documents uploaded yet.</p>
-        {% endfor %}
+    <div class="upload-list">
+        <h2>Uploaded Documents</h2>
+        <div id="uploaded-documents">
+            {% for document in uploaded_documents %}
+                <div class="upload-item">
+                    <span>{{ document.document_type }}: <a href="{{ document.document_file.url }}" target="_blank">{{ document.document_file.name }}</a></span>
+                    <a href="{{ document.document_file.url }}" download class="btn btn-primary">Download</a>
+                </div>
+            {% empty %}
+                <p>No documents uploaded yet.</p>
+            {% endfor %}
+        </div>
     </div>
-</div>
+
     <a href="{% url 'dashboard' %}" class="back-to-dashboard">← Back to Dashboard</a>
 </div>
 
