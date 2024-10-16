@@ -383,6 +383,7 @@ def apply_work_permit(request):
             return render(request, 'docs/apply_work_permit.html')
 
     return render(request, 'docs/apply_work_permit.html')
+
 @login_required
 def fetch_application_details(request):
     application_id = request.GET.get('application_id')

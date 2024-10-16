@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from docs.models import Application, UploadedDocument
-from .models import Fulfiller,Note
+from .models import Fulfiller,Note, PostLocation
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -73,6 +73,9 @@ def fulfiller_detail(request, id):
     doc_uploads = UploadedDocument.objects.filter(application=application)  # Fetch all documents related to the application
     notes = Note.objects.filter(application=application).order_by('-created_at')  # Fetch all notes for this application
 
+    # Fetch all post locations for the dropdown
+    post_locations = PostLocation.objects.all()
+
     # If no documents exist, set doc_uploads to None or False
     if not doc_uploads.exists():
         doc_uploads = False  # You can also use None here depending on your preference
@@ -89,7 +92,7 @@ def fulfiller_detail(request, id):
             message_to_requester = request.POST.get('message')  # Message to requester
 
             # Update the fulfiller details
-            fulfiller.location = location
+            fulfiller.location_id = location
             if action_user_id:
                 fulfiller.action = User.objects.get(id=action_user_id)  # Assign selected user
             fulfiller.schedule = schedule
@@ -124,6 +127,73 @@ def fulfiller_detail(request, id):
         'fulfiller': fulfiller,
         'application': application,
         'doc_uploads': doc_uploads,  # Pass the documents to the template (False if none)
+        'post_locations': post_locations,  # Pass the post locations to the template
         'users': users,
         'notes': notes,  # Pass the notes to the template
     })
+
+
+@login_required
+def post_locations(request):
+    locations_list = PostLocation.objects.all()
+    paginator = Paginator(locations_list, 10)  # Show 10 locations per page
+    page_number = request.GET.get('page')
+    locations = paginator.get_page(page_number)
+
+    return render(request, 'immigration/post_locations.html', {'locations': locations})
+
+@login_required
+def add_post_location(request):
+    # Handle POST request to add a new post location
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        region = request.POST.get('region')
+        district = request.POST.get('district')
+        settlement = request.POST.get('settlement')
+        postal_code = request.POST.get('postal_code')
+        country = request.POST.get('country')
+
+        # Create a new post location with all fields
+        PostLocation.objects.create(
+            name=name,
+            address=address,
+            city=city,
+            region=region,
+            district=district,
+            settlement=settlement,
+            postal_code=postal_code,
+            country=country
+        )
+        messages.success(request, "Post location added successfully.")
+        return redirect('post_locations')
+
+    return render(request, 'immigration/add_post_location.html')
+
+@login_required
+def edit_post_location(request, id):
+    # Fetch the specific post location to edit
+    location = get_object_or_404(PostLocation, id=id)
+    if request.method == 'POST':
+        # Update the post location details
+        location.name = request.POST.get('name')
+        location.address = request.POST.get('address')
+        location.city = request.POST.get('city')
+        location.region = request.POST.get('region')
+        location.district = request.POST.get('district')
+        location.settlement = request.POST.get('settlement')
+        location.postal_code = request.POST.get('postal_code')
+        location.country = request.POST.get('country')
+        location.save()
+        messages.success(request, "Post location updated successfully.")
+        return redirect('post_locations')
+
+    return render(request, 'immigration/edit_post_location.html', {'location': location})
+
+@login_required
+def delete_post_location(request, id):
+    location = get_object_or_404(PostLocation, id=id)
+    location.delete()
+    messages.success(request, "Post location deleted successfully.")
+    return redirect('post_locations')
