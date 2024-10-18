@@ -109,6 +109,17 @@
                 <input type="email" id="email" name="email" class="form-control" required>
             </div>
 
+            <!-- New Closest Post Location Dropdown -->
+            <div class="form-group">
+                <label for="post-location">Closest Post Location</label>
+                <select id="post-location" name="post-location" class="form-control" required>
+                    <option value="">Select Closest Post</option>
+                    {% for post in post_locations %}
+                        <option value="{{ post.id }}">{{ post.name }} - {{ post.district }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
             <h2>Document Upload</h2>
             <div class="form-group">
                 <label for="birth-certificate">Birth Certificate</label>

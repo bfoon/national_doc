@@ -57,6 +57,14 @@
     }
 </style>
 <div class="container my-5">
+      <!-- Breadcrumbs -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'fulfiller' %}">Fulfiller List</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Fulfiller Details</li>
+        </ol>
+    </nav>
+
     {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -75,9 +83,11 @@
                 <div class="form-group col-md-6">
                     <label for="location">Location</label>
                     <select class="form-control" id="location" name="location" required>
-                        <option value="">Select Location</option>
+                        <option value="{{application.post_location.id}}"> {{application.post_location}}</option>
                         {% for location in post_locations %}
+                        {% if location != application.post_location %}
                             <option value="{{ location.id }}" {% if fulfiller.location.id == location.id %}selected{% endif %}>{{ location.name }}</option>
+                        {% endif %}
                         {% endfor %}
                     </select>
                 </div>

@@ -6,6 +6,7 @@ from .models import (NationalIDApplication,
                      UploadedDocument, Application,
                      ResidentPermitApplication, WorkPermitApplication, Profile)
 from django.core.files.storage import FileSystemStorage
+from immigration.models import PostLocation
 from django.db import transaction
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
@@ -220,10 +221,12 @@ def apply_national_id(request):
 
     # Prevent foreign nationals from applying for a National ID
     nationality = getattr(request.user.profile, 'nationality', None)
-
     if nationality and nationality.lower() == 'foreigner':
         messages.warning(request, "Foreign nationals cannot apply for a National ID.")
         return redirect('dashboard')
+
+    # Get available post locations for the dropdown
+    post_locations = PostLocation.objects.all()
 
     if request.method == 'POST':
         try:
@@ -236,12 +239,15 @@ def apply_national_id(request):
             email = request.POST.get('email')
             birth_certificate = request.FILES.get('birth-certificate')
             passport_photo = request.FILES.get('passport-photo')
+            post_location_id = request.POST.get('post-location')  # Get selected post location
+            post_location = PostLocation.objects.get(id=post_location_id)  # Fetch post location
 
             # Create the Application and National ID Application atomically
             application = Application.objects.create(
                 user=request.user,
                 application_type='new',
                 status='pending',
+                post_location=post_location  # Save selected post location
             )
 
             NationalIDApplication.objects.create(
@@ -263,75 +269,83 @@ def apply_national_id(request):
         except Exception as e:
             transaction.set_rollback(True)
             messages.warning(request, "An error occurred while processing your application. Please try again.")
-            return render(request, 'docs/apply_national_id.html')
+            return render(request, 'docs/apply_national_id.html', {'post_locations': post_locations})
 
-    return render(request, 'docs/apply_national_id.html')
+    return render(request, 'docs/apply_national_id.html', {'post_locations': post_locations})
 
-# Apply for Resident Permit
 @login_required
-@transaction.atomic
 def apply_resident_permit(request):
-    profile = Profile.objects.get(user=request.user)
+    # Fetch the user's profile
+    profile = get_object_or_404(Profile, user=request.user)
 
-    # Restrict nationals from applying for resident permits
+    # Nationals cannot apply for resident permits
     if profile.nationality == 'national':
         messages.warning(request, "Nationals cannot apply for a resident permit.")
         return redirect('dashboard')
 
-    # Check if there is an ongoing application
-    existing_application = Application.objects.filter(
-        user=request.user, status__in=['pending', 'processing', 'waiting', 'interview']
-    ).exists()
+    # Check if the user has an ongoing application
+    existing_application = Application.objects.filter(user=request.user, status__in=['pending', 'processing', 'waiting', 'interview']).exists()
 
     if existing_application:
         messages.warning(request, "You already have an ongoing application. Please complete or cancel it before applying for another service.")
         return redirect('dashboard')
 
+    # Get available post locations
+    post_locations = PostLocation.objects.all()
+
     if request.method == 'POST':
-        try:
-            full_name = request.POST.get('full-name')
-            date_of_birth = request.POST.get('date-of-birth')
-            nationality = request.POST.get('nationality')
-            date_of_entry = request.POST.get('date-of-entry')
-            passport_number = request.POST.get('passport-number')
-            purpose_of_Stay = request.POST.get('purpose-of-stay')
-            phone_number = request.POST.get('phone')
-            address = request.POST.get('address')
-            passport_photo = request.FILES.get('passport-photo')
-            resident_permit_document = request.FILES.get('resident-permit-document')
+        # Start atomic transaction
+        with transaction.atomic():
+            try:
+                full_name = request.POST.get('full-name')
+                date_of_birth = request.POST.get('date-of-birth')
+                nationality = request.POST.get('nationality')
+                passport_number = request.POST.get('passport-number')
+                date_of_entry = request.POST.get('date-of-entry')
+                purpose_of_stay = request.POST.get('purpose-of-stay')
+                address = request.POST.get('address')
+                email = request.POST.get('email')
+                phone = request.POST.get('phone')
+                passport_photo = request.FILES.get('passport-photo')
+                resident_permit_document = request.FILES.get('resident-permit-document')
+                post_location_id = request.POST.get('post-location')  # Get selected post location
 
-            # Create the base Application model instance
-            application = Application.objects.create(
-                user=request.user,
-                application_type='new',
-                status='pending',
-            )
+                # Fetch the post location object
+                post_location = get_object_or_404(PostLocation, id=post_location_id)
 
-            # Create the ResidentPermitApplication instance
-            ResidentPermitApplication.objects.create(
-                application=application,
-                full_name=full_name,
-                date_of_birth=date_of_birth,
-                nationality=nationality,
-                date_of_entry=date_of_entry,
-                passport_number=passport_number,
-                purpose_of_Stay=purpose_of_Stay,
-                phone_number=phone_number,
-                address=address,
-                passport_photo=passport_photo,
-                resident_permit_document=resident_permit_document,
-            )
+                # Create the Application and Resident Permit Application atomically
+                application = Application.objects.create(
+                    user=request.user,
+                    application_type='new',
+                    status='pending',
+                    post_location=post_location  # Save selected post location
+                )
 
-            messages.success(request, "Your Resident Permit application has been submitted successfully.")
-            return redirect('dashboard')
+                ResidentPermitApplication.objects.create(
+                    application=application,
+                    full_name=full_name,
+                    date_of_birth=date_of_birth,
+                    nationality=nationality,
+                    passport_number=passport_number,
+                    date_of_entry=date_of_entry,
+                    purpose_of_stay=purpose_of_stay,
+                    address=address,
+                    phone_number=phone,
+                    email=email,
+                    passport_photo=passport_photo,
+                    resident_permit_document=resident_permit_document,
+                )
 
-        except Exception as e:
-            transaction.set_rollback(True)
-            messages.error(request, "An error occurred while processing your application. Please try again.")
-            return render(request, 'docs/apply_resident_permit.html')
+                messages.success(request, "Your Resident Permit application has been submitted.")
+                return redirect('dashboard')
 
-    return render(request, 'docs/apply_resident_permit.html')
+            except Exception as e:
+                # If any error occurs, rollback the transaction
+                messages.error(request, f"An error occurred: {str(e)}. Please try again.")
+                return render(request, 'docs/apply_resident_permit.html', {'post_locations': post_locations})
 
+    # Render the form with post locations available for selection
+    return render(request, 'docs/apply_resident_permit.html', {'post_locations': post_locations})
 
 # Apply for Work Permit
 @login_required

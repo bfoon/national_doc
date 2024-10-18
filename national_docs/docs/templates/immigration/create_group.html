@@ -1,0 +1,19 @@
+{% include 'docs/header.html' %}
+
+<div class="container my-5">
+    <h2>Create New Group</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="group_name">Group Name</label>
+            <input type="text" class="form-control" id="group_name" name="group_name" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Group</button>
+    </form>
+
+    <a href="{% url 'list_officer_users' %}" class="btn btn-link mt-3">← Back to User List</a>
+</div>
+
+{% include 'docs/footer.html' %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from docs.models import Application, UploadedDocument
 from .models import Fulfiller,Note, PostLocation
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -132,7 +132,6 @@ def fulfiller_detail(request, id):
         'notes': notes,  # Pass the notes to the template
     })
 
-
 @login_required
 def post_locations(request):
     locations_list = PostLocation.objects.all()
@@ -197,3 +196,63 @@ def delete_post_location(request, id):
     location.delete()
     messages.success(request, "Post location deleted successfully.")
     return redirect('post_locations')
+
+@login_required
+def list_officer_users(request):
+    # Get users in the Immigration, Police, and Tax officer groups
+    immigration_officers = User.objects.filter(groups__name='immigration')
+    police_officers = User.objects.filter(groups__name='police')
+    tax_officers = User.objects.filter(groups__name='tax')
+
+    context = {
+        'immigration_officers': immigration_officers,
+        'police_officers': police_officers,
+        'tax_officers': tax_officers
+    }
+
+    return render(request, 'immigration/list_officer_users.html', context)
+
+@login_required
+def create_user(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        role = request.POST.get('role')  # Immigration, Police, or Tax officer
+
+        # Check if the username already exists
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Username already exists.')
+        else:
+            # Create the user
+            user = User.objects.create_user(username=username, email=email, password=password)
+
+            # Try to get the group by name (role) instead of id
+            try:
+                group = Group.objects.get(name=role)
+                user.groups.add(group)  # Add the user to the group
+                user.save()
+                messages.success(request, f'{role.capitalize()} user created successfully!')
+                return redirect('list_officer_users')
+            except Group.DoesNotExist:
+                messages.error(request, f'Group "{role}" does not exist.')
+
+    # Fetch groups based on their name
+    groups = Group.objects.filter(name__in=['immigration', 'police', 'tax'])
+
+    return render(request, 'immigration/create_user.html', {'groups': groups})
+
+@login_required
+def create_group(request):
+    if request.method == 'POST':
+        group_name = request.POST.get('group_name')
+
+        if Group.objects.filter(name=group_name).exists():
+            messages.error(request, 'Group already exists.')
+        else:
+            Group.objects.create(name=group_name)
+            messages.success(request, f'Group "{group_name}" created successfully.')
+            return redirect('list_officer_users')
+
+    return render(request, 'immigration/create_group.html')
+

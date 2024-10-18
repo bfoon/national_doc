@@ -55,6 +55,8 @@ class Application(models.Model):
     status = models.CharField(max_length=50, choices=APPLICATION_STATUS_CHOICES, default='pending')
     interview_slot = models.ForeignKey(InterviewSlot, on_delete=models.SET_NULL, null=True, blank=True)
     interview_queue_number = models.IntegerField(null=True, blank=True)
+    post_location = models.ForeignKey('immigration.PostLocation', on_delete=models.SET_NULL,
+                                      null=True, blank=True)
 
     def __str__(self):
         return f"Application {self.id} - {self.application_type} for {self.user.username}"
@@ -96,9 +98,10 @@ class ResidentPermitApplication(models.Model):
     nationality = models.CharField(max_length=255)
     date_of_entry = models.CharField(max_length=255, null=True)
     passport_number = models.CharField(max_length=255, null=True)
-    purpose_of_Stay = models.CharField(max_length=255, null=True)
+    purpose_of_stay = models.CharField(max_length=255, null=True)
     phone_number = models.CharField(max_length=255, null=True)
     address = models.TextField()
+    email = models.CharField(max_length=255, null=True)
     passport_photo = models.FileField(null=True, upload_to='documents/passport_photos/')
     resident_permit_document = models.FileField(null=True, upload_to='documents/resident_permits/')
     created_at = models.DateTimeField(auto_now_add=True)

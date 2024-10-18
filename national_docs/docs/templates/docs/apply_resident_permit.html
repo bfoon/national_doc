@@ -72,6 +72,16 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="post-location">Closest Post Location</label>
+                    <select id="post-location" name="post-location" class="form-control" required>
+                        <option value="">Select Post Location</option>
+                        {% for post in post_locations %}
+                            <option value="{{ post.id }}">{{ post.name }} - {{ post.city }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="passport-photo">Passport Photo</label>
                     <input type="file" class="form-control-file" id="passport-photo" name="passport-photo" accept=".jpg,.png" required>
                 </div>
