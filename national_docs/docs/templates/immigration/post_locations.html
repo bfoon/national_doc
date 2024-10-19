@@ -1,5 +1,14 @@
 {% include 'docs/header.html' %}
 <div class="container my-5">
+     {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <h2>Manage Post Locations</h2>
 
     <!-- Back to Dashboard Button -->

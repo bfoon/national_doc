@@ -140,10 +140,15 @@
                 </div>
             </div>
 
-            <div class="form-row">
+          <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="progress">Progress (%)</label>
-                    <input type="number" class="form-control" id="progress" name="progress" value="{{ fulfiller.progress }}" min="0" max="100" required>
+                    <div class="input-group">
+                        <input type="number" class="form-control" id="progress" name="progress" value="{{ fulfiller.progress }}" min="0" max="100" required>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#progressDetailsModal">More Details</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -213,5 +218,88 @@
 
     <a href="{% url 'fulfiller' %}" class="btn btn-link mt-3">← Back to Fulfiller List</a>
 </div>
+
+<!-- Modal for Application Details -->
+<div class="modal fade" id="progressDetailsModal" tabindex="-1" role="dialog" aria-labelledby="progressDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="progressDetailsModalLabel">Application Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Applicant Information -->
+                <h5>Applicant Information</h5>
+                 {% if application.national_id_applications.first %}
+                <p><strong>Full Name:</strong> {{application.national_id_applications.first.full_name }}</p>
+                <p><strong>Email:</strong> {{ application.national_id_applications.first.email }}</p>
+                <p><strong>Phone Number:</strong> {{ application.national_id_applications.first.phone_number }}</p>
+                {% elif application.resident_permit_applications.first %}
+                <p><strong>Full Name:</strong> {{application.resident_permit_applications.first.full_name }}</p>
+                <p><strong>Email:</strong> {{ application.resident_permit_applications.first.email }}</p>
+                <p><strong>Phone Number:</strong> {{ application.resident_permit_applications.first.phone_number }}</p>
+                {% elif application.work_permit_applications.first %}
+                <p><strong>Full Name:</strong> {{application.work_permit_applications.first.full_name }}</p>
+                <p><strong>Email:</strong> {{ application.work_permit_applications.first.email }}</p>
+                <p><strong>Phone Number:</strong> {{ application.work_permit_applications.first.phone_number }}</p>
+                {% endif %}
+
+                <!-- Application Information -->
+                <h5>Application Information</h5>
+                <p><strong>Application Type:</strong> {{ fulfiller.application.application_type|capfirst }}</p>
+                <p><strong>Status:</strong> {{ fulfiller.application.status|capfirst }}</p>
+                <p><strong>Post Location:</strong> {{ fulfiller.application.post_location.name }}, {{ fulfiller.application.post_location.city }}</p>
+                <p><strong>Progress:</strong> {{ fulfiller.progress }}%</p>
+
+                <!-- Conditional Information based on Service Type -->
+                {% if application.national_id_applications.first %}
+                    <h5>National ID Application Details</h5>
+                    <ul>
+                        <li><strong>Birth Certificate:</strong>
+                            <a href="{{ application.national_id_applications.first.birth_certificate.url }}" target="_blank">View Document</a>
+                        </li>
+                        <li><strong>Passport Photo:</strong>
+                            <a href="{{ application.national_id_applications.first.passport_photo.url }}" target="_blank">View Document</a>
+                        </li>
+                    </ul>
+                {% elif application.resident_permit_applications.first %}
+                    <h5>Resident Permit Application Details</h5>
+                    <ul>
+                        <li><strong>Purpose of Stay:</strong> {{ application.resident_permit_applications.first.purpose_of_stay }}</li>
+                        <li><strong>Passport Number:</strong> {{ application.resident_permit_applications.first.passport_number }}</li>
+                        <li><strong>Date of Entry:</strong> {{ application.resident_permit_applications.first.date_of_entry }}</li>
+                        <li><strong>Resident Permit Document:</strong>
+                            <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">View Document</a>
+                        </li>
+                        <li><strong>Passport Photo:</strong>
+                            <a href="{{ application.resident_permit_applications.first.passport_photo.url }}" target="_blank">View Document</a>
+                        </li>
+                    </ul>
+                {% elif application.work_permit_applications.first %}
+                    <h5>Work Permit Application Details</h5>
+                    <ul>
+                        <li><strong>Job Title:</strong> {{ application.work_permit_applications.first.job_title }}</li>
+                        <li><strong>Work Contract:</strong>
+                            <a href="{{ application.work_permit_applications.first.work_contract.url }}" target="_blank">View Document</a>
+                        </li>
+                        <li><strong>Passport Photo:</strong>
+                            <a href="{{ application.work_permit_applications.first.passport_photo.url }}" target="_blank">View Document</a>
+                        </li>
+                    </ul>
+                {% else %}
+                    <p>No additional details available for this application type.</p>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 
 {% include 'docs/footer.html' %}

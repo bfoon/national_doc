@@ -11,5 +11,8 @@ urlpatterns = [
     path('post-locations/delete/<int:id>/', views.delete_post_location, name='delete_post_location'),
     path('create_user/', views.create_user, name='create_user'),
     path('create_group/', views.create_group, name='create_group'),
+    path('available_slots/', views.available_slots, name='available_slots'),
     path('list_officer_users/', views.list_officer_users, name='list_officer_users'),
+    path('interviews/', views.interview_list, name='interview_list'),  # List of interviews
+    path('interview/<int:interview_id>/', views.interview_view, name='interview_view'),  # Interview detail view
 ]

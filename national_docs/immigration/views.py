@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
 from docs.models import Application, UploadedDocument
-from .models import Fulfiller,Note, PostLocation
+from .models import Fulfiller,Note, PostLocation, InterviewSlot, Interview
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.contrib import messages
+from django.db.models import F
+from django.utils import timezone
+from django.db import transaction
 from django.shortcuts import render, get_object_or_404
 from datetime import datetime
 from datetime import date
@@ -70,31 +73,30 @@ def fulfillers_list(request):
 def fulfiller_detail(request, id):
     fulfiller = get_object_or_404(Fulfiller, id=id)
     application = fulfiller.application
-    doc_uploads = UploadedDocument.objects.filter(application=application)  # Fetch all documents related to the application
-    notes = Note.objects.filter(application=application).order_by('-created_at')  # Fetch all notes for this application
-
-    # Fetch all post locations for the dropdown
+    doc_uploads = UploadedDocument.objects.filter(application=application)
+    notes = Note.objects.filter(application=application).order_by('-created_at')
     post_locations = PostLocation.objects.all()
 
-    # If no documents exist, set doc_uploads to None or False
     if not doc_uploads.exists():
-        doc_uploads = False  # You can also use None here depending on your preference
+        doc_uploads = False
 
     if request.method == 'POST':
         try:
             # Get data from POST request
             location = request.POST.get('location')
-            action_user_id = request.POST.get('action')  # User selected in the dropdown
+            action_user_id = request.POST.get('action')
             schedule = request.POST.get('schedule')
             priority = request.POST.get('priority')
             status = request.POST.get('status')
             progress = request.POST.get('progress')
-            message_to_requester = request.POST.get('message')  # Message to requester
+            message_to_requester = request.POST.get('message')
+            questionnaire = request.POST.get('questionnaire')  # Get questionnaire responses
+            notes_text = request.POST.get('notes')  # Get additional notes
 
             # Update the fulfiller details
             fulfiller.location_id = location
             if action_user_id:
-                fulfiller.action = User.objects.get(id=action_user_id)  # Assign selected user
+                fulfiller.action = User.objects.get(id=action_user_id)
             fulfiller.schedule = schedule
             fulfiller.priority = priority
             fulfiller.status = status
@@ -103,6 +105,41 @@ def fulfiller_detail(request, id):
 
             # Update application status
             application_status = request.POST.get('state')
+            if application_status == 'interview':
+                # Check if the application already has an interview slot
+                if not application.interview_slot:
+                    # Find available interview slot
+                    interview_slot = InterviewSlot.objects.filter(
+                        current_interviewees__lt=F('max_interviewees'),
+                        date_time__gte=timezone.now(),
+                        is_available=True
+                    ).order_by('date_time').first()
+
+                    if interview_slot:
+                        # Assign interview slot to the application
+                        application.interview_slot = interview_slot
+                        application.interview_queue_number = interview_slot.current_interviewees + 1
+
+                        # Increment the current interviewees count in the interview slot
+                        interview_slot.current_interviewees += 1
+                        if interview_slot.current_interviewees >= interview_slot.max_interviewees:
+                            interview_slot.is_available = False
+                        interview_slot.save()
+
+                        # Create an Interview instance
+                        Interview.objects.create(
+                            application=application,
+                            interviewer=request.user,  # Assuming the logged-in user is the interviewer
+                            interview_date=timezone.now(),  # Set to the current time or the interview slot time
+                            questionnaire=questionnaire,
+                            notes=notes_text,
+                            status='scheduled'
+                        )
+                    else:
+                        messages.error(request, 'No available interview slots.')
+                        return redirect('fulfiller_detail', id=fulfiller.id)
+
+            # Update the application status
             application.status = application_status
             application.save()
 
@@ -120,17 +157,17 @@ def fulfiller_detail(request, id):
 
         return redirect('fulfiller_detail', id=fulfiller.id)
 
-    # Get the list of users for the action dropdown
     users = User.objects.all()
 
     return render(request, 'immigration/fulfiller_detail.html', {
         'fulfiller': fulfiller,
         'application': application,
-        'doc_uploads': doc_uploads,  # Pass the documents to the template (False if none)
-        'post_locations': post_locations,  # Pass the post locations to the template
+        'doc_uploads': doc_uploads,
+        'post_locations': post_locations,
         'users': users,
-        'notes': notes,  # Pass the notes to the template
+        'notes': notes,
     })
+
 
 @login_required
 def post_locations(request):
@@ -256,3 +293,113 @@ def create_group(request):
 
     return render(request, 'immigration/create_group.html')
 
+
+@login_required
+def available_slots(request):
+    # Fetch all interview slots (both available and unavailable)
+    interview_slots = InterviewSlot.objects.all()
+
+    # Paginate the interview slots to show 5 per page
+    paginator = Paginator(interview_slots, 5)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    if request.method == 'POST':
+        # Add a new interview slot
+        date_time = request.POST.get('date_time')
+        max_interviewees = request.POST.get('max_interviewees')
+        location_id = request.POST.get('location')
+        location = PostLocation.objects.get(id=location_id)
+
+        try:
+            # Create a new interview slot
+            InterviewSlot.objects.create(
+                date_time=date_time,
+                max_interviewees=max_interviewees,
+                location=location,
+                is_available=True
+            )
+            messages.success(request, "Interview slot added successfully!")
+            return redirect('available_slots')
+        except Exception as e:
+            messages.error(request, f"An error occurred: {str(e)}")
+
+    # Get available post locations for the dropdown
+    post_locations = PostLocation.objects.all()
+
+    return render(request, 'immigration/available_slots.html', {
+        'page_obj': page_obj,  # Pass the paginated interview slots to the template
+        'post_locations': post_locations,
+    })
+
+@login_required
+def interview_list(request):
+    # Fetch all interviews except those that are completed
+    interviews = Interview.objects.exclude(status='completed').order_by('date_created')
+
+    return render(request, 'immigration/interview_list.html', {
+        'interviews': interviews,
+    })
+
+
+@login_required
+def interview_view(request, interview_id):
+    interview = get_object_or_404(Interview, id=interview_id)
+    application = interview.application
+    documents = UploadedDocument.objects.filter(application=application)  # Assuming you have a method to get uploaded docs
+
+    if interview.status == 'waiting':
+        read_only = True  # Set a flag for read-only mode
+    else:
+        read_only = False  # Editable for other statuses
+
+    if request.method == 'POST':
+        if 'postpone' in request.POST:  # Check if the postpone button was pressed
+            # Change the status of the interview to postponed
+            interview.status = 'postponed'
+            interview.save()  # Save the updated interview
+
+            # Get the current interview date to skip
+            current_interview_date = interview.application.interview_slot.date_time
+
+            # Find the next available interview slot after the current interview date
+            interview_slot = InterviewSlot.objects.filter(
+                current_interviewees__lt=F('max_interviewees'),
+                date_time__gt=current_interview_date,  # Skip the current interview date
+                is_available=True
+            ).order_by('date_time').first()
+
+            if interview_slot:
+                # Assign the new slot to the application
+                application.interview_slot = interview_slot
+                application.interview_queue_number = interview_slot.current_interviewees + 1
+
+                # Increment the current interviewees count in the interview slot
+                interview_slot.current_interviewees += 1
+                if interview_slot.current_interviewees >= interview_slot.max_interviewees:
+                    interview_slot.is_available = False  # Mark as full if necessary
+                interview_slot.save()
+
+                application.save()  # Save the updated application
+                messages.success(request, "Interview postponed successfully and new slot assigned.")
+            else:
+                messages.error(request, "No available interview slots for postponement.")
+            return redirect('interview_list')
+
+
+        else:  # Handle the submission of questionnaire and notes
+            questionnaire = request.POST.get('questionnaire')
+            notes = request.POST.get('notes')
+            interview.questionnaire = questionnaire
+            interview.notes = notes
+            interview.status = 'waiting'
+            interview.save()
+            messages.success(request, 'Interview details updated successfully.')
+            return redirect('interview_list')
+
+    return render(request, 'immigration/interview.html', {
+        'interview': interview,
+        'application': application,
+        'documents': documents,
+        'read_only': read_only,
+    })

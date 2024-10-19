@@ -49,3 +49,37 @@ class Note(models.Model):
 
     def __str__(self):
         return f"Note for Application {self.application.id} by {self.user.username}"
+
+class InterviewSlot(models.Model):
+    date_time = models.DateTimeField(unique=True)  # Date and time of the interview slot
+    max_interviewees = models.IntegerField(default=10)  # Maximum number of interviews allowed
+    current_interviewees = models.IntegerField(default=0)  # Track how many have been assigned
+    location = models.ForeignKey(PostLocation, on_delete=models.SET_NULL, null=True)  # Link to Post Location
+    is_available = models.BooleanField(default=True)  # Whether the slot is available or not
+
+    def __str__(self):
+        return f"Interview Slot on {self.date_time} at {self.location.name}"
+
+    def check_availability(self):
+        # Update availability status based on current interviewees count
+        self.is_available = self.current_interviewees < self.max_interviewees
+        self.save()
+
+
+class Interview(models.Model):
+    STATUS_CHOICES = [
+        ('scheduled', 'Scheduled'),
+        ('completed', 'Completed'),
+        ('postponed', 'Postponed'),
+        ('waiting', 'Waiting Approval'),
+    ]
+
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='interviews')
+    interviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)  # The interviewer conducting the interview
+    date_created = models.DateTimeField(auto_now_add=True)  # Date and time of the interview
+    duration = models.IntegerField(default=0)  # Duration of the interview in minutes
+    questionnaire = models.TextField(null=True, blank=True)  # Questionnaire responses
+    notes = models.TextField(null=True, blank=True)  # Interview notes
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='scheduled')
+    def __str__(self):
+        return f"Interview for {self.application.user.username} on {self.date_created}"

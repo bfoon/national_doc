@@ -23,18 +23,6 @@ class Profile(models.Model):
 # def save_user_profile(sender, instance, **kwargs):
 #     instance.profile.save()
 
-class InterviewSlot(models.Model):
-    date_time = models.DateTimeField(unique=True)  # Date and time of the interview slot
-    max_interviewees = models.IntegerField(default=10)  # Maximum number of interviews allowed in this slot
-    current_interviewees = models.IntegerField(default=0)  # Track how many have been assigned
-
-    def has_available_slots(self):
-        """Returns True if this slot has available spots."""
-        return self.current_interviewees < self.max_interviewees
-
-    def __str__(self):
-        return f"Interview Slot: {self.date_time} - {self.current_interviewees}/{self.max_interviewees} filled"
-
 class Application(models.Model):
     APPLICATION_TYPE_CHOICES = [
         ('new', 'New Application'),
@@ -53,7 +41,7 @@ class Application(models.Model):
     application_type = models.CharField(max_length=50, choices=APPLICATION_TYPE_CHOICES)
     application_date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=50, choices=APPLICATION_STATUS_CHOICES, default='pending')
-    interview_slot = models.ForeignKey(InterviewSlot, on_delete=models.SET_NULL, null=True, blank=True)
+    interview_slot = models.ForeignKey('immigration.InterviewSlot', on_delete=models.SET_NULL, null=True, blank=True)
     interview_queue_number = models.IntegerField(null=True, blank=True)
     post_location = models.ForeignKey('immigration.PostLocation', on_delete=models.SET_NULL,
                                       null=True, blank=True)
@@ -63,17 +51,18 @@ class Application(models.Model):
 
     def get_service_type(self):
         """Get the type of service based on the related models."""
-        if hasattr(self, 'national_id_applications'):
+        if self.national_id_applications.exists():
             return "National ID"
-        elif hasattr(self, 'resident_permit_applications'):
+        elif self.resident_permit_applications.exists():
             return "Resident Permit"
-        elif hasattr(self, 'work_permit_applications'):
+        elif self.work_permit_applications.exists():
             return "Work Permit"
-        elif hasattr(self, 'drivers_license_applications'):
+        elif self.drivers_license_applications.exists():
             return "Driver's License"
-        elif hasattr(self, 'tin_applications'):
+        elif self.tin_applications.exists():
             return "TIN"
         return "Unknown Service"
+
 
 class NationalIDApplication(models.Model):
     application = models.ForeignKey(Application, on_delete=models.CASCADE, null=True, related_name='national_id_applications')
