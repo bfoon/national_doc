@@ -208,19 +208,36 @@
 
             <div class="dashboard-item">
                 <h3>Upcoming Appointments</h3>
-                <p id="appointment-info">National ID Card Interview on 2023-06-15 at 10:00 AM</p>
-                <p>Queue Number: <span id="queue-number">A123</span></p>
+                {% if national_id_application.application.status == 'interview' %}
+                <p id="appointment-info">National ID Card Interview on
+                    {{ national_id_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
+                <p>Queue Number: <span id="queue-number">{{ national_id_application.application.interview_queue_number }}</span></p>
                 <a href="#" class="cta-button">Manage Appointments</a>
-                <a href="#" class="cta-button print-button" onclick="printAppointment()">Print Appointment</a>
+                <a href="#" class="cta-button print-button" onclick="printAppointment('nationalId')">Print National ID Appointment</a>
+                {% elif resident_permit_application.application.status == 'interview' %}
+                <p id="appointment-info">National ID Card Interview on
+                    {{ resident_permit_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
+                <p>Queue Number: <span id="queue-number">{{ resident_permit_application.application.interview_queue_number }}</span></p>
+                <a href="#" class="cta-button">Manage Appointments</a>
+                <a href="#" class="cta-button print-button" onclick="printAppointment('residentPermit')">Print Resident Permit Appointment</a>
+                {% elif work_permit_application.application.status == 'interview' %}
+                <p id="appointment-info">National ID Card Interview on
+                    {{ work_permit_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
+                <p>Queue Number: <span id="queue-number">{{ work_permit_application.application.interview_queue_number }}</span></p>
+                <a href="#" class="cta-button">Manage Appointments</a>
+                <a href="#" class="cta-button print-button" onclick="printAppointment('workPermit')">Print Work Permit Appointment</a>
+
+
+                {% endif %}
             </div>
 
             <div class="dashboard-item">
                 <h3>Upload Document</h3>
-                {% if national_id_application %}
+                {% if national_id_application.application.status == 'waiting' %}
                 <p>Status: <span class="status">{{ national_id_application.application.status }}</span></p>
-                {% elif resident_permit_application %}
+                {% elif resident_permit_application.application.status == 'waiting' %}
                 <p>Status: <span class="status">{{ resident_permit_application.application.status }}</span></p>
-                {% elif work_permit_application %}
+                {% elif work_permit_application.application.status == 'waiting' %}
                 <p>Status: <span class="status">{{ work_permit_application.application.status }}</span></p>
                 {% endif %}
                 {% if national_id_application.application.status == 'waiting' %}
@@ -329,119 +346,69 @@
 
 
 <script>
-        // Simulating user data
-        const userData = {
-
-            idCardStatus: "Document Verification",
-            idCardApplicationDate: "2023-05-15",
-            idCardProgress: 60,
-            residentPermitStatus: "Pending Approval",
-            residentPermitApplicationDate: "2023-05-20",
-            residentPermitProgress: 80,
-            workPermitStatus: "Processing",
-            workPermitApplicationDate: "2023-06-01",
-            workPermitProgress: 80,
-            tinStatus: "Approved",
-            tinNumber: "1234567890",
-            driversLicense: {
-                status: "Expired",
-                expiryDate: "2023-05-31",
-                points: 8,
-                maxPoints: 12,
-                freezeStatus: "Active"
-            },
+    const userData = {
+        nationalId: {
             appointment: {
-                date: "2023-06-15",
-                time: "10:00 AM",
+                date: "{{ national_id_application.application.interview_slot.date_time|date:'Y-m-d' }}",
+                time: "{{ national_id_application.application.interview_slot.date_time|time:'H:i' }}",
                 type: "National ID Card Interview",
-                queueNumber: "A123"
+                name: "{{ national_id_application.full_name }}",
+                queueNumber: "{{ national_id_application.application.interview_queue_number }}"
             }
-        };
+        },
+        residentPermit: {
+            appointment: {
+                date: "{{ resident_permit_application.application.interview_slot.date_time|date:'Y-m-d' }}",
+                time: "{{ resident_permit_application.application.interview_slot.date_time|time:'H:i' }}",
+                type: "Resident Permit Interview",
+                name: "{{ resident_permit_application.full_name }}",
+                queueNumber: "{{ resident_permit_application.application.interview_queue_number }}"
+            }
+        },
+        workPermit: {
+            appointment: {
+                date: "{{ work_permit_application.application.interview_slot.date_time|date:'Y-m-d' }}",
+                time: "{{ work_permit_application.application.interview_slot.date_time|time:'H:i' }}",
+                type: "Work Permit Interview",
+                name: "{{ work_permit_application.full_name }}",
+                queueNumber: "{{ work_permit_application.application.interview_queue_number }}"
+            }
+        },
+        // Add any other services as needed...
+    };
 
-        // Updating the dashboard with user data
-        document.getElementById('user-name').textContent = userData.name;
-        document.getElementById('id-card-status').textContent = userData.idCardStatus;
-        document.getElementById('id-card-application-date').textContent = userData.idCardApplicationDate;
-        document.getElementById('id-card-progress').style.width = `${userData.idCardProgress}%`;
-        document.getElementById('resident-permit-status').textContent = userData.residentPermitStatus;
-        document.getElementById('resident-permit-application-date').textContent = userData.residentPermitApplicationDate;
-        document.getElementById('resident-permit-progress').style.width = `${userData.residentPermitProgress}%`;
-        document.getElementById('work-permit-status').textContent = userData.workPermitStatus;
-        document.getElementById('work-permit-application-date').textContent = userData.workPermitApplicationDate;
-        document.getElementById('work-permit-progress').style.width = `${userData.workPermitProgress}%`;
-        document.getElementById('tin-status').textContent = userData.tinStatus;
-        document.getElementById('tin-number').textContent = userData.tinNumber;
+    // Function to print appointment details
+    function printAppointment(applicationType) {
+        const appointment = userData[applicationType].appointment; // Get the specific appointment data
 
-        // Update Driver's License information
-        document.getElementById('drivers-license-status').textContent = userData.driversLicense.status;
-        document.getElementById('drivers-license-expiry').textContent = userData.driversLicense.expiryDate;
-        document.getElementById('drivers-license-points').textContent = `${userData.driversLicense.points}/${userData.driversLicense.maxPoints}`;
-        document.getElementById('drivers-license-freeze-status').textContent = userData.driversLicense.freezeStatus;
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Appointment Details</title>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; }
+                    h1 { color: #3498db; }
+                    .appointment-details { border: 1px solid #ccc; padding: 20px; margin-top: 20px; }
+                </style>
+            </head>
+            <body>
+                <h1>National Document Portal - Appointment Details</h1>
+                <div class="appointment-details">
+                    <h2>${appointment.type}</h2>
+                    <p><strong>Date:</strong> ${appointment.date}</p>
+                    <p><strong>Time:</strong> ${appointment.time}</p>
+                    <p><strong>Queue Number:</strong> ${appointment.queueNumber}</p>
+                    <p><strong>Applicant:</strong> ${appointment.name}</p>
+                </div>
+                <p>Please bring this appointment slip and all required documents to your interview.</p>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+    }
+</script>
 
-        if (userData.appointment) {
-            document.getElementById('appointment-info').textContent =
-                `${userData.appointment.type} on ${userData.appointment.date} at ${userData.appointment.time}`;
-            document.getElementById('queue-number').textContent = userData.appointment.queueNumber;
-        }
-
-        // Function to print appointment details
-        function printAppointment() {
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>Appointment Details</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; }
-                        h1 { color: #3498db; }
-                        .appointment-details { border: 1px solid #ccc; padding: 20px; margin-top: 20px; }
-                    </style>
-                </head>
-                <body>
-                    <h1>National Document Portal - Appointment Details</h1>
-                    <div class="appointment-details">
-                        <h2>${userData.appointment.type}</h2>
-                        <p><strong>Date:</strong> ${userData.appointment.date}</p>
-                        <p><strong>Time:</strong> ${userData.appointment.time}</p>
-                        <p><strong>Queue Number:</strong> ${userData.appointment.queueNumber}</p>
-                        <p><strong>Applicant:</strong> ${userData.name}</p>
-                    </div>
-                    <p>Please bring this appointment slip and all required documents to your interview.</p>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
-        }
-
-        // Function to print TIN certificate
-        function printTIN() {
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                <head>
-                    <title>TIN Certificate</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; line-height: 1.6; }
-                        h1 { color: #3498db; }
-                        .tin-details { border: 2px solid #3498db; padding: 20px; margin-top: 20px; text-align: center; }
-                    </style>
-                </head>
-                <body>
-                    <h1>National Document Portal - TIN Certificate</h1>
-                    <div class="tin-details">
-                        <h2>Tax Identification Number (TIN)</h2>
-                        <h3>${userData.tinNumber}</h3>
-                        <p><strong>Name:</strong> ${userData.name}</p>
-                        <p><strong>Issue Date:</strong> ${new Date().toLocaleDateString()}</p>
-                    </div>
-                    <p>This document serves as an official certificate of your Tax Identification Number.</p>
-                </body>
-                </html>
-            `);
-            printWindow.document.close();
-            printWindow.print();
-        }
-    </script>
 
       {% include 'docs/footer.html' %}  <!-- Include the footer -->
