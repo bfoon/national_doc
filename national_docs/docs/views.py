@@ -27,9 +27,17 @@ def login_page(request):
         user = authenticate(request, username=username, password=password)
 
         if user is not None:
-            # Log the user in and redirect to the dashboard
+            # Log the user in
             login(request, user)
-            return redirect('dashboard')  # Change this to the name of your dashboard URL
+
+            # Redirect based on user group or superuser status
+            if user.is_superuser:
+                return redirect('dashboard')  # Superuser dashboard URL
+            elif user.groups.filter(name__in=['immigration', 'police', 'tax', 'admin']).exists():
+                return redirect('immigration_dashboard')  # Immigration dashboard URL
+            else:
+                return redirect('dashboard')  # Default dashboard URL for other users
+
         else:
             # Add an error message and re-render the login page
             messages.error(request, 'Invalid username or password')
@@ -445,11 +453,11 @@ def cancel_application(request):
 def upload_document(request, id):
     try:
         # Fetch the NationalIDApplication for the user
-        application = NationalIDApplication.objects.get(id=id, application__user=request.user)
+        application = Application.objects.get(id=id, user=request.user)
 
         # Only allow document upload if the status is "waiting"
-        if application.application.status != 'waiting':
-            return render(request, 'error.html', {
+        if application.status != 'waiting':
+            return render(request, 'docs/error.html', {
                 'message': 'You can only upload documents when the application is waiting for more information.'
             })
 
@@ -464,7 +472,7 @@ def upload_document(request, id):
 
             # Create the document linked to the application
             UploadedDocument.objects.create(
-                application=application.application,  # Link to the base Application model
+                application=application,  # Link to the base Application model
                 document_type=document_type,
                 document_file=document_file,
             )
@@ -473,7 +481,7 @@ def upload_document(request, id):
             return redirect('dashboard')  # Redirect after successful upload
 
         # Fetch uploaded documents for this application
-        uploaded_documents = UploadedDocument.objects.filter(application=application.application)
+        uploaded_documents = UploadedDocument.objects.filter(application=application)
 
         return render(request, 'docs/upload_document.html', {
             'application': application,
@@ -481,4 +489,4 @@ def upload_document(request, id):
         })
 
     except NationalIDApplication.DoesNotExist:
-        return render(request, 'error.html', {'message': 'Application not found.'})
+        return render(request, 'docs/error.html', {'message': 'Application not found.'})

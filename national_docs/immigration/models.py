@@ -1,6 +1,6 @@
 # immigration/models.py
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from docs.models import Application
 
 
@@ -71,6 +71,7 @@ class Interview(models.Model):
         ('scheduled', 'Scheduled'),
         ('completed', 'Completed'),
         ('postponed', 'Postponed'),
+        ('in_progress', 'In Progress'),
         ('waiting', 'Waiting Approval'),
     ]
 
@@ -101,3 +102,13 @@ class ToDo(models.Model):
 
     def __str__(self):
         return f"To-Do for {self.application} by {self.user}"
+
+class Boot(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
+    assigned_to = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_boots')
+    group = models.ForeignKey(Group, on_delete=models.SET_NULL, null=True, blank=True, related_name='boots')
+    post_location = models.ForeignKey('immigration.PostLocation', on_delete=models.SET_NULL, null=True, blank=True, related_name='boots')
+
+    def __str__(self):
+        return self.name

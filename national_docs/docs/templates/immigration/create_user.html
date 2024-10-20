@@ -1,38 +1,51 @@
 {% include 'docs/header.html' %}
-
 <div class="container my-5">
-    <h2>Create New Officer User</h2>
-
+    <h2>Create New Officer Account</h2>
     <form method="POST">
         {% csrf_token %}
         <div class="form-group">
             <label for="username">Username</label>
             <input type="text" class="form-control" id="username" name="username" required>
         </div>
-
+        <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input type="text" class="form-control" id="first_name" name="first_name" required>
+        </div>
+        <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input type="text" class="form-control" id="last_name" name="last_name" required>
+        </div>
         <div class="form-group">
             <label for="email">Email</label>
             <input type="email" class="form-control" id="email" name="email" required>
         </div>
-
         <div class="form-group">
             <label for="password">Password</label>
             <input type="password" class="form-control" id="password" name="password" required>
         </div>
-
         <div class="form-group">
             <label for="role">Role</label>
             <select class="form-control" id="role" name="role" required>
                 {% for group in groups %}
-                    <option value="{{ group.id }}">{{ group.name }}</option>
+                    <option value="{{ group.name }}">{{ group.name|capfirst }}</option>
                 {% endfor %}
             </select>
         </div>
-
+        <div class="form-group">
+            <label for="post_location">Post Location</label>
+            <select class="form-control" id="post_location" name="post_location" required>
+                {% for post_location in post_locations %}
+                    <option value="{{ post_location.id }}">{{ post_location.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="officer_batch_number">Officer Batch Number</label>
+            <input type="text" class="form-control" id="officer_batch_number" name="officer_batch_number" required>
+        </div>
         <button type="submit" class="btn btn-primary">Create User</button>
+        <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">Cancel</a>
     </form>
-
-    <a href="{% url 'list_officer_users' %}" class="btn btn-link mt-3">← Back to User List</a>
 </div>
-
 {% include 'docs/footer.html' %}
+

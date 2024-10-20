@@ -1,0 +1,13 @@
+ {% include 'docs/header.html' %}
+{% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+ <p> 404 </p>
+  {% include 'docs/footer.html' %}

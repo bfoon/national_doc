@@ -18,4 +18,8 @@ urlpatterns = [
     path('todos/<int:todo_id>/', views.todo_detail, name='todo_detail'),
     path('todos/<int:todo_id>/approve/', views.approve_todo, name='approve_todo'),
     path('interview/<int:interview_id>/', views.interview_view, name='interview_view'),  # Interview detail view
+    path('queue-info/', views.queue_info, name='queue_info'),
+    path('boots/', views.boot_list, name='boot_list'),
+    path('boots/add/', views.add_boot, name='add_boot'),
+    path('boots/change-assignment/<int:boot_id>/', views.change_assignment, name='change_assignment'),
 ]

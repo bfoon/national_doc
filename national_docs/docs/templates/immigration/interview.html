@@ -31,79 +31,81 @@
         <div class="col-md-6">
             <div class="card mb-4 border-primary">
                 <div class="card-header bg-primary text-white">
-            <h4>Applicant Information</h4>
-             </div>
+                    <h4>Applicant Information</h4>
+                </div>
                 <div class="card-body">
-            {% if interview.application.national_id_applications.first %}
-                <p><strong>Full Name:</strong> {{ interview.application.national_id_applications.first.full_name }}</p>
-                <p><strong>Email:</strong> {{ interview.application.national_id_applications.first.email }}</p>
-                <p><strong>Phone:</strong> {{ interview.application.national_id_applications.first.phone }}</p>
-            {% elif interview.application.resident_permit_applications.first %}
-                <p><strong>Full Name:</strong> {{ interview.application.resident_permit_applications.first.full_name }}</p>
-                <p><strong>Email:</strong> {{ interview.application.resident_permit_applications.first.email }}</p>
-                <p><strong>Phone:</strong> {{ interview.application.resident_permit_applications.first.phone_number }}</p>
-            {% elif interview.application.work_permit_applications.first %}
-                <p><strong>Full Name:</strong> {{ interview.application.work_permit_applications.first.full_name }}</p>
-                <p><strong>Email:</strong> {{ interview.application.work_permit_applications.first.email }}</p>
-                <p><strong>Phone:</strong> {{ interview.application.work_permit_applications.first.phone }}</p>
-            {% else %}
-                <p>No applicant information available.</p>
-            {% endif %}
-                    <p><strong>Interviewer:</strong> {{ interview.interviewer}}</p>
+                    {% if interview.application.national_id_applications.first %}
+                        <p><strong>Full Name:</strong> {{ interview.application.national_id_applications.first.full_name }}</p>
+                        <p><strong>Email:</strong> {{ interview.application.national_id_applications.first.email }}</p>
+                        <p><strong>Phone:</strong> {{ interview.application.national_id_applications.first.phone }}</p>
+                    {% elif interview.application.resident_permit_applications.first %}
+                        <p><strong>Full Name:</strong> {{ interview.application.resident_permit_applications.first.full_name }}</p>
+                        <p><strong>Email:</strong> {{ interview.application.resident_permit_applications.first.email }}</p>
+                        <p><strong>Phone:</strong> {{ interview.application.resident_permit_applications.first.phone_number }}</p>
+                    {% elif interview.application.work_permit_applications.first %}
+                        <p><strong>Full Name:</strong> {{ interview.application.work_permit_applications.first.full_name }}</p>
+                        <p><strong>Email:</strong> {{ interview.application.work_permit_applications.first.email }}</p>
+                        <p><strong>Phone:</strong> {{ interview.application.work_permit_applications.first.phone }}</p>
+                    {% else %}
+                        <p>No applicant information available.</p>
+                    {% endif %}
+                    <p><strong>Interviewer:</strong> {{ interview.interviewer }}</p>
 
-            <h4>Documents</h4>
-            <ul>
-                {% if interview.application.national_id_applications.first %}
-                    <li><a href="{{ interview.application.national_id_applications.first.birth_certificate.url }}" target="_blank">Birth Certificate</a></li>
-                    <li><a href="{{ interview.application.national_id_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
-                {% elif interview.application.resident_permit_applications.first %}
-                    <li><a href="{{ interview.application.resident_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
-                    <li><a href="{{ interview.application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">Resident Permit Document</a></li>
-                {% elif interview.application.work_permit_applications.first %}
-                    <li><a href="{{ interview.application.work_permit_applications.first.work_contract.url }}" target="_blank">Work Contract</a></li>
-                    <li><a href="{{ interview.application.work_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
-                {% endif %}
+                    <h4>Documents</h4>
+                    <ul>
+                        {% if interview.application.national_id_applications.first %}
+                            <li><a href="{{ interview.application.national_id_applications.first.birth_certificate.url }}" target="_blank">Birth Certificate</a></li>
+                            <li><a href="{{ interview.application.national_id_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
+                        {% elif interview.application.resident_permit_applications.first %}
+                            <li><a href="{{ interview.application.resident_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
+                            <li><a href="{{ interview.application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">Resident Permit Document</a></li>
+                        {% elif interview.application.work_permit_applications.first %}
+                            <li><a href="{{ interview.application.work_permit_applications.first.work_contract.url }}" target="_blank">Work Contract</a></li>
+                            <li><a href="{{ interview.application.work_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
+                        {% endif %}
 
-                {% for document in documents %}
-                    <li><a href="{{ document.url }}" target="_blank">{{ document.name }}</a></li>
-                {% empty %}
-                    <li>No additional documents uploaded</li>
-                {% endfor %}
-            </ul>
-        </div>
-        </div>
+                        {% for document in documents %}
+                            <li><a href="{{ document.document_file.url }}" target="_blank">{{ document.document_type }}</a></li>
+                        {% empty %}
+                            <li>No additional documents uploaded</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
         </div>
 
        <!-- Questionnaire and Notes -->
         <div class="col-md-6">
             <div class="card mb-4 border-primary">
                 <div class="card-header bg-primary text-white">
-            <h4>Interview Questionnaire</h4>
-                    </div>
+                    <h4>Interview Questionnaire</h4>
+                </div>
                 <div class="card-body">
+                    <form method="POST" id="interview-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label for="questionnaire">Questionnaire</label>
+                            <textarea class="form-control" id="questionnaire" name="questionnaire" rows="5" {% if read_only %}readonly{% endif %}>{{ interview.questionnaire }}</textarea>
+                        </div>
 
-            <form method="POST" {% if read_only %}readonly{% endif %}>
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="questionnaire">Questionnaire</label>
-                    <textarea class="form-control" id="questionnaire" name="questionnaire" rows="5"
-                              {% if read_only %}readonly{% endif %}>{{ interview.questionnaire }}</textarea>
+                        <div class="form-group">
+                            <label for="notes">Interview Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="5" {% if read_only %}readonly{% endif %}>{{ interview.notes }}</textarea>
+                        </div>
+
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#notesModal">
+                            <i class="fas fa-info-circle"></i> View Notes
+                        </button>
+
+                        <input type="hidden" id="duration" name="duration" value="0">
+                        {% if not read_only %}
+                            <button type="submit" name="submit" class="btn btn-primary">Submit for Approval</button>
+                            <button type="submit" name="postpone" class="btn btn-warning">Postpone Interview</button>
+                        {% endif %}
+                    </form>
                 </div>
-
-                <div class="form-group">
-                    <label for="notes">Interview Notes</label>
-                    <textarea class="form-control" id="notes" name="notes" rows="5"
-                              {% if read_only %}readonly{% endif %}>{{ interview.notes }}</textarea>
-                </div>
-
-                {% if not read_only %}
-                    <button type="submit" name="submit" class="btn btn-primary">Submit for Approval</button>
-                    <button type="submit" name="postpone" class="btn btn-warning">Postpone Interview</button>
-                {% endif %}
-            </form>
+            </div>
         </div>
-    </div>
-    </div>
     </div>
 
     <!-- Interview Timer -->
@@ -116,8 +118,33 @@
     </div>
     {% endif %}
 </div>
-{% include 'docs/footer.html' %}
 
+<!-- Modal for Viewing Notes -->
+<div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notesModalLabel">Interview Notes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Display the notes here -->
+                {% for note in interview.application.notes.all %}
+                    <p><strong>{{ note.user.get_full_name }}:</strong> {{ note.message }}</p>
+                {% empty %}
+                    <p>No notes available for this interview.</p>
+                {% endfor %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'docs/footer.html' %}
 
 <script>
     let startTime;
@@ -130,17 +157,26 @@
 
     document.getElementById('stop-timer').addEventListener('click', function() {
         clearInterval(timerInterval);
+        saveDuration();
+    });
+
+    document.getElementById('interview-form').addEventListener('submit', function() {
+        saveDuration();
     });
 
     function updateTimer() {
         const now = new Date();
-        const diff = now - startTime;
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        document.getElementById('timer').textContent = 
-            String(hours).padStart(2, '0') + ':' +
-            String(minutes).padStart(2, '0') + ':' +
-            String(seconds).padStart(2, '0');
+        const elapsedTime = new Date(now - startTime);
+        const hours = String(elapsedTime.getUTCHours()).padStart(2, '0');
+        const minutes = String(elapsedTime.getUTCMinutes()).padStart(2, '0');
+        const seconds = String(elapsedTime.getUTCSeconds()).padStart(2, '0');
+        document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
+    }
+
+    function saveDuration() {
+        const now = new Date();
+        const elapsedTime = new Date(now - startTime);
+        const durationInMinutes = Math.floor(elapsedTime / 60000);
+        document.getElementById('duration').value = durationInMinutes;
     }
 </script>

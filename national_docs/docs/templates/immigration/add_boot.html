@@ -1,0 +1,45 @@
+{% include 'docs/header.html' %}
+<div class="container my-5">
+    <h2>Add Boot</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="assigned_to">Assign To</label>
+            <select class="form-control" id="assigned_to" name="assigned_to" required>
+                <option value="">Select a user</option>
+                {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="group">Group</label>
+            <select class="form-control" id="group" name="group" required>
+                <option value="">Select a group</option>
+                {% for group in groups %}
+                    <option value="{{ group.id }}">{{ group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="post_location">Post Location</label>
+            <select class="form-control" id="post_location" name="post_location" required>
+                <option value="">Select a post location</option>
+                {% for post_location in post_locations %}
+                    <option value="{{ post_location.id }}">{{ post_location.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Add Boot</button>
+        <a href="{% url 'boot_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% include 'docs/footer.html' %}

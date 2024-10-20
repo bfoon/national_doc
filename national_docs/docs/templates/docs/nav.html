@@ -2,7 +2,20 @@
     <ul>
         <li><a href="/profile">Profile</a></li>
         <li><a href="#notifications">Notifications</a></li>
-        <li><a href="/immigration/dashboard">Immigration</a></li>
+        {% if user.is_superuser %}
+            <li><a href="/immigration/dashboard">Admin Dashboard</a></li>
+        {% elif user.groups.exists %}
+            {% for group in user.groups.all %}
+                {% if group.name == 'immigration' %}
+                    <li><a href="/immigration/queue-info">Queue Info</a></li>
+                    <li><a href="/immigration/dashboard">Admin Dashboard</a></li>
+                {% elif group.name == 'police' %}
+                    <li><a href="/police/dashboard">Police Dashboard</a></li>
+                {% elif group.name == 'tax' %}
+                    <li><a href="/tax/dashboard">Tax Dashboard</a></li>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
         <li><a href="{% url 'logout' %}">Logout</a></li>
     </ul>
 </nav>

@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from docs.models import Application, UploadedDocument
-from .models import Fulfiller,Note, PostLocation, InterviewSlot, Interview, ToDo
+from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
+                     Interview, ToDo, Boot, OfficerProfile)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -35,8 +36,21 @@ def immigration_dashboard(request):
 
 @login_required
 def fulfillers_list(request):
-    # Get all fulfillers for the logged-in user
+    user = request.user
     fulfillers = Fulfiller.objects.all()
+
+    # Filtering based on user group and post location
+    if not user.is_superuser:
+        if user.groups.filter(name='immigration').exists():
+            fulfillers = fulfillers.filter(
+                application__post_location=user.officerprofile.post_location,
+            )
+        else:
+            # Admins can see requests based on their groups and location
+            user_groups = user.groups.values_list('name', flat=True)
+            fulfillers = fulfillers.filter(
+                application__post_location=user.officerprofile.post_location,
+            )
 
     # Filtering logic
     if 'dateFrom' in request.GET and request.GET['dateFrom']:
@@ -69,9 +83,17 @@ def fulfillers_list(request):
         'fulfillers': fulfillers_page,
     })
 
+
 @login_required
 def fulfiller_detail(request, id):
+    user = request.user
     fulfiller = get_object_or_404(Fulfiller, id=id)
+
+    # Ensure the user can only see fulfillers in their post location if not a superuser
+    if not user.is_superuser and fulfiller.application.post_location != user.officerprofile.post_location:
+        messages.error(request, "You do not have permission to view this fulfiller.")
+        return redirect('fulfillers_list')
+
     application = fulfiller.application
     doc_uploads = UploadedDocument.objects.filter(application=application)
     notes = Note.objects.filter(application=application).order_by('-created_at')
@@ -130,7 +152,6 @@ def fulfiller_detail(request, id):
                         Interview.objects.create(
                             application=application,
                             interviewer=request.user,  # Assuming the logged-in user is the interviewer
-                            interview_date=timezone.now(),  # Set to the current time or the interview slot time
                             questionnaire=questionnaire,
                             notes=notes_text,
                             status='scheduled'
@@ -171,7 +192,12 @@ def fulfiller_detail(request, id):
 
 @login_required
 def post_locations(request):
-    locations_list = PostLocation.objects.all()
+    user = request.user
+    if user.is_superuser:
+        locations_list = PostLocation.objects.all()
+    else:
+        locations_list = PostLocation.objects.filter(id=user.officerprofile.post_location.id)
+
     paginator = Paginator(locations_list, 10)  # Show 10 locations per page
     page_number = request.GET.get('page')
     locations = paginator.get_page(page_number)
@@ -180,7 +206,10 @@ def post_locations(request):
 
 @login_required
 def add_post_location(request):
-    # Handle POST request to add a new post location
+    if not request.user.is_superuser:
+        messages.error(request, "You do not have permission to add post locations.")
+        return redirect('post_locations')
+
     if request.method == 'POST':
         name = request.POST.get('name')
         address = request.POST.get('address')
@@ -207,12 +236,16 @@ def add_post_location(request):
 
     return render(request, 'immigration/add_post_location.html')
 
+
 @login_required
 def edit_post_location(request, id):
-    # Fetch the specific post location to edit
     location = get_object_or_404(PostLocation, id=id)
+
+    if not request.user.is_superuser and location != request.user.officerprofile.post_location:
+        messages.error(request, "You do not have permission to edit this post location.")
+        return redirect('post_locations')
+
     if request.method == 'POST':
-        # Update the post location details
         location.name = request.POST.get('name')
         location.address = request.POST.get('address')
         location.city = request.POST.get('city')
@@ -227,19 +260,30 @@ def edit_post_location(request, id):
 
     return render(request, 'immigration/edit_post_location.html', {'location': location})
 
+
 @login_required
 def delete_post_location(request, id):
     location = get_object_or_404(PostLocation, id=id)
+
+    if not request.user.is_superuser and location != request.user.officerprofile.post_location:
+        messages.error(request, "You do not have permission to delete this post location.")
+        return redirect('post_locations')
+
     location.delete()
     messages.success(request, "Post location deleted successfully.")
     return redirect('post_locations')
 
 @login_required
 def list_officer_users(request):
-    # Get users in the Immigration, Police, and Tax officer groups
-    immigration_officers = User.objects.filter(groups__name='immigration')
-    police_officers = User.objects.filter(groups__name='police')
-    tax_officers = User.objects.filter(groups__name='tax')
+    user = request.user
+    if user.is_superuser:
+        immigration_officers = User.objects.filter(groups__name='immigration')
+        police_officers = User.objects.filter(groups__name='police')
+        tax_officers = User.objects.filter(groups__name='tax')
+    else:
+        immigration_officers = User.objects.filter(groups__name='immigration', officerprofile__post_location=user.officerprofile.post_location)
+        police_officers = User.objects.filter(groups__name='police', officerprofile__post_location=user.officerprofile.post_location)
+        tax_officers = User.objects.filter(groups__name='tax', officerprofile__post_location=user.officerprofile.post_location)
 
     context = {
         'immigration_officers': immigration_officers,
@@ -251,11 +295,19 @@ def list_officer_users(request):
 
 @login_required
 def create_user(request):
+    if not request.user.is_superuser:
+        messages.error(request, "You do not have permission to create users.")
+        return redirect('list_officer_users')
+
     if request.method == 'POST':
         username = request.POST.get('username')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
         email = request.POST.get('email')
         password = request.POST.get('password')
         role = request.POST.get('role')  # Immigration, Police, or Tax officer
+        post_location_id = request.POST.get('post_location')
+        officer_batch_number = request.POST.get('officer_batch_number')
 
         # Check if the username already exists
         if User.objects.filter(username=username).exists():
@@ -263,24 +315,43 @@ def create_user(request):
         else:
             # Create the user
             user = User.objects.create_user(username=username, email=email, password=password)
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
 
             # Try to get the group by name (role) instead of id
             try:
                 group = Group.objects.get(name=role)
                 user.groups.add(group)  # Add the user to the group
                 user.save()
+
+                # Create the officer profile
+                post_location = PostLocation.objects.get(id=post_location_id)
+                OfficerProfile.objects.create(
+                    user=user,
+                    officer_batch_number=officer_batch_number,
+                    post_location=post_location
+                )
+
                 messages.success(request, f'{role.capitalize()} user created successfully!')
                 return redirect('list_officer_users')
             except Group.DoesNotExist:
                 messages.error(request, f'Group "{role}" does not exist.')
+            except PostLocation.DoesNotExist:
+                messages.error(request, 'Invalid post location.')
 
     # Fetch groups based on their name
-    groups = Group.objects.filter(name__in=['immigration', 'police', 'tax'])
+    groups = Group.objects.filter(name__in=['immigration', 'police', 'tax', 'admin'])
+    post_locations = PostLocation.objects.all()
 
-    return render(request, 'immigration/create_user.html', {'groups': groups})
+    return render(request, 'immigration/create_user.html', {'groups': groups, 'post_locations': post_locations})
 
 @login_required
 def create_group(request):
+    if not request.user.is_superuser:
+        messages.error(request, "You do not have permission to create groups.")
+        return redirect('list_officer_users')
+
     if request.method == 'POST':
         group_name = request.POST.get('group_name')
 
@@ -296,23 +367,23 @@ def create_group(request):
 
 @login_required
 def available_slots(request):
-    # Fetch all interview slots (both available and unavailable)
-    interview_slots = InterviewSlot.objects.all()
+    user = request.user
+    if user.is_superuser:
+        interview_slots = InterviewSlot.objects.all()
+    else:
+        interview_slots = InterviewSlot.objects.filter(location=user.officerprofile.post_location)
 
-    # Paginate the interview slots to show 5 per page
-    paginator = Paginator(interview_slots, 5)
+    paginator = Paginator(interview_slots, 5)  # Show 5 slots per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
     if request.method == 'POST':
-        # Add a new interview slot
         date_time = request.POST.get('date_time')
         max_interviewees = request.POST.get('max_interviewees')
         location_id = request.POST.get('location')
         location = PostLocation.objects.get(id=location_id)
 
         try:
-            # Create a new interview slot
             InterviewSlot.objects.create(
                 date_time=date_time,
                 max_interviewees=max_interviewees,
@@ -324,18 +395,20 @@ def available_slots(request):
         except Exception as e:
             messages.error(request, f"An error occurred: {str(e)}")
 
-    # Get available post locations for the dropdown
     post_locations = PostLocation.objects.all()
 
     return render(request, 'immigration/available_slots.html', {
-        'page_obj': page_obj,  # Pass the paginated interview slots to the template
+        'page_obj': page_obj,
         'post_locations': post_locations,
     })
 
 @login_required
 def interview_list(request):
-    # Fetch all interviews except those that are completed
-    interviews = Interview.objects.exclude(status='completed').order_by('date_created')
+    user = request.user
+    if user.is_superuser:
+        interviews = Interview.objects.exclude(status='completed').order_by('date_created')
+    else:
+        interviews = Interview.objects.exclude(status='completed').filter(application__post_location=user.officerprofile.post_location).order_by('date_created')
 
     return render(request, 'immigration/interview_list.html', {
         'interviews': interviews,
@@ -346,15 +419,24 @@ def interview_list(request):
 def interview_view(request, interview_id):
     interview = get_object_or_404(Interview, id=interview_id)
     application = interview.application
+
+    # Ensure the user can only see interviews in their post location if not a superuser
+    if not request.user.is_superuser and application.post_location != request.user.officerprofile.post_location:
+        messages.error(request, "You do not have permission to view this interview.")
+        return redirect('interview_list')
+
     documents = UploadedDocument.objects.filter(application=application)  # Fetch the related documents
 
     # Determine if the form should be read-only (when status is 'waiting')
     read_only = interview.status == 'waiting'
 
     if request.method == 'POST':
+        duration = int(request.POST.get('duration', 0))  # Get the duration from the form
+
         if 'postpone' in request.POST:  # Handle postponing the interview
             # Change interview status to postponed
             interview.status = 'postponed'
+            interview.duration = duration  # Save the duration
             interview.save()
 
             # Get the current interview slot's date
@@ -390,6 +472,7 @@ def interview_view(request, interview_id):
             interview.questionnaire = questionnaire
             interview.notes = notes
             interview.status = 'waiting'  # Update the status to 'waiting'
+            interview.duration = duration  # Save the duration
             interview.save()
 
             # Create a ToDo instance when interview status changes to 'waiting'
@@ -413,17 +496,25 @@ def interview_view(request, interview_id):
 
 @login_required
 def todo_list(request):
-    # Fetch all ToDo items, you can filter by user, status, etc. as needed
-    todos = ToDo.objects.all().order_by('-created_at')  # You can customize the query as needed
+    user = request.user
+    if user.is_superuser:
+        todos = ToDo.objects.all().order_by('-created_at')
+    else:
+        todos = ToDo.objects.filter(application__post_location=user.officerprofile.post_location).order_by('-created_at')
 
     return render(request, 'immigration/todo_list.html', {
         'todos': todos,
     })
 
+
 @login_required
 def todo_detail(request, todo_id):
-    # Fetch the ToDo item based on the id
     todo = get_object_or_404(ToDo, id=todo_id)
+
+    # Ensure the user can only see ToDo items in their post location if not a superuser
+    if not request.user.is_superuser and todo.application.post_location != request.user.officerprofile.post_location:
+        messages.error(request, "You do not have permission to view this ToDo item.")
+        return redirect('todo_list')
 
     return render(request, 'immigration/todo_detail.html', {
         'todo': todo,
@@ -432,8 +523,12 @@ def todo_detail(request, todo_id):
 
 @login_required
 def approve_todo(request, todo_id):
-    # Fetch the ToDo item based on the id
     todo = get_object_or_404(ToDo, id=todo_id)
+
+    # Ensure the user can only approve ToDo items in their post location if not a superuser
+    if not request.user.is_superuser and todo.application.post_location != request.user.officerprofile.post_location:
+        messages.error(request, "You do not have permission to approve this ToDo item.")
+        return redirect('todo_list')
 
     # Update the status to approved and set the approver to the current user
     todo.status = 1  # Approved status
@@ -461,3 +556,88 @@ def approve_todo(request, todo_id):
     messages.success(request, "ToDo item has been approved successfully. Application and Interview are marked as completed.")
     return redirect('todo_list')
 
+@login_required
+def queue_info(request):
+    user = request.user
+    if user.is_superuser:
+        boots = Boot.objects.all()
+        interviews = Interview.objects.exclude(status__in=["waiting", "completed"]).order_by('application__interview_queue_number')
+    else:
+        boots = Boot.objects.filter(post_location=user.officerprofile.post_location)
+        interviews = Interview.objects.exclude(status__in=["waiting", "completed"]).filter(application__post_location=user.officerprofile.post_location).order_by('application__interview_queue_number')
+
+    if request.method == 'POST':
+        interview_id = request.POST.get('interview_id')
+        interview = get_object_or_404(Interview, id=interview_id)
+        interview.status = 'in_progress'
+        interview.save()
+        messages.success(request, 'Interview started successfully.')
+        return redirect(f'/immigration/interview/{interview_id}')
+
+    return render(request, 'immigration/queue_info.html', {
+        'boots': boots,
+        'interviews': interviews,
+    })
+
+@login_required
+def boot_list(request):
+    user = request.user
+    if user.is_superuser:
+        boots = Boot.objects.all()
+    else:
+        boots = Boot.objects.filter(post_location=user.officerprofile.post_location)
+
+    users = User.objects.all()
+    groups = Group.objects.all()
+    post_locations = PostLocation.objects.all()
+    return render(request, 'immigration/boot_list.html', {'boots': boots, 'users': users, 'groups': groups, 'post_locations': post_locations})
+
+@login_required
+def add_boot(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        assigned_to_id = request.POST.get('assigned_to')
+        group_id = request.POST.get('group')
+        post_location_id = request.POST.get('post_location')
+
+        if name and assigned_to_id and group_id and post_location_id:
+            assigned_to = User.objects.get(id=assigned_to_id)
+            group = Group.objects.get(id=group_id)
+            post_location = PostLocation.objects.get(id=post_location_id)
+            Boot.objects.create(name=name, description=description, assigned_to=assigned_to, group=group, post_location=post_location)
+            messages.success(request, 'Boot added successfully.')
+            return redirect('boot_list')
+        else:
+            messages.error(request, 'Please fill in all required fields.')
+
+    users = User.objects.all()
+    groups = Group.objects.all()
+    post_locations = PostLocation.objects.all()
+    return render(request, 'immigration/add_boot.html', {'users': users, 'groups': groups, 'post_locations': post_locations})
+
+@login_required
+def change_assignment(request, boot_id):
+    boot = get_object_or_404(Boot, id=boot_id)
+
+    # Ensure the user can only change assignments for boots in their post location if not a superuser
+    if not request.user.is_superuser and boot.post_location != request.user.officerprofile.post_location:
+        messages.error(request, "You do not have permission to change the assignment for this boot.")
+        return redirect('boot_list')
+
+    if request.method == 'POST':
+        assigned_to_id = request.POST.get('assigned_to')
+        group_id = request.POST.get('group')
+        post_location_id = request.POST.get('post_location')
+        if assigned_to_id and group_id and post_location_id:
+            assigned_to = User.objects.get(id=assigned_to_id)
+            group = Group.objects.get(id=group_id)
+            post_location = PostLocation.objects.get(id=post_location_id)
+            boot.assigned_to = assigned_to
+            boot.group = group
+            boot.post_location = post_location
+            boot.save()
+            messages.success(request, 'Boot assignment updated successfully.')
+        else:
+            messages.error(request, 'Please select valid user, group, and post location.')
+    return redirect('boot_list')

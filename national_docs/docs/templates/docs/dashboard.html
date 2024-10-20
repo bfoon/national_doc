@@ -242,10 +242,19 @@
                 {% endif %}
                 {% if national_id_application.application.status == 'waiting' %}
                     <a href="{% url 'upload_document' national_id_application.id %}" class="cta-button">Upload Document</a>
+                <button class="btn btn-info" data-toggle="modal" data-target="#notesModal">
+                <i class="fas fa-info-circle"></i> View Notes
+                </button>
                 {% elif resident_permit_application.application.status == 'waiting' %}
-                    <a href="{% url 'upload_document' resident_permit_application.id %}" class="cta-button">Upload Document</a>
+                    <a href="{% url 'upload_document' resident_permit_application.application.id %}" class="cta-button">Upload Document</a>
+                <button class="btn btn-info" data-toggle="modal" data-target="#notesModal">
+                <i class="fas fa-info-circle"></i> View Notes
+                </button>
                 {% elif work_permit_application.application.status == 'waiting' %}
-                    <a href="{% url 'upload_document' work_permit_application.id %}" class="cta-button">Upload Document</a>
+                    <a href="{% url 'upload_document' work_permit_application.application.id %}" class="cta-button">Upload Document</a>
+                <button class="btn btn-info" data-toggle="modal" data-target="#notesModal">
+                <i class="fas fa-info-circle"></i> View Notes
+                </button>
                 {% else %}
                     <p>Document upload is not available at this stage.</p>
                 {% endif %}
@@ -278,6 +287,47 @@
 </div>
 </div>
 </div>
+
+
+ <!-- Modal for Notes -->
+<div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="notesModalLabel">Notes</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                     {% if national_id_application.application.notes %}
+                            <li class="list-group-item">
+                                <strong>{{ national_id_application.application.notes.first.user.get_full_name }}
+                                    ({{ national_id_application.application.notes.first.created_at|date:"Y-m-d H:i" }}):</strong>
+                                <p>{{ national_id_application.application.notes.first.message }}</p>
+                            </li>
+                    {% elif resident_permit_application.application.notes %}
+                            <li class="list-group-item">
+                                <strong>{{ resident_permit_application.application.notes.first.user.get_full_name }}
+                                    ({{ resident_permit_application.application.notes.first.created_at|date:"Y-m-d H:i" }}):</strong>
+                                <p>{{ resident_permit_application.application.notes.first.message }}</p>
+                            </li>
+                     {% elif work_permit_application.application.notes %}
+                            <li class="list-group-item">
+                                <strong>{{ work_permit_application.application.notes.first.user.get_full_name }}
+                                    ({{ work_permit_application.application.notes.first.created_at|date:"Y-m-d H:i" }}):</strong>
+                                <p>{{ work_permit_application.application.notes.first.message }}</p>
+                            </li>
+                    {% else %}
+                        <li class="list-group-item">No notes available.</li>
+                    {% endif %}
+                </ul>
+            </div>
+            </div>
+            </div>
+            </div>
+
 
 
 <script>

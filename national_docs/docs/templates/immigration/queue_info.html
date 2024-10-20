@@ -1,0 +1,40 @@
+{% include 'docs/header.html' %}
+<div class="container my-5">
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <h2>Interview Queue</h2>
+    <div class="row">
+        {% for boot in boots %}
+            <div class="col-md-4">
+                <h3>Boot {{ boot.name }}</h3>
+                <ul class="list-group">
+                    {% for interview in interviews %}
+                        {% if interview.application.post_location == boot.post_location %}
+                            <li class="list-group-item">
+                                Queue Number: {{ interview.application.interview_queue_number }}
+                                {% if interview.status == 'scheduled' %}
+                                    <form method="POST" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="interview_id" value="{{ interview.id }}">
+                                        <button type="submit" class="btn btn-primary btn-sm">Start Interview</button>
+                                    </form>
+                                {% elif interview.status == 'in_progress' %}
+                                    <span class="badge badge-success">In Progress</span>
+                                {% endif %}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% include 'docs/footer.html' %}

@@ -1,7 +1,7 @@
 {% include 'docs/header.html' %}
 
 <div class="container my-5">
-     {% if messages %}
+    {% if messages %}
         <div class="messages">
             {% for message in messages %}
                 <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
@@ -17,6 +17,9 @@
 
     <!-- Create Group Button -->
     <a href="{% url 'create_group' %}" class="btn btn-secondary mb-3">Create Group</a>
+
+    <!-- List Boots Button -->
+    <a href="{% url 'boot_list' %}" class="btn btn-info mb-3">List Boots</a>
 
     <h4>Immigration Officers</h4>
     <table class="table table-striped">
