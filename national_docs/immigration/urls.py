@@ -14,5 +14,8 @@ urlpatterns = [
     path('available_slots/', views.available_slots, name='available_slots'),
     path('list_officer_users/', views.list_officer_users, name='list_officer_users'),
     path('interviews/', views.interview_list, name='interview_list'),  # List of interviews
+    path('todos/', views.todo_list, name='todo_list'),
+    path('todos/<int:todo_id>/', views.todo_detail, name='todo_detail'),
+    path('todos/<int:todo_id>/approve/', views.approve_todo, name='approve_todo'),
     path('interview/<int:interview_id>/', views.interview_view, name='interview_view'),  # Interview detail view
 ]

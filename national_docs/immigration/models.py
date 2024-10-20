@@ -83,3 +83,21 @@ class Interview(models.Model):
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='scheduled')
     def __str__(self):
         return f"Interview for {self.application.user.username} on {self.date_created}"
+
+
+class ToDo(models.Model):
+    STATUS_CHOICES = [
+        (0, 'Pending'),
+        (1, 'Approved'),
+    ]
+
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='todos')
+    interview = models.ForeignKey(Interview, on_delete=models.CASCADE, null=True, blank=True, related_name='todos')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,  related_name='todos')  # The user assigned the task
+    status = models.IntegerField(choices=STATUS_CHOICES, default=0)  # 0 by default, 1 if approved
+    approver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_todos')  # User who approves the task
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"To-Do for {self.application} by {self.user}"

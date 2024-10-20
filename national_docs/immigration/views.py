@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from docs.models import Application, UploadedDocument
-from .models import Fulfiller,Note, PostLocation, InterviewSlot, Interview
+from .models import Fulfiller,Note, PostLocation, InterviewSlot, Interview, ToDo
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -346,55 +346,62 @@ def interview_list(request):
 def interview_view(request, interview_id):
     interview = get_object_or_404(Interview, id=interview_id)
     application = interview.application
-    documents = UploadedDocument.objects.filter(application=application)  # Assuming you have a method to get uploaded docs
+    documents = UploadedDocument.objects.filter(application=application)  # Fetch the related documents
 
-    if interview.status == 'waiting':
-        read_only = True  # Set a flag for read-only mode
-    else:
-        read_only = False  # Editable for other statuses
+    # Determine if the form should be read-only (when status is 'waiting')
+    read_only = interview.status == 'waiting'
 
     if request.method == 'POST':
-        if 'postpone' in request.POST:  # Check if the postpone button was pressed
-            # Change the status of the interview to postponed
+        if 'postpone' in request.POST:  # Handle postponing the interview
+            # Change interview status to postponed
             interview.status = 'postponed'
-            interview.save()  # Save the updated interview
+            interview.save()
 
-            # Get the current interview date to skip
+            # Get the current interview slot's date
             current_interview_date = interview.application.interview_slot.date_time
 
             # Find the next available interview slot after the current interview date
             interview_slot = InterviewSlot.objects.filter(
                 current_interviewees__lt=F('max_interviewees'),
-                date_time__gt=current_interview_date,  # Skip the current interview date
+                date_time__gt=current_interview_date,  # Ensure it is after the current date
                 is_available=True
             ).order_by('date_time').first()
 
             if interview_slot:
-                # Assign the new slot to the application
+                # Assign the new interview slot and update the queue number
                 application.interview_slot = interview_slot
                 application.interview_queue_number = interview_slot.current_interviewees + 1
 
-                # Increment the current interviewees count in the interview slot
+                # Update the interview slot's current interviewees count
                 interview_slot.current_interviewees += 1
                 if interview_slot.current_interviewees >= interview_slot.max_interviewees:
-                    interview_slot.is_available = False  # Mark as full if necessary
+                    interview_slot.is_available = False
                 interview_slot.save()
 
-                application.save()  # Save the updated application
-                messages.success(request, "Interview postponed successfully and new slot assigned.")
+                application.save()  # Save the application updates
+                messages.success(request, "Interview postponed successfully, and a new slot assigned.")
             else:
                 messages.error(request, "No available interview slots for postponement.")
             return redirect('interview_list')
 
-
-        else:  # Handle the submission of questionnaire and notes
+        else:  # Handle submitting the interview questionnaire and notes
             questionnaire = request.POST.get('questionnaire')
             notes = request.POST.get('notes')
             interview.questionnaire = questionnaire
             interview.notes = notes
-            interview.status = 'waiting'
+            interview.status = 'waiting'  # Update the status to 'waiting'
             interview.save()
-            messages.success(request, 'Interview details updated successfully.')
+
+            # Create a ToDo instance when interview status changes to 'waiting'
+            ToDo.objects.create(
+                application=application,
+                interview=interview,
+                user=request.user,  # The user who is conducting the interview
+                approver=None,  # Approver can be set later
+                status=0  # Default to pending (0)
+            )
+
+            messages.success(request, 'Interview details updated and ToDo created successfully.')
             return redirect('interview_list')
 
     return render(request, 'immigration/interview.html', {
@@ -403,3 +410,54 @@ def interview_view(request, interview_id):
         'documents': documents,
         'read_only': read_only,
     })
+
+@login_required
+def todo_list(request):
+    # Fetch all ToDo items, you can filter by user, status, etc. as needed
+    todos = ToDo.objects.all().order_by('-created_at')  # You can customize the query as needed
+
+    return render(request, 'immigration/todo_list.html', {
+        'todos': todos,
+    })
+
+@login_required
+def todo_detail(request, todo_id):
+    # Fetch the ToDo item based on the id
+    todo = get_object_or_404(ToDo, id=todo_id)
+
+    return render(request, 'immigration/todo_detail.html', {
+        'todo': todo,
+    })
+
+
+@login_required
+def approve_todo(request, todo_id):
+    # Fetch the ToDo item based on the id
+    todo = get_object_or_404(ToDo, id=todo_id)
+
+    # Update the status to approved and set the approver to the current user
+    todo.status = 1  # Approved status
+    todo.approver = request.user
+    todo.save()
+
+    # Also update the related application and interview statuses to 'completed'
+    application = todo.application
+    interview = todo.interview
+
+    # Update application and interview status to 'completed'
+    application.status = 'completed'
+    interview.status = 'completed'
+
+    # Set the fulfiller status to 'closed' and progress to 100
+    fulfiller = application.fulfiller  # Accessing the related fulfiller
+    if fulfiller:
+        fulfiller.status = 'closed'
+        fulfiller.progress = 100
+        fulfiller.save()
+
+    application.save()
+    interview.save()
+
+    messages.success(request, "ToDo item has been approved successfully. Application and Interview are marked as completed.")
+    return redirect('todo_list')
+

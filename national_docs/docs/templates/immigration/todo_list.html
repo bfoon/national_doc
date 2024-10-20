@@ -1,0 +1,62 @@
+{% include 'docs/header.html' %}
+<div class="container my-5">
+    <h2>ToDo List</h2>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <table class="table table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Application</th>
+                <th>Interviewee</th>
+                <th>User</th>
+                <th>Approver</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for todo in todos %}
+            <tr>
+                <td>{{ todo.application.get_service_type  }}</td>
+                <td>{{ todo.interview.application.user.get_full_name }}</td>
+                <td>{{ todo.user.get_full_name }}</td>
+                <td>{% if todo.approver %}{{ todo.approver.get_full_name }}{% else %}N/A{% endif %}</td>
+                <td>
+                    {% if todo.status == 1 %}
+                        <span class="badge badge-success">Approved</span>
+                    {% else %}
+                        <span class="badge badge-warning">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <!-- Use a button group or inline-block to keep buttons side by side -->
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'todo_detail' todo.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        {% if todo.status == 0 %}
+                            <a href="{% url 'approve_todo' todo.id %}" class="btn btn-success btn-sm">
+                                <i class="fas fa-check"></i> Approve
+                            </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center">No ToDo items found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% include 'docs/footer.html' %}

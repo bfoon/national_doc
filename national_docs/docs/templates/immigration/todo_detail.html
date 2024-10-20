@@ -1,0 +1,41 @@
+{% include 'docs/header.html' %}
+
+<div class="container my-5">
+    <h2>ToDo Details</h2>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4>Details for ToDo #{{ todo.id }}</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Application:</strong> {{ todo.application.get_service_type }}</p>
+            <p><strong>Interviewee:</strong> {{ todo.interview.application.user.get_full_name }}</p>
+            <p><strong>User:</strong> {{ todo.user.get_full_name }}</p>
+
+            <!-- Notes as a read-only textarea -->
+            <div class="form-group">
+                <label for="notes"><strong>Notes:</strong></label>
+                <textarea id="notes" class="form-control" rows="5" readonly>{{ todo.interview.notes }}</textarea>
+            </div>
+
+            <p><strong>Approver:</strong>
+                {% if todo.approver %}
+                    {{ todo.approver.get_full_name }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+            <p><strong>Status:</strong> 
+                {% if todo.status == 1 %}
+                    <span class="badge badge-success">Approved</span>
+                {% else %}
+                    <span class="badge badge-warning">Pending</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <a href="{% url 'todo_list' %}" class="btn btn-secondary">Back to ToDo List</a>
+</div>
+
+{% include 'docs/footer.html' %}

@@ -56,8 +56,9 @@
         resize: none;
     }
 </style>
+
 <div class="container my-5">
-      <!-- Breadcrumbs -->
+    <!-- Breadcrumbs -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'fulfiller' %}">Fulfiller List</a></li>
@@ -74,6 +75,7 @@
             {% endfor %}
         </div>
     {% endif %}
+
     <h2>Edit Fulfiller Details</h2>
 
     <div class="form-container">
@@ -82,7 +84,7 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="location">Location</label>
-                    <select class="form-control" id="location" name="location" required>
+                    <select class="form-control" id="location" name="location" required {% if fulfiller.application.status == 'completed' %}disabled{% endif %}>
                         <option value="{{application.post_location.id}}"> {{application.post_location}}</option>
                         {% for location in post_locations %}
                         {% if location != application.post_location %}
@@ -94,7 +96,7 @@
 
                 <div class="form-group col-md-6">
                     <label for="action">Action (User)</label>
-                    <select class="form-control" id="action" name="action" required>
+                    <select class="form-control" id="action" name="action" required {% if fulfiller.application.status == 'completed' %}disabled{% endif %}>
                         <option value="">Select User</option>
                         {% for user in users %}
                             <option value="{{ user.id }}" {% if fulfiller.action.id == user.id %}selected{% endif %}>{{ user.username }}</option>
@@ -106,12 +108,12 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="schedule">Schedule</label>
-                    <input type="date" class="form-control" id="schedule" name="schedule" value="{{ fulfiller.schedule|date:'Y-m-d' }}" required>
+                    <input type="date" class="form-control" id="schedule" name="schedule" value="{{ fulfiller.schedule|date:'Y-m-d' }}" required {% if fulfiller.application.status == 'completed' %}disabled{% endif %}>
                 </div>
 
                 <div class="form-group col-md-6">
                     <label for="priority">Priority</label>
-                    <select class="form-control" id="priority" name="priority" required>
+                    <select class="form-control" id="priority" name="priority" required {% if fulfiller.application.status == 'completed' %}disabled{% endif %}>
                         <option value="high" {% if fulfiller.priority == 'high' %}selected{% endif %}>High</option>
                         <option value="medium" {% if fulfiller.priority == 'medium' %}selected{% endif %}>Medium</option>
                         <option value="low" {% if fulfiller.priority == 'low' %}selected{% endif %}>Low</option>
@@ -122,7 +124,7 @@
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="status">Status</label>
-                    <select class="form-control" id="status" name="status" required>
+                    <select class="form-control" id="status" name="status" required {% if fulfiller.application.status == 'completed' %}disabled{% endif %}>
                         <option value="open" {% if fulfiller.status == 'open' %}selected{% endif %}>Open</option>
                         <option value="closed" {% if fulfiller.status == 'closed' %}selected{% endif %}>Closed</option>
                     </select>
@@ -130,7 +132,7 @@
 
                 <div class="form-group col-md-6">
                     <label for="state">State</label>
-                    <select class="form-control" id="state" name="state" required>
+                    <select class="form-control" id="state" name="state" required {% if fulfiller.application.status == 'completed' %}disabled{% endif %}>
                         <option value="pending" {% if fulfiller.application.status == 'pending' %}selected{% endif %}>Pending</option>
                         <option value="processing" {% if fulfiller.application.status == 'processing' %}selected{% endif %}>Processing</option>
                         <option value="waiting" {% if fulfiller.application.status == 'waiting' %}selected{% endif %}>Waiting</option>
@@ -140,13 +142,13 @@
                 </div>
             </div>
 
-          <div class="form-row">
+            <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="progress">Progress (%)</label>
                     <div class="input-group">
-                        <input type="number" class="form-control" id="progress" name="progress" value="{{ fulfiller.progress }}" min="0" max="100" required>
+                        <input type="number" class="form-control" id="progress" name="progress" value="{{ fulfiller.progress }}" min="0" max="100" required {% if fulfiller.application.status == 'completed' %}disabled{% endif %}>
                         <div class="input-group-append">
-                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#progressDetailsModal">More Details</button>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#progressDetailsModal" {% if fulfiller.application.status == 'completed' %}disabled{% endif %}>More Details</button>
                         </div>
                     </div>
                 </div>
@@ -211,8 +213,9 @@
                 <label for="message">Message to Requester</label>
                 <textarea class="form-control" id="message" name="message" rows="3" placeholder="Type your message here..."></textarea>
             </div>
-
+            {% if fulfiller.application.status != 'completed' %}
             <button type="submit" class="btn btn-primary">Update Fulfiller</button>
+             {% endif %}
         </form>
     </div>
 
