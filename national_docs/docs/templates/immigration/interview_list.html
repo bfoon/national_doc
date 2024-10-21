@@ -1,4 +1,5 @@
-{% include 'docs/header.html' %}
+ {% extends 'docs/header.html' %}
+ {% block content %}
 
 <div class="container my-5">
      {% if messages %}
@@ -102,4 +103,4 @@
     </div>
 </div>
 
-{% include 'docs/footer.html' %}
+{% endblock %}

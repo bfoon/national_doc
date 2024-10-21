@@ -4,9 +4,11 @@ from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
+from django.utils.dateparse import parse_date
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
-from django.db.models import F
+from django.db.models import F, Q
+from django.http import JsonResponse
 from django.utils import timezone
 from django.db import transaction
 from django.shortcuts import render, get_object_or_404
@@ -42,43 +44,63 @@ def fulfillers_list(request):
     # Filtering based on user group and post location
     if not user.is_superuser:
         if user.groups.filter(name__in=['immigration', 'police', 'tax']).exists():
-            fulfillers = fulfillers.filter(
-                location=user.officerprofile.post_location,
-            )
+            fulfillers = fulfillers.filter(location=user.officerprofile.post_location)
         else:
-            # If the user is not in the specified groups, they should not see any fulfillers
             fulfillers = Fulfiller.objects.none()
-
-    # Filtering logic
-    if 'dateFrom' in request.GET and request.GET['dateFrom']:
-        date_from = request.GET['dateFrom']
-        fulfillers = fulfillers.filter(schedule__gte=date_from)
-
-    if 'dateTo' in request.GET and request.GET['dateTo']:
-        date_to = request.GET['dateTo']
-        fulfillers = fulfillers.filter(schedule__lte=date_to)
-
-    if 'priority' in request.GET and request.GET['priority']:
-        priority = request.GET['priority']
-        fulfillers = fulfillers.filter(priority=priority)
-
-    if 'status' in request.GET and request.GET['status']:
-        status = request.GET['status']
-        fulfillers = fulfillers.filter(status=status)
-
-    # Searching logic
-    if 'search' in request.GET and request.GET['search']:
-        search_query = request.GET['search']
-        fulfillers = fulfillers.filter(title__icontains=search_query)
 
     # Pagination
     paginator = Paginator(fulfillers, 10)  # Show 10 fulfillers per page
     page_number = request.GET.get('page')
-    fulfillers_page = paginator.get_page(page_number)
+    try:
+        fulfillers_page = paginator.get_page(page_number)
+    except (EmptyPage, PageNotAnInteger):
+        fulfillers_page = paginator.get_page(1)
 
-    return render(request, 'immigration/fulfillers_list.html', {
+    # Pass filter parameters back to the template to persist them in the form
+    context = {
         'fulfillers': fulfillers_page,
-    })
+    }
+
+    return render(request, 'immigration/fulfillers_list.html', context)
+
+@login_required
+def filler_search(request):
+    search_query = request.GET.get('search', '')
+    date_from = request.GET.get('dateFrom', '')
+    date_to = request.GET.get('dateTo', '')
+    priority = request.GET.get('priority', '')
+    status = request.GET.get('status', '')
+
+    # Start with all fulfillers if the user is a superuser
+    if request.user.is_superuser:
+        fulfillers = Fulfiller.objects.all()
+    else:
+        user_location = request.user.officerprofile.post_location  # Adjust as necessary
+        fulfillers = Fulfiller.objects.filter(location=user_location)
+
+    # Apply filters
+    if search_query:
+        fulfillers = fulfillers.filter(
+            Q(application__status__icontains=search_query) |  # Application's status
+            Q(location__name__icontains=search_query) |       # PostLocation's name
+            Q(action__username__icontains=search_query) |     # User's username
+            Q(status__icontains=search_query)                  # Fulfiller's status
+        )
+
+    if date_from:
+        fulfillers = fulfillers.filter(created_at__gte=date_from)
+
+    if date_to:
+        fulfillers = fulfillers.filter(created_at__lte=date_to)
+
+    if priority:
+        fulfillers = fulfillers.filter(priority=priority)
+
+    if status:
+        fulfillers = fulfillers.filter(status=status)
+
+    # Render the filtered results as HTML
+    return render(request, 'immigration/filler_search.html', {'fulfillers': fulfillers})
 
 @login_required
 def fulfiller_detail(request, id):
@@ -204,7 +226,7 @@ def post_locations(request):
 @login_required
 def add_post_location(request):
     if not request.user.is_superuser:
-        messages.error(request, "You do not have permission to add post locations.")
+        messages.warning(request, "You do not have permission to add post locations.")
         return redirect('post_locations')
 
     if request.method == 'POST':
@@ -232,15 +254,15 @@ def add_post_location(request):
         return redirect('post_locations')
 
     return render(request, 'immigration/add_post_location.html')
-
-
 @login_required
 def edit_post_location(request, id):
     location = get_object_or_404(PostLocation, id=id)
 
-    if not request.user.is_superuser and location != request.user.officerprofile.post_location:
-        messages.error(request, "You do not have permission to edit this post location.")
-        return redirect('post_locations')
+    # Check if the user is a superuser or has the admin group for the location
+    if not request.user.is_superuser:
+        if location != request.user.officerprofile.post_location or not request.user.groups.filter(name='admin').exists():
+            messages.warning(request, "You do not have permission to edit this post location.")
+            return redirect('post_locations')
 
     if request.method == 'POST':
         location.name = request.POST.get('name')
@@ -262,9 +284,11 @@ def edit_post_location(request, id):
 def delete_post_location(request, id):
     location = get_object_or_404(PostLocation, id=id)
 
-    if not request.user.is_superuser and location != request.user.officerprofile.post_location:
-        messages.error(request, "You do not have permission to delete this post location.")
-        return redirect('post_locations')
+    # Check if the user is a superuser or has the admin group for the location
+    if not request.user.is_superuser:
+        if location != request.user.officerprofile.post_location or not request.user.groups.filter(name='admin').exists():
+            messages.warning(request, "You do not have permission to delete this post location.")
+            return redirect('post_locations')
 
     location.delete()
     messages.success(request, "Post location deleted successfully.")
@@ -272,15 +296,14 @@ def delete_post_location(request, id):
 
 @login_required
 def list_officer_users(request):
-    user = request.user
-    if user.is_superuser:
-        immigration_officers = User.objects.filter(groups__name='immigration')
-        police_officers = User.objects.filter(groups__name='police')
-        tax_officers = User.objects.filter(groups__name='tax')
-    else:
-        immigration_officers = User.objects.filter(groups__name='immigration', officerprofile__post_location=user.officerprofile.post_location)
-        police_officers = User.objects.filter(groups__name='police', officerprofile__post_location=user.officerprofile.post_location)
-        tax_officers = User.objects.filter(groups__name='tax', officerprofile__post_location=user.officerprofile.post_location)
+    # Ensure that only superusers can view this list
+    if not request.user.is_superuser:
+        messages.warning(request, "You do not have permission to view this list.")
+        return redirect('immigration_dashboard')  # Redirect to a safe page
+
+    immigration_officers = User.objects.filter(groups__name='immigration')
+    police_officers = User.objects.filter(groups__name='police')
+    tax_officers = User.objects.filter(groups__name='tax')
 
     context = {
         'immigration_officers': immigration_officers,
@@ -290,10 +313,12 @@ def list_officer_users(request):
 
     return render(request, 'immigration/list_officer_users.html', context)
 
+
 @login_required
 def create_user(request):
+    # Ensure that only superusers can create users
     if not request.user.is_superuser:
-        messages.error(request, "You do not have permission to create users.")
+        messages.warning(request, "You do not have permission to create users.")
         return redirect('list_officer_users')
 
     if request.method == 'POST':
@@ -308,7 +333,7 @@ def create_user(request):
 
         # Check if the username already exists
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists.')
+            messages.warning(request, 'Username already exists.')
         else:
             # Create the user
             user = User.objects.create_user(username=username, email=email, password=password)
@@ -333,9 +358,9 @@ def create_user(request):
                 messages.success(request, f'{role.capitalize()} user created successfully!')
                 return redirect('list_officer_users')
             except Group.DoesNotExist:
-                messages.error(request, f'Group "{role}" does not exist.')
+                messages.warning(request, f'Group "{role}" does not exist.')
             except PostLocation.DoesNotExist:
-                messages.error(request, 'Invalid post location.')
+                messages.warning(request, 'Invalid post location.')
 
     # Fetch groups based on their name
     groups = Group.objects.filter(name__in=['immigration', 'police', 'tax', 'admin'])
@@ -345,8 +370,9 @@ def create_user(request):
 
 @login_required
 def create_group(request):
+    # Ensure that only superusers can create groups
     if not request.user.is_superuser:
-        messages.error(request, "You do not have permission to create groups.")
+        messages.warning(request, "You do not have permission to create groups.")
         return redirect('list_officer_users')
 
     if request.method == 'POST':
@@ -362,9 +388,19 @@ def create_group(request):
     return render(request, 'immigration/create_group.html')
 
 
+
 @login_required
 def available_slots(request):
     user = request.user
+
+    # Check if the user is in the admin group for their location
+    is_admin = user.groups.filter(name='admin').exists() and user.officerprofile.post_location
+
+    # Ensure that only users in the admin group for the specific location or superusers can access the slots
+    if not user.is_superuser and not is_admin:
+        messages.warning(request, "You do not have permission to view available interview slots.")
+        return redirect('todo_list')
+
     if user.is_superuser:
         interview_slots = InterviewSlot.objects.all()
     else:
@@ -498,10 +534,16 @@ def interview_view(request, interview_id):
 @login_required
 def todo_list(request):
     user = request.user
+    # Check if the user is in the admin group for their location
+    is_admin = user.groups.filter(name='admin').exists() and user.officerprofile.post_location
+
     if user.is_superuser:
         todos = ToDo.objects.all().order_by('-created_at')
-    else:
+    elif is_admin:
         todos = ToDo.objects.filter(application__post_location=user.officerprofile.post_location).order_by('-created_at')
+    else:
+        messages.warning(request, "You do not have permission to view ToDo items.")
+        return redirect('immigration_dashboard')  # Redirect to a suitable page
 
     return render(request, 'immigration/todo_list.html', {
         'todos': todos,
@@ -512,23 +554,37 @@ def todo_list(request):
 def todo_detail(request, todo_id):
     todo = get_object_or_404(ToDo, id=todo_id)
 
-    # Ensure the user can only see ToDo items in their post location if not a superuser
+    # Ensure the user is in the admin group for their location if not a superuser
+    is_admin = request.user.groups.filter(name='admin').exists() and request.user.officerprofile.post_location
+
+    if not request.user.is_superuser and not is_admin:
+        messages.warning(request, "You do not have permission to view this ToDo item.")
+        return redirect('todo_list')
+
+    # Further check for specific location
     if not request.user.is_superuser and todo.application.post_location != request.user.officerprofile.post_location:
-        messages.error(request, "You do not have permission to view this ToDo item.")
+        messages.warning(request, "You do not have permission to view this ToDo item.")
         return redirect('todo_list')
 
     return render(request, 'immigration/todo_detail.html', {
         'todo': todo,
     })
 
-
 @login_required
 def approve_todo(request, todo_id):
     todo = get_object_or_404(ToDo, id=todo_id)
 
+    # Check if the user is in the admin group for their location
+    is_admin = request.user.groups.filter(name='admin').exists() and request.user.officerprofile.post_location
+
     # Ensure the user can only approve ToDo items in their post location if not a superuser
+    if not request.user.is_superuser and not is_admin:
+        messages.warning(request, "You do not have permission to approve this ToDo item.")
+        return redirect('todo_list')
+
+    # Further check for specific location
     if not request.user.is_superuser and todo.application.post_location != request.user.officerprofile.post_location:
-        messages.error(request, "You do not have permission to approve this ToDo item.")
+        messages.warning(request, "You do not have permission to approve this ToDo item.")
         return redirect('todo_list')
 
     # Update the status to approved and set the approver to the current user
@@ -557,13 +613,22 @@ def approve_todo(request, todo_id):
     messages.success(request, "ToDo item has been approved successfully. Application and Interview are marked as completed.")
     return redirect('todo_list')
 
+
 @login_required
 def reject_todo(request, todo_id):
     todo = get_object_or_404(ToDo, id=todo_id)
 
+    # Check if the user is in the admin group for their location
+    is_admin = request.user.groups.filter(name='admin').exists() and request.user.officerprofile.post_location
+
     # Ensure the user can only reject ToDo items in their post location if not a superuser
+    if not request.user.is_superuser and not is_admin:
+        messages.warning(request, "You do not have permission to reject this ToDo item.")
+        return redirect('todo_list')
+
+    # Further check for specific location
     if not request.user.is_superuser and todo.application.post_location != request.user.officerprofile.post_location:
-        messages.error(request, "You do not have permission to reject this ToDo item.")
+        messages.warning(request, "You do not have permission to reject this ToDo item.")
         return redirect('todo_list')
 
     if request.method == 'POST':
@@ -596,6 +661,7 @@ def reject_todo(request, todo_id):
     return render(request, 'immigration/reject_todo.html', {
         'todo': todo,
     })
+
 
 @login_required
 def queue_info(request):
@@ -644,6 +710,10 @@ def boot_list(request):
 
 @login_required
 def add_boot(request):
+    if not request.user.is_superuser:
+        messages.error(request, "You do not have permission to add boots.")
+        return redirect('boot_list')
+
     if request.method == 'POST':
         name = request.POST.get('name')
         description = request.POST.get('description')
@@ -690,4 +760,5 @@ def change_assignment(request, boot_id):
             messages.success(request, 'Boot assignment updated successfully.')
         else:
             messages.error(request, 'Please select valid user, group, and post location.')
+
     return redirect('boot_list')

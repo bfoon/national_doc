@@ -1,4 +1,6 @@
- {% include 'docs/header.html' %}  <!-- Include the header -->
+ {% extends 'docs/header.html' %}
+ <!-- Include the header -->
+ {% block content %}
     <style>
 
     h1, h2 {
@@ -116,7 +118,7 @@
             </p>
             {% endif %}
 
-            {% if national_id_application.application.status != "canceled" %}
+            {% if national_id_application.application and national_id_application.application.status != "canceled" %}
                 <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
                         data-application-id="{{ national_id_application.application.id }}"
                         data-application-type="National ID Card">
@@ -146,7 +148,7 @@
             </p>
             {% endif %}
 
-            {% if resident_permit_application.application.status != "canceled" %}
+            {% if resident_permit_application.application and resident_permit_application.application.status != "canceled" %}
                 <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
                         data-application-id="{{ resident_permit_application.application.id }}"
                         data-application-type="Resident Permit">
@@ -176,7 +178,7 @@
             </p>
             {% endif %}
 
-            {% if work_permit_application.application.status != "canceled" %}
+            {% if work_permit_application.application and work_permit_application.application.status != "canceled" %}
                 <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
                         data-application-id="{{ work_permit_application.application.id }}"
                         data-application-type="Work Permit">
@@ -461,4 +463,4 @@
 </script>
 
 
-      {% include 'docs/footer.html' %}  <!-- Include the footer -->
+      {% endblock %}

@@ -1,4 +1,5 @@
-{% include 'docs/header.html' %}
+ {% extends 'docs/header.html' %}
+ {% block content %}
 <div class="container">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
@@ -34,4 +35,4 @@
         <button type="submit" class="btn btn-primary">Save Changes</button>
     </form>
 </div>
-{% include 'docs/footer.html' %}
+{% endblock %}

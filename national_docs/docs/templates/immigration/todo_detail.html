@@ -1,4 +1,5 @@
-{% include 'docs/header.html' %}
+{% extends 'docs/header.html' %}
+{% block content %}
 
 <div class="container my-5">
     <h2>ToDo Details</h2>
@@ -36,7 +37,7 @@
                     N/A
                 {% endif %}
             </p>
-            <p><strong>Status:</strong> 
+            <p><strong>Status:</strong>
                 {% if todo.status == 1 %}
                     <span class="badge badge-success">Approved</span>
                 {% elif todo.status == 2 %}
@@ -45,6 +46,14 @@
                     <span class="badge badge-warning">Pending</span>
                 {% endif %}
             </p>
+
+            {% if todo.status == 2 %}
+                <div class="alert alert-danger mt-3" style="margin-left: auto; width: 300px;">
+                    <strong>Rejection Reason:</strong>
+                    <p>{{ todo.rejection_reason }}</p>  <!-- Ensure this field is available in your ToDo model -->
+                </div>
+            {% endif %}
+
             {% if todo.status == 0 %}
                 <a href="{% url 'approve_todo' todo.id %}" class="btn btn-success btn-sm">
                     <i class="fas fa-check"></i> Approve
@@ -88,5 +97,6 @@
     </div>
 </div>
 
-{% include 'docs/footer.html' %}
+{% endblock %}
+
 

@@ -1,4 +1,5 @@
-{% include 'docs/header.html' %}
+{% extends 'docs/header.html' %}
+{% block content %}
 <div class="container my-5">
     {% if messages %}
         <div class="messages">
@@ -13,7 +14,7 @@
     <h2>Interview Queue</h2>
     <div id="interview-queue" class="row">
         {% for boot in boots %}
-            <div class="col-md-4">
+            <div class="col-md-4 boot-container" data-boot-id="{{ boot.id }}">
                 <h3>Boot {{ boot.name }}</h3>
                 <ul class="list-group">
                     {% for interview in interviews %}
@@ -37,14 +38,42 @@
         {% endfor %}
     </div>
 </div>
-{% include 'docs/footer.html' %}
 
 <script>
     function fetchInterviewQueue() {
         fetch("{% url 'fetch_interview_queue' %}")
-            .then(response => response.text())
+            .then(response => response.json())
             .then(data => {
-                document.getElementById('interview-queue').innerHTML = data;
+                const interviewQueue = document.getElementById('interview-queue');
+                interviewQueue.innerHTML = '';  // Clear existing content
+
+                data.boots.forEach(boot => {
+                    const bootContainer = document.createElement('div');
+                    bootContainer.classList.add('col-md-4', 'boot-container');
+                    bootContainer.dataset.bootId = boot.id;
+
+                    bootContainer.innerHTML = `
+                        <h3>Boot ${boot.name}</h3>
+                        <ul class="list-group">
+                            ${boot.interviews.map(interview => `
+                                <li class="list-group-item">
+                                    Queue Number: ${interview.application.interview_queue_number}
+                                    ${interview.status === 'scheduled' ? `
+                                        <form method="POST" style="display:inline;">
+                                            <input type="hidden" name="csrfmiddlewaretoken" value="${data.csrf_token}">
+                                            <input type="hidden" name="interview_id" value="${interview.id}">
+                                            <button type="submit" class="btn btn-primary btn-sm">Start Interview</button>
+                                        </form>
+                                    ` : `
+                                        <span class="badge badge-success">In Progress</span>
+                                    `}
+                                </li>
+                            `).join('')}
+                        </ul>
+                    `;
+
+                    interviewQueue.appendChild(bootContainer);
+                });
             })
             .catch(error => console.error('Error fetching interview queue:', error));
     }
@@ -52,3 +81,4 @@
     // Fetch the interview queue every 20 seconds
     setInterval(fetchInterviewQueue, 20000);
 </script>
+{% endblock %}

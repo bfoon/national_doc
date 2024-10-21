@@ -1,4 +1,5 @@
-{% include 'docs/header.html' %}
+ {% extends 'docs/header.html' %}
+ {% block content %}
 <div class="container my-5">
     <h2>ToDo List</h2>
 
@@ -71,4 +72,4 @@
         </tbody>
     </table>
 </div>
-{% include 'docs/footer.html' %}
+{% endblock %}

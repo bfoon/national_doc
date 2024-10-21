@@ -1,5 +1,5 @@
-{% include 'docs/header.html' %}
-
+ {% extends 'docs/header.html' %}
+{% block content %}
 <style>
     .application-form {
         background-color: white;
@@ -151,7 +151,7 @@
     </div>
 </div>
 
-{% include 'docs/footer.html' %}
+
 
 <script>
     // Handle document upload UI
@@ -203,3 +203,4 @@
         form.submit();  // Submit the form after the disclaimer is acknowledged
     }
 </script>
+{% endblock %}

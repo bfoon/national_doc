@@ -1,5 +1,6 @@
-{% include 'docs/header.html' %}
-<!-- Include Font Awesome for icons and any additional CSS for styling -->
+{% extends 'docs/header.html' %}
+{% block content %}
+<!-- Include Font Awesome for icons -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
 <style>
@@ -11,43 +12,41 @@
         color: #fff;
     }
 
-    .state-pending {
-        background-color: #f39c12; /* orange */
-    }
+    .state-pending { background-color: #f39c12; }
+    .state-processing { background-color: #3498db; }
+    .state-waiting { background-color: #e67e22; }
+    .state-interview { background-color: #8e44ad; }
+    .state-completed { background-color: #27ae60; }
+    .state-canceled { background-color: #e74c3c; }
 
-    .state-processing {
-        background-color: #3498db; /* blue */
-    }
-
-    .state-waiting {
-        background-color: #e67e22; /* darker orange */
-    }
-
-    .state-interview {
-        background-color: #8e44ad; /* purple */
-    }
-
-    .state-completed {
-        background-color: #27ae60; /* green */
-    }
-    .state-canceled {
-        background-color: #e74c3c; /* red */
-    }
-
-    .locked-link {
-        color: gray;
-        cursor: not-allowed;
-    }
+    .locked-link { color: gray; cursor: not-allowed; }
 </style>
 
-<div class="container mt-3 mb-5">  <!-- Reduced top margin with 'mt-3' -->
+<div class="container mt-3 mb-5">
+     {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Fulfiller</li>
+        </ol>
+    </nav>
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <!-- Export Dropdown -->
         <div class="dropdown">
-            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="exportDropdown" data-toggle="dropdown">
                 <i class="fas fa-file-export"></i> Export as
             </button>
-            <div class="dropdown-menu" aria-labelledby="exportDropdown">
+            <div class="dropdown-menu">
                 <a class="dropdown-item" href="#">PDF</a>
                 <a class="dropdown-item" href="#">Excel</a>
                 <a class="dropdown-item" href="#">CSV</a>
@@ -55,44 +54,37 @@
             </div>
         </div>
 
-        <!-- Search Bar with Filter Icon -->
+        <!-- Search Bar and Filter Icon -->
         <div class="d-flex align-items-center">
             <input type="text" id="searchInput" class="form-control mr-2" placeholder="Search..." style="width: 250px;">
-            <button class="btn btn-outline-secondary" type="button" id="filterToggleBtn" data-toggle="collapse" data-target="#filterOptions" aria-expanded="false" aria-controls="filterOptions">
+            <button class="btn btn-primary" type="button" id="searchButton" onclick="performSearch()">
+                <i class="fas fa-search"></i> Search
+            </button>
+            <button class="btn btn-outline-secondary ml-2" type="button" data-toggle="collapse" data-target="#filterOptions">
                 <i class="fas fa-filter"></i> Filter
             </button>
         </div>
 
-        <!-- Filter Dropdown -->
-        <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-cogs"></i> Open/Close Filter
-            </button>
-            <div class="dropdown-menu" aria-labelledby="filterDropdown">
-                <a class="dropdown-item" href="#">Open</a>
-                <a class="dropdown-item" href="#">Closed</a>
-            </div>
-        </div>
-
         <!-- Button to go back to the Immigration Dashboard -->
-        <a href="{% url 'immigration_dashboard' %}" class="btn btn-secondary">Back to Immigration Dashboard</a>
+        <a href="{% url 'immigration_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
     </div>
 
     <!-- Filter Options (collapsible) -->
-    <div class="collapse mb-4" id="filterOptions">
-        <div class="card card-body">
+<div class="collapse mb-4" id="filterOptions">
+    <div class="card card-body">
+        <form id="filterForm">
             <div class="form-row">
                 <div class="col-md-3">
                     <label for="dateFrom">Date From</label>
-                    <input type="date" class="form-control" id="dateFrom" name="dateFrom">
+                    <input type="date" class="form-control" id="dateFrom" name="dateFrom" onchange="performSearch()">
                 </div>
                 <div class="col-md-3">
                     <label for="dateTo">Date To</label>
-                    <input type="date" class="form-control" id="dateTo" name="dateTo">
+                    <input type="date" class="form-control" id="dateTo" name="dateTo" onchange="performSearch()">
                 </div>
                 <div class="col-md-3">
                     <label for="priority">Priority</label>
-                    <select class="form-control" id="priority" name="priority">
+                    <select class="form-control" id="priority" name="priority" onchange="performSearch()">
                         <option value="">Select Priority</option>
                         <option value="high">High</option>
                         <option value="medium">Medium</option>
@@ -101,7 +93,7 @@
                 </div>
                 <div class="col-md-3">
                     <label for="status">Status</label>
-                    <select class="form-control" id="status" name="status">
+                    <select class="form-control" id="status" name="status" onchange="performSearch()">
                         <option value="">Select Status</option>
                         <option value="open">Open</option>
                         <option value="closed">Closed</option>
@@ -109,8 +101,10 @@
                     </select>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
+</div>
+
 
     <!-- Fulfillers Table -->
     <table class="table table-striped table-hover">
@@ -129,7 +123,7 @@
                 <th scope="col">Progress</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="fulfillerTableBody">
             {% for item in fulfillers %}
             <tr>
                 <td><input type="checkbox" class="itemCheckbox"></td>
@@ -156,7 +150,9 @@
                 <td>{{ item.created_at|date:"Y-m-d" }}</td>
                 <td>
                     <div class="progress">
-                        <div class="progress-bar" role="progressbar" style="width: {{ item.progress }}%;" aria-valuenow="{{ item.progress }}" aria-valuemin="0" aria-valuemax="100">{{ item.progress }}%</div>
+                        <div class="progress-bar" role="progressbar" style="width: {{ item.progress }}%;" aria-valuenow="{{ item.progress }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ item.progress }}%
+                        </div>
                     </div>
                 </td>
             </tr>
@@ -173,7 +169,7 @@
         <ul class="pagination justify-content-center">
             {% if fulfillers.has_previous %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ fulfillers.previous_page_number }}" aria-label="Previous">
+                <a class="page-link" href="?page={{ fulfillers.previous_page_number }}&{{ request.GET.urlencode }}" aria-label="Previous">
                     <span aria-hidden="true">&laquo;</span>
                 </a>
             </li>
@@ -181,13 +177,13 @@
 
             {% for num in fulfillers.paginator.page_range %}
             <li class="page-item {% if fulfillers.number == num %}active{% endif %}">
-                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                <a class="page-link" href="?page={{ num }}&{{ request.GET.urlencode }}">{{ num }}</a>
             </li>
             {% endfor %}
 
             {% if fulfillers.has_next %}
             <li class="page-item">
-                <a class="page-link" href="?page={{ fulfillers.next_page_number }}" aria-label="Next">
+                <a class="page-link" href="?page={{ fulfillers.next_page_number }}&{{ request.GET.urlencode }}" aria-label="Next">
                     <span aria-hidden="true">&raquo;</span>
                 </a>
             </li>
@@ -196,9 +192,31 @@
     </nav>
 </div>
 
-{% include 'docs/footer.html' %}
-
 <script>
+    function performSearch() {
+        const searchQuery = document.getElementById('searchInput').value;
+        const dateFrom = document.getElementById('dateFrom').value;
+        const dateTo = document.getElementById('dateTo').value;
+        const priority = document.getElementById('priority').value;
+        const status = document.getElementById('status').value;
+
+        // Build the query string with all parameters
+        const queryString = new URLSearchParams({
+            search: searchQuery,
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            priority: priority,
+            status: status
+        }).toString();
+
+        fetch(`{% url 'filler_search' %}?${queryString}`)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('fulfillerTableBody').innerHTML = data; // Update the innerHTML with new rows
+            })
+            .catch(error => console.error('Error fetching search results:', error));
+    }
+
     // Functionality to select all checkboxes
     document.getElementById('selectAll').addEventListener('click', function() {
         const checkboxes = document.querySelectorAll('.itemCheckbox');
@@ -206,13 +224,6 @@
             checkbox.checked = this.checked;
         });
     });
-
-    // Toggle filter icon based on collapse state
-    $('#filterOptions').on('shown.bs.collapse', function () {
-        $('#filterToggleBtn').html('<i class="fas fa-times"></i> Close Filter');
-    });
-
-    $('#filterOptions').on('hidden.bs.collapse', function () {
-        $('#filterToggleBtn').html('<i class="fas fa-filter"></i> Filter');
-    });
 </script>
+
+{% endblock %}

@@ -3,52 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National Documents Portal</title>
+    <title>{% block title %}National Documents Portal{% endblock %}</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .container {
+            flex: 1;
+            padding: 20px;
+            margin-top: 60px;
+        }
+        footer {
+            background-color: #3498db;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            width: 100%;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
 <header>
     <h2>National Documents Portal</h2>
     {% include 'docs/nav.html' %}  <!-- Include the navigation -->
-    {% include 'docs/base.html' %}
 </header>
 
-    <style>
-    html, body {
-        height: 100%;  /* Make sure the body takes full height */
-        margin: 0;
-    }
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f0f0;
-        display: flex;
-        flex-direction: column;  /* Use flexbox to structure the layout */
-    }
-    header {
-        background-color: #3498db;
-        color: white;
-        padding: 1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    nav ul {
-        list-style-type: none;
-        padding: 0;
-        display: flex;
-    }
-    nav ul li {
-        margin-right: 20px;
-    }
-    nav ul li a {
-        color: white;
-        text-decoration: none;
-    }
-    h1, h2 {
-        color: #2c3e50;
-    }
-    .container {
-        flex: 1;  /* Allow the container to take up available space */
-        padding: 20px;
-    }
-    </style>
-</head>
+<div class="container">
+    {% block content %}
+    <!-- Page-specific content will go here -->
+    {% endblock %}
+</div>
+
+{% include 'docs/footer.html' %}  <!-- Include the footer -->
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

@@ -1,4 +1,5 @@
-{% include 'docs/header.html' %}
+ {% extends 'docs/header.html' %}
+ {% block content %}
 <style>
     .border {
         border: 1px solid #007bff; /* Bootstrap primary color */
@@ -147,8 +148,6 @@
     </div>
 </div>
 
-{% include 'docs/footer.html' %}
-
 <script>
     let startTime;
     let timerInterval;
@@ -183,3 +182,4 @@
         document.getElementById('duration').value = durationInMinutes;
     }
 </script>
+{% endblock %}

@@ -27,6 +27,7 @@ class Application(models.Model):
     APPLICATION_TYPE_CHOICES = [
         ('new', 'New Application'),
         ('extension', 'Extension'),
+        ('lost', 'Lost ID'),
     ]
 
     APPLICATION_STATUS_CHOICES = [
@@ -35,6 +36,7 @@ class Application(models.Model):
         ('waiting', 'Waiting'),
         ('interview', 'Interview'),
         ('completed', 'Completed'),
+        ('canceled', 'Canceled'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)

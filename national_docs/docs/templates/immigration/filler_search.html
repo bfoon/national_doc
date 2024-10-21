@@ -1,0 +1,37 @@
+{% for item in fulfillers %}
+<tr>
+    <td><input type="checkbox" class="itemCheckbox"></td>
+    <td>
+        {% if item.application.status == 'interview' %}
+            <span class="locked-link"><i class="fas fa-lock"></i> {{ item.application.get_service_type }}</span>
+        {% else %}
+            <a href="{% url 'fulfiller_detail' item.id %}">
+                {{ item.application.get_service_type }}
+            </a>
+        {% endif %}
+    </td>
+    <td>{{ item.application.application_type|capfirst }}</td>
+    <td>{{ item.location.name }}</td>
+    <td>{{ item.action }}</td>
+    <td>{{ item.schedule }}</td>
+    <td>{{ item.priority|capfirst }}</td>
+    <td>
+        <span class="state-badge state-{{ item.application.status }}">
+            {{ item.application.status|capfirst }}
+        </span>
+    </td>
+    <td>{{ item.status|capfirst }}</td>
+    <td>{{ item.created_at|date:"Y-m-d" }}</td>
+    <td>
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" style="width: {{ item.progress }}%;" aria-valuenow="{{ item.progress }}" aria-valuemin="0" aria-valuemax="100">
+                {{ item.progress }}%
+            </div>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="11" class="text-center">No records found.</td>
+</tr>
+{% endfor %}
