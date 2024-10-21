@@ -41,16 +41,13 @@ def fulfillers_list(request):
 
     # Filtering based on user group and post location
     if not user.is_superuser:
-        if user.groups.filter(name='immigration').exists():
+        if user.groups.filter(name__in=['immigration', 'police', 'tax']).exists():
             fulfillers = fulfillers.filter(
-                application__post_location=user.officerprofile.post_location,
+                location=user.officerprofile.post_location,
             )
         else:
-            # Admins can see requests based on their groups and location
-            user_groups = user.groups.values_list('name', flat=True)
-            fulfillers = fulfillers.filter(
-                application__post_location=user.officerprofile.post_location,
-            )
+            # If the user is not in the specified groups, they should not see any fulfillers
+            fulfillers = Fulfiller.objects.none()
 
     # Filtering logic
     if 'dateFrom' in request.GET and request.GET['dateFrom']:
@@ -82,7 +79,6 @@ def fulfillers_list(request):
     return render(request, 'immigration/fulfillers_list.html', {
         'fulfillers': fulfillers_page,
     })
-
 
 @login_required
 def fulfiller_detail(request, id):
@@ -130,11 +126,12 @@ def fulfiller_detail(request, id):
             if application_status == 'interview':
                 # Check if the application already has an interview slot
                 if not application.interview_slot:
-                    # Find available interview slot
+                    # Find available interview slot at the closest location
                     interview_slot = InterviewSlot.objects.filter(
                         current_interviewees__lt=F('max_interviewees'),
                         date_time__gte=timezone.now(),
-                        is_available=True
+                        is_available=True,
+                        location=application.post_location  # Ensure the slot is at the application's post location
                     ).order_by('date_time').first()
 
                     if interview_slot:
@@ -381,9 +378,10 @@ def available_slots(request):
         date_time = request.POST.get('date_time')
         max_interviewees = request.POST.get('max_interviewees')
         location_id = request.POST.get('location')
-        location = PostLocation.objects.get(id=location_id)
+        location = get_object_or_404(PostLocation, id=location_id)
 
         try:
+            # Create a new interview slot
             InterviewSlot.objects.create(
                 date_time=date_time,
                 max_interviewees=max_interviewees,
@@ -414,7 +412,6 @@ def interview_list(request):
         'interviews': interviews,
     })
 
-
 @login_required
 def interview_view(request, interview_id):
     interview = get_object_or_404(Interview, id=interview_id)
@@ -427,11 +424,15 @@ def interview_view(request, interview_id):
 
     documents = UploadedDocument.objects.filter(application=application)  # Fetch the related documents
 
-    # Determine if the form should be read-only (when status is 'waiting')
-    read_only = interview.status == 'waiting'
+    # Determine if the form should be read-only (when status is 'waiting' or 'canceled')
+    read_only = interview.status in ['waiting', 'canceled']
 
     if request.method == 'POST':
-        duration = int(request.POST.get('duration', 0))  # Get the duration from the form
+        duration_str = request.POST.get('duration', '0')
+        try:
+            duration = int(duration_str)
+        except ValueError:
+            duration = 0  # Default to 0 if the duration is not a valid number
 
         if 'postpone' in request.POST:  # Handle postponing the interview
             # Change interview status to postponed
@@ -557,6 +558,46 @@ def approve_todo(request, todo_id):
     return redirect('todo_list')
 
 @login_required
+def reject_todo(request, todo_id):
+    todo = get_object_or_404(ToDo, id=todo_id)
+
+    # Ensure the user can only reject ToDo items in their post location if not a superuser
+    if not request.user.is_superuser and todo.application.post_location != request.user.officerprofile.post_location:
+        messages.error(request, "You do not have permission to reject this ToDo item.")
+        return redirect('todo_list')
+
+    if request.method == 'POST':
+        rejection_reason = request.POST.get('rejection_reason', '')
+        todo.status = 2  # Assuming 2 is the status code for rejected
+        todo.approver = request.user
+        todo.rejection_reason = rejection_reason
+        todo.save()
+
+        # Also update the related application and interview statuses to 'canceled'
+        application = todo.application
+        interview = todo.interview
+
+        # Update application and interview status to 'canceled'
+        application.status = 'canceled'
+        interview.status = 'canceled'
+
+        fulfiller = application.fulfiller  # Accessing the related fulfiller
+        if fulfiller:
+            fulfiller.status = 'closed'
+            fulfiller.progress = 100
+            fulfiller.save()
+
+        application.save()
+        interview.save()
+
+        messages.success(request, "ToDo item has been rejected successfully.")
+        return redirect('todo_list')
+
+    return render(request, 'immigration/reject_todo.html', {
+        'todo': todo,
+    })
+
+@login_required
 def queue_info(request):
     user = request.user
     if user.is_superuser:
@@ -564,7 +605,7 @@ def queue_info(request):
         interviews = Interview.objects.exclude(status__in=["waiting", "completed"]).order_by('application__interview_queue_number')
     else:
         boots = Boot.objects.filter(post_location=user.officerprofile.post_location)
-        interviews = Interview.objects.exclude(status__in=["waiting", "completed"]).filter(application__post_location=user.officerprofile.post_location).order_by('application__interview_queue_number')
+        interviews = Interview.objects.exclude(status__in=["waiting", "completed", "canceled"]).filter(application__post_location=user.officerprofile.post_location).order_by('application__interview_queue_number')
 
     if request.method == 'POST':
         interview_id = request.POST.get('interview_id')
@@ -575,6 +616,15 @@ def queue_info(request):
         return redirect(f'/immigration/interview/{interview_id}')
 
     return render(request, 'immigration/queue_info.html', {
+        'boots': boots,
+        'interviews': interviews,
+    })
+
+@login_required
+def fetch_interview_queue(request):
+    boots = Boot.objects.all()
+    interviews = Interview.objects.exclude(status__in=["waiting", "completed", "canceled"]).order_by('application__interview_queue_number')
+    return render(request, 'immigration/interview_queue_partial.html', {
         'boots': boots,
         'interviews': interviews,
     })

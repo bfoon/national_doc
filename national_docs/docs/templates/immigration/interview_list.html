@@ -26,7 +26,7 @@
                 <tr>
                     <th>Applicant Name</th>
                     <th>Email</th>
-                    <th>Phone</th>
+                    <th>Service</th>
                     <th>Interview Date</th>
                     <th>Status</th>
                     <th>Actions</th>
@@ -59,11 +59,11 @@
                 </td>
                 <td>
                     {% if interview.application.national_id_applications.first %}
-                        {{ interview.application.national_id_applications.first.phone_number }}
+                        {{ interview.application.get_service_type }}
                     {% elif interview.application.resident_permit_applications.first %}
-                        {{ interview.application.resident_permit_applications.first.phone_number }}
+                        {{ interview.application.get_service_type}}
                     {% elif interview.application.work_permit_applications.first %}
-                        {{ interview.application.work_permit_applications.first.phone_number }}
+                        {{ interview.application.get_service_type}}
                     {% else %}
                         Unknown Phone Number
                     {% endif %}
@@ -74,12 +74,14 @@
                             {% if interview.status == 'scheduled' %}badge-success{% endif %}
                             {% if interview.status == 'postponed' %}badge-warning{% endif %}
                             {% if interview.status == 'waiting' %}badge-info{% endif %}
+                            {% if interview.status == 'canceled' %}badge-danger{% endif %}
+                            {% if interview.status == 'in_progress' %}badge-success{% endif %}
                         ">
                             {{ interview.status|capfirst }}
                         </span>
                     </td>
                 <td>
-                    {% if interview.status == 'waiting' %}
+                    {% if interview.status == 'waiting' or interview.status == 'canceled' %}
                     <a href="{% url 'interview_view' interview.id %}" class="btn btn-primary">
                         Details
                     </a>

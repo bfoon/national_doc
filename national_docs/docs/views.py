@@ -15,6 +15,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from .models import Profile
 from django.db import IntegrityError
+from immigration.models import OfficerProfile
+
 
 def landing_page(request):
     return render(request, 'docs/landing_page.html')
@@ -116,7 +118,7 @@ def logout_view(request):
 def dashboard(request):
     # National ID Application
     try:
-        national_id_application = NationalIDApplication.objects.get(application__user=request.user)
+        national_id_application = NationalIDApplication.objects.filter(application__user=request.user).latest('created_at')
         is_expired = national_id_application.application.status == 'complete' and national_id_application.application.is_expired()
 
         if is_expired:
@@ -134,7 +136,7 @@ def dashboard(request):
 
     # Resident Permit Application
     try:
-        resident_permit_application = ResidentPermitApplication.objects.get(application__user=request.user)
+        resident_permit_application = ResidentPermitApplication.objects.filter(application__user=request.user).latest('created_at')
         resident_permit_status = resident_permit_application.application.status
         resident_permit_application_date = resident_permit_application.created_at
         resident_permit_application_exists = True
@@ -145,7 +147,7 @@ def dashboard(request):
 
     # Work Permit Application
     try:
-        work_permit_application = WorkPermitApplication.objects.get(application__user=request.user)
+        work_permit_application = WorkPermitApplication.objects.filter(application__user=request.user).latest('created_at')
         work_permit_status = work_permit_application.application.status
         work_permit_application_date = work_permit_application.created_at
         work_permit_application_exists = True
@@ -173,11 +175,17 @@ def dashboard(request):
 
 @login_required
 def profile_view(request):
-    # Get the user's profile
-    profile = get_object_or_404(Profile, user=request.user)
+    try:
+        profile = get_object_or_404(Profile, user=request.user)
+    except:
+        profile = get_object_or_404(OfficerProfile, user=request.user)
+
+    user_groups = request.user.groups.values_list('name', flat=True)
+    belongs_to_special_group = any(group in ['immigration', 'police', 'tax'] for group in user_groups)
 
     return render(request, 'docs/profile.html', {
-        'profile': profile
+        'profile': profile,
+        'belongs_to_special_group': belongs_to_special_group,
     })
 
 @login_required
@@ -203,7 +211,11 @@ def edit_profile(request):
         user.save()
 
         # Update profile phone number
-        profile, created = Profile.objects.get_or_create(user=user)
+        try:
+            profile = get_object_or_404(Profile, user=user)
+        except:
+            profile = get_object_or_404(OfficerProfile, user=user)
+
         profile.phone = phone
         profile.save()
 
@@ -211,7 +223,11 @@ def edit_profile(request):
         return redirect('/profile')
 
     else:
-        profile, created = Profile.objects.get_or_create(user=request.user)
+        try:
+            profile = get_object_or_404(Profile, user=request.user)
+        except:
+            profile = get_object_or_404(OfficerProfile, user=request.user)
+
         return render(request, 'docs/edit_profile.html', {
             'user': request.user,
             'profile': profile,

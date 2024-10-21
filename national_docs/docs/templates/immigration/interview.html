@@ -38,18 +38,21 @@
                         <p><strong>Full Name:</strong> {{ interview.application.national_id_applications.first.full_name }}</p>
                         <p><strong>Email:</strong> {{ interview.application.national_id_applications.first.email }}</p>
                         <p><strong>Phone:</strong> {{ interview.application.national_id_applications.first.phone }}</p>
+                        <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
                     {% elif interview.application.resident_permit_applications.first %}
                         <p><strong>Full Name:</strong> {{ interview.application.resident_permit_applications.first.full_name }}</p>
                         <p><strong>Email:</strong> {{ interview.application.resident_permit_applications.first.email }}</p>
                         <p><strong>Phone:</strong> {{ interview.application.resident_permit_applications.first.phone_number }}</p>
+                        <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
                     {% elif interview.application.work_permit_applications.first %}
                         <p><strong>Full Name:</strong> {{ interview.application.work_permit_applications.first.full_name }}</p>
                         <p><strong>Email:</strong> {{ interview.application.work_permit_applications.first.email }}</p>
                         <p><strong>Phone:</strong> {{ interview.application.work_permit_applications.first.phone }}</p>
+                        <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
                     {% else %}
                         <p>No applicant information available.</p>
                     {% endif %}
-                    <p><strong>Interviewer:</strong> {{ interview.interviewer }}</p>
+                    <p><strong>Interviewer:</strong> {{ interview.interviewer.get_full_name }}</p>
 
                     <h4>Documents</h4>
                     <ul>

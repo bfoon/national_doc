@@ -116,7 +116,7 @@
             </p>
             {% endif %}
 
-            {% if national_id_application %}
+            {% if national_id_application.application.status != "canceled" %}
                 <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
                         data-application-id="{{ national_id_application.application.id }}"
                         data-application-type="National ID Card">
@@ -146,7 +146,7 @@
             </p>
             {% endif %}
 
-            {% if resident_permit_application %}
+            {% if resident_permit_application.application.status != "canceled" %}
                 <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
                         data-application-id="{{ resident_permit_application.application.id }}"
                         data-application-type="Resident Permit">
@@ -176,7 +176,7 @@
             </p>
             {% endif %}
 
-            {% if work_permit_application %}
+            {% if work_permit_application.application.status != "canceled" %}
                 <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
                         data-application-id="{{ work_permit_application.application.id }}"
                         data-application-type="Work Permit">
@@ -241,7 +241,7 @@
                 <p>Status: <span class="status">{{ work_permit_application.application.status }}</span></p>
                 {% endif %}
                 {% if national_id_application.application.status == 'waiting' %}
-                    <a href="{% url 'upload_document' national_id_application.id %}" class="cta-button">Upload Document</a>
+                    <a href="{% url 'upload_document' national_id_application.application.id %}" class="cta-button">Upload Document</a>
                 <button class="btn btn-info" data-toggle="modal" data-target="#notesModal">
                 <i class="fas fa-info-circle"></i> View Notes
                 </button>

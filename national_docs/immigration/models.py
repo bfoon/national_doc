@@ -51,7 +51,7 @@ class Note(models.Model):
         return f"Note for Application {self.application.id} by {self.user.username}"
 
 class InterviewSlot(models.Model):
-    date_time = models.DateTimeField(unique=True)  # Date and time of the interview slot
+    date_time = models.DateTimeField()  # Date and time of the interview slot
     max_interviewees = models.IntegerField(default=10)  # Maximum number of interviews allowed
     current_interviewees = models.IntegerField(default=0)  # Track how many have been assigned
     location = models.ForeignKey(PostLocation, on_delete=models.SET_NULL, null=True)  # Link to Post Location
@@ -97,6 +97,7 @@ class ToDo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,  related_name='todos')  # The user assigned the task
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)  # 0 by default, 1 if approved
     approver = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_todos')  # User who approves the task
+    rejection_reason = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

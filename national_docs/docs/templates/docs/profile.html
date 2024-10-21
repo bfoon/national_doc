@@ -13,7 +13,15 @@
     <!-- Breadcrumb navigation -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item">
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'dashboard' %}">Dashboard</a>
+                {% elif belongs_to_special_group %}
+                    <a href="{% url 'immigration_dashboard' %}">Dashboard</a>
+                {% else %}
+                    <a href="{% url 'dashboard' %}">Dashboard</a>
+                {% endif %}
+            </li>
             <li class="breadcrumb-item active" aria-current="page">Profile</li>
         </ol>
     </nav>
@@ -29,7 +37,7 @@
         <div class="card-body">
             <p><strong>Username:</strong> {{ request.user.username }}</p>
             <p><strong>Email:</strong> {{ request.user.email }}</p>
-            <p><strong>Phone Numebr:</strong> {{ profile.phone }}</p>
+            <p><strong>Phone Number:</strong> {{ profile.phone }}</p>
             <p><strong>Date of Birth:</strong> {{ profile.date_of_birth|date:"F d, Y" }}</p>
             <p><strong>Nationality:</strong> {{ profile.nationality|capfirst }}</p>
         </div>
@@ -38,7 +46,14 @@
     <!-- Action buttons -->
     <div class="text-center">
         <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
-        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+
+        {% if request.user.is_superuser %}
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        {% elif belongs_to_special_group %}
+            <a href="{% url 'immigration_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        {% else %}
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+        {% endif %}
     </div>
 </div>
 

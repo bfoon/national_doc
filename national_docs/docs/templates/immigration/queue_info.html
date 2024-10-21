@@ -11,7 +11,7 @@
     {% endif %}
 
     <h2>Interview Queue</h2>
-    <div class="row">
+    <div id="interview-queue" class="row">
         {% for boot in boots %}
             <div class="col-md-4">
                 <h3>Boot {{ boot.name }}</h3>
@@ -38,3 +38,17 @@
     </div>
 </div>
 {% include 'docs/footer.html' %}
+
+<script>
+    function fetchInterviewQueue() {
+        fetch("{% url 'fetch_interview_queue' %}")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('interview-queue').innerHTML = data;
+            })
+            .catch(error => console.error('Error fetching interview queue:', error));
+    }
+
+    // Fetch the interview queue every 20 seconds
+    setInterval(fetchInterviewQueue, 20000);
+</script>
