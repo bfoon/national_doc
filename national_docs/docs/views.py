@@ -6,7 +6,7 @@ from .models import (NationalIDApplication,
                      UploadedDocument, Application,
                      ResidentPermitApplication, WorkPermitApplication, Profile)
 from django.core.files.storage import FileSystemStorage
-from immigration.models import PostLocation
+from immigration.models import PostLocation, Fulfiller
 from django.db import transaction
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
@@ -264,9 +264,9 @@ def apply_national_id(request):
             birth_certificate = request.FILES.get('birth-certificate')
             passport_photo = request.FILES.get('passport-photo')
             post_location_id = request.POST.get('post-location')  # Get selected post location
-            post_location = PostLocation.objects.get(id=post_location_id)  # Fetch post location
+            post_location = get_object_or_404(PostLocation, id=post_location_id)  # Fetch post location
 
-            # Create the Application and National ID Application atomically
+            # Create the Application atomically
             application = Application.objects.create(
                 user=request.user,
                 application_type='new',
@@ -274,7 +274,8 @@ def apply_national_id(request):
                 post_location=post_location  # Save selected post location
             )
 
-            NationalIDApplication.objects.create(
+            # Create the National ID Application
+            national_id_application = NationalIDApplication.objects.create(
                 application=application,
                 full_name=full_name,
                 date_of_birth=date_of_birth,
@@ -287,10 +288,20 @@ def apply_national_id(request):
                 passport_photo=passport_photo,
             )
 
+            # Create the Fulfiller instance
+            Fulfiller.objects.create(
+                application=application,
+                location=post_location,  # Assuming you want to link it to the same post location
+                action=request.user,  # Assuming the user submitting is the one taking action
+                status='open',  # Default status for the fulfiller
+                progress=0  # Default progress
+            )
+
             messages.success(request, "Your National ID application has been submitted.")
             return redirect('dashboard')
 
         except Exception as e:
+            # Rollback if any exception occurs
             transaction.set_rollback(True)
             messages.warning(request, "An error occurred while processing your application. Please try again.")
             return render(request, 'docs/apply_national_id.html', {'post_locations': post_locations})
@@ -337,7 +348,7 @@ def apply_resident_permit(request):
                 # Fetch the post location object
                 post_location = get_object_or_404(PostLocation, id=post_location_id)
 
-                # Create the Application and Resident Permit Application atomically
+                # Create the Application atomically
                 application = Application.objects.create(
                     user=request.user,
                     application_type='new',
@@ -345,7 +356,8 @@ def apply_resident_permit(request):
                     post_location=post_location  # Save selected post location
                 )
 
-                ResidentPermitApplication.objects.create(
+                # Create the Resident Permit Application
+                resident_permit_application = ResidentPermitApplication.objects.create(
                     application=application,
                     full_name=full_name,
                     date_of_birth=date_of_birth,
@@ -360,22 +372,31 @@ def apply_resident_permit(request):
                     resident_permit_document=resident_permit_document,
                 )
 
+                # Create the Fulfiller instance
+                Fulfiller.objects.create(
+                    application=application,
+                    location=post_location,  # Link to the post location
+                    action=request.user,  # Assuming the user submitting is the one taking action
+                    status='open',  # Default status for the fulfiller
+                    progress=0  # Default progress
+                )
+
                 messages.success(request, "Your Resident Permit application has been submitted.")
                 return redirect('dashboard')
 
             except Exception as e:
                 # If any error occurs, rollback the transaction
+                transaction.set_rollback(True)
                 messages.error(request, f"An error occurred: {str(e)}. Please try again.")
                 return render(request, 'docs/apply_resident_permit.html', {'post_locations': post_locations})
 
     # Render the form with post locations available for selection
     return render(request, 'docs/apply_resident_permit.html', {'post_locations': post_locations})
 
-# Apply for Work Permit
 @login_required
 @transaction.atomic
 def apply_work_permit(request):
-    profile = Profile.objects.get(user=request.user)
+    profile = get_object_or_404(Profile, user=request.user)
 
     if profile.nationality == 'national':
         messages.warning(request, "Nationals cannot apply for a work permit.")
@@ -396,14 +417,21 @@ def apply_work_permit(request):
             job_title = request.POST.get('job_title')
             work_contract = request.FILES.get('work_contract')
             passport_photo = request.FILES.get('passport_photo')
+            post_location_id = request.POST.get('post_location')  # Get selected post location
 
+            # Fetch the post location object
+            post_location = get_object_or_404(PostLocation, id=post_location_id)
+
+            # Create the Application atomically
             application = Application.objects.create(
                 user=request.user,
                 application_type='new',
                 status='pending',
+                post_location=post_location  # Save selected post location
             )
 
-            WorkPermitApplication.objects.create(
+            # Create the Work Permit Application
+            work_permit_application = WorkPermitApplication.objects.create(
                 application=application,
                 full_name=full_name,
                 date_of_birth=date_of_birth,
@@ -414,13 +442,27 @@ def apply_work_permit(request):
                 passport_photo=passport_photo,
             )
 
+            # Create the Fulfiller instance
+            Fulfiller.objects.create(
+                application=application,
+                location=post_location,  # Link to the post location
+                action=request.user,  # Assuming the user submitting is the one taking action
+                status='open',  # Default status for the fulfiller
+                progress=0  # Default progress
+            )
+
+            messages.success(request, "Your Work Permit application has been submitted.")
             return redirect('dashboard')
+
         except Exception as e:
+            # If any error occurs, rollback the transaction
             transaction.set_rollback(True)
-            messages.error(request, "An error occurred while processing your application. Please try again.")
+            messages.error(request, f"An error occurred while processing your application: {str(e)}. Please try again.")
             return render(request, 'docs/apply_work_permit.html')
 
-    return render(request, 'docs/apply_work_permit.html')
+    # Render the form with post locations available for selection
+    post_locations = PostLocation.objects.all()
+    return render(request, 'docs/apply_work_permit.html', {'post_locations': post_locations})
 
 @login_required
 def fetch_application_details(request):

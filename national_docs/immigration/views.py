@@ -113,18 +113,20 @@ def fulfiller_detail(request, id):
         return redirect('fulfillers_list')
 
     application = fulfiller.application
-    doc_uploads = UploadedDocument.objects.filter(application=application)
+    doc_uploads = UploadedDocument.objects.filter(application=application)  # Get the queryset
+
+    # No need to check if doc_uploads exists; just set it to an empty list if no documents found
+    if not doc_uploads.exists():
+        doc_uploads = []  # Ensure this is an empty list
+
     notes = Note.objects.filter(application=application).order_by('-created_at')
     post_locations = PostLocation.objects.all()
-
-    if not doc_uploads.exists():
-        doc_uploads = False
 
     if request.method == 'POST':
         try:
             # Get data from POST request
             location = request.POST.get('location')
-            action_user_id = request.POST.get('action')
+            # action_user_id = request.POST.get('action')
             schedule = request.POST.get('schedule')
             priority = request.POST.get('priority')
             status = request.POST.get('status')
@@ -135,8 +137,8 @@ def fulfiller_detail(request, id):
 
             # Update the fulfiller details
             fulfiller.location_id = location
-            if action_user_id:
-                fulfiller.action = User.objects.get(id=action_user_id)
+
+            fulfiller.action = request.user
             fulfiller.schedule = schedule
             fulfiller.priority = priority
             fulfiller.status = status
@@ -176,7 +178,7 @@ def fulfiller_detail(request, id):
                             status='scheduled'
                         )
                     else:
-                        messages.error(request, 'No available interview slots.')
+                        messages.warning(request, 'No available interview slots.')
                         return redirect('fulfiller_detail', id=fulfiller.id)
 
             # Update the application status
@@ -193,7 +195,7 @@ def fulfiller_detail(request, id):
 
             messages.success(request, 'Fulfiller details and message updated successfully.')
         except Exception as e:
-            messages.error(request, f"Error updating fulfiller details: {e}")
+            messages.warning(request, f"Error updating fulfiller details: {e}")
 
         return redirect('fulfiller_detail', id=fulfiller.id)
 
@@ -202,11 +204,12 @@ def fulfiller_detail(request, id):
     return render(request, 'immigration/fulfiller_detail.html', {
         'fulfiller': fulfiller,
         'application': application,
-        'doc_uploads': doc_uploads,
+        'doc_uploads': doc_uploads,  # This is now always an iterable
         'post_locations': post_locations,
         'users': users,
         'notes': notes,
     })
+
 
 
 @login_required

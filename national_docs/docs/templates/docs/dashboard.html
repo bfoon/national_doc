@@ -329,72 +329,71 @@
             </div>
             </div>
             </div>
+  <!-- Custom JavaScript -->
+    <script>
+        let applicationId; // To store the application ID globally
 
+        // Ensure jQuery is ready
+        $(document).ready(function() {
+            $('#applicationModal').on('show.bs.modal', function (event) {
+                const button = $(event.relatedTarget);
+                applicationId = button.data('application-id');  // Store application ID when the modal opens
+                const applicationType = button.data('application-type');
 
+                // AJAX request to fetch the application details
+                $.ajax({
+                    url: "/fetch-application-details/",
+                    data: {
+                        'application_id': applicationId,
+                        'application_type': applicationType
+                    },
+                    success: function(response) {
+                        $('#applicationDetails').html(response.html);
 
-<script>
-    let applicationId; // To store the application ID globally
+                        // Show immigration note if available
+                        if (response.immigration_note) {
+                            $('#immigrationNote').show();
+                            $('#immigrationMessage').text(response.immigration_note);
+                        } else {
+                            $('#immigrationNote').hide();
+                        }
 
-    $(document).ready(function() {
-        $('#applicationModal').on('show.bs.modal', function (event) {
-            const button = $(event.relatedTarget);
-            applicationId = button.data('application-id');  // Store application ID when the modal opens
-            const applicationType = button.data('application-type');
-
-            // AJAX request to fetch the application details
-            $.ajax({
-                url: "{% url 'fetch_application_details' %}",
-                data: {
-                    'application_id': applicationId,
-                    'application_type': applicationType
-                },
-                success: function(response) {
-                    $('#applicationDetails').html(response.html);
-
-                    // Show immigration note if available
-                    if (response.immigration_note) {
-                        $('#immigrationNote').show();
-                        $('#immigrationMessage').text(response.immigration_note);
-                    } else {
-                        $('#immigrationNote').hide();
+                        // Show or hide cancel button
+                        if (response.allow_cancel) {
+                            $('#cancelApplicationBtn').show();
+                        } else {
+                            $('#cancelApplicationBtn').hide();
+                        }
                     }
+                });
+            });
 
-                    // Show or hide cancel button
-                    if (response.allow_cancel) {
-                        $('#cancelApplicationBtn').show();
-                    } else {
-                        $('#cancelApplicationBtn').hide();
-                    }
+            // Cancel Application button click event
+            $('#cancelApplicationBtn').click(function() {
+                if (applicationId) {
+                    // AJAX request to cancel the application
+                    $.ajax({
+                        url: "/cancel-application/",
+                        data: {
+                            'application_id': applicationId
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                alert('Application successfully cancelled.');
+                                $('#applicationModal').modal('hide');
+                                location.reload();  // Reload the page to reflect the cancellation
+                            } else {
+                                alert(response.error);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Error cancelling the application: ' + error);
+                        }
+                    });
                 }
             });
         });
-
-        // Cancel Application button click event
-        $('#cancelApplicationBtn').click(function() {
-            if (applicationId) {
-                // AJAX request to cancel the application
-                $.ajax({
-                    url: "{% url 'cancel_application' %}",
-                    data: {
-                        'application_id': applicationId
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            alert('Application successfully cancelled.');
-                            $('#applicationModal').modal('hide');
-                            location.reload();  // Reload the page to reflect the cancellation
-                        } else {
-                            alert(response.error);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Error cancelling the application: ' + error);
-                    }
-                });
-            }
-        });
-    });
-</script>
+    </script>
 
 
 <script>
