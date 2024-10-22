@@ -30,11 +30,13 @@
     <!-- Profile Header -->
     <h2 class="mb-4">User Profile</h2>
 
-    <!-- Profile Card -->
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
+        <!-- Profile Card -->
+        <div class="card mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between">
             <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>
+            <strong>{{ profile.officer_batch_number }}</strong>
         </div>
+
         <div class="card-body">
             <p><strong>Username:</strong> {{ request.user.username }}</p>
             <p><strong>Email:</strong> {{ request.user.email }}</p>

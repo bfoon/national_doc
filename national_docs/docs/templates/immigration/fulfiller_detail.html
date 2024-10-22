@@ -1,5 +1,5 @@
- {% extends 'docs/header.html' %}
- {% block content %}
+{% extends 'docs/header.html' %}
+{% block content %}
 
 <style>
     .form-container {
@@ -56,6 +56,14 @@
     .form-group textarea {
         resize: none;
     }
+
+    .alert-right {
+        position: absolute;
+        top: 350px; /* Adjusts the position to align with the progress field */
+        right: 0;
+        width: 300px;
+    }
+
 </style>
 
 <div class="container my-5">
@@ -79,7 +87,7 @@
 
     <h2>Edit Fulfiller Details</h2>
 
-    <div class="form-container">
+    <div class="form-container position-relative">
         <form method="POST">
             {% csrf_token %}
             <div class="form-row">
@@ -97,7 +105,7 @@
 
                 <div class="form-group col-md-6">
                     <label for="action">Action (User)</label>
-                    <select class="form-control" id="action" name="action" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %} disabled>
+                    <select class="form-control" id="action" name="action" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
                         <option value="">Select User</option>
                         {% for user in users %}
                             <option value="{{ user.id }}" {% if fulfiller.action.id == user.id %}selected{% endif %}>{{ user.get_full_name }}</option>
@@ -139,6 +147,7 @@
                         <option value="waiting" {% if fulfiller.application.status == 'waiting' %}selected{% endif %}>Waiting</option>
                         <option value="interview" {% if fulfiller.application.status == 'interview' %}selected{% endif %}>Interview</option>
                         <option value="completed" {% if fulfiller.application.status == 'completed' %}selected{% endif %}>Completed</option>
+                        <option value="rejected" {% if fulfiller.application.status == 'rejected' %}selected{% endif %}>Rejected</option>
                     </select>
                 </div>
             </div>
@@ -153,7 +162,18 @@
                         </div>
                     </div>
                 </div>
+                {% if application.todos.first.status == 2 %}
+                <div class="alert alert-danger alert-right" role="alert">
+                    <strong>Rejection Note:</strong> {{ application.todos.first.rejection_reason }}
+                </div>
+                {% endif %}
             </div>
+
+            {% if application.todos.first.status == 2 %}
+            <div class="alert alert-danger alert-right" role="alert">
+                <strong>Rejection Note:</strong> {{ application.todos.first.rejection_reason }}
+            </div>
+            {% endif %}
 
             <h4>Uploaded Documents</h4>
             <ul class="list-group mb-3">
@@ -208,9 +228,7 @@
                 <label for="message">Message to Requester</label>
                 <textarea class="form-control" id="message" name="message" rows="3" placeholder="Type your message here..."></textarea>
             </div>
-            {% if fulfiller.application.status != 'completed' and fulfiller.status != 'closed' %}
-            <button type="submit" class="btn btn-primary">Update Fulfiller</button>
-             {% endif %}
+            <button type="submit" class="btn btn-primary" {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>Update Fulfiller</button>
         </form>
     </div>
 

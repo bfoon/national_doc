@@ -443,9 +443,9 @@ def available_slots(request):
 def interview_list(request):
     user = request.user
     if user.is_superuser:
-        interviews = Interview.objects.exclude(status='completed').order_by('date_created')
+        interviews = Interview.objects.exclude(Q(status='completed') | Q(status='canceled')).order_by('date_created')
     else:
-        interviews = Interview.objects.exclude(status='completed').filter(application__post_location=user.officerprofile.post_location).order_by('date_created')
+        interviews = Interview.objects.exclude(Q(status='completed') | Q(status='canceled')).filter(application__post_location=user.officerprofile.post_location).order_by('date_created')
 
     return render(request, 'immigration/interview_list.html', {
         'interviews': interviews,

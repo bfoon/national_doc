@@ -20,6 +20,8 @@ class PostLocation(models.Model):
 class OfficerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    phone = models.CharField(max_length=50, null=True)
+    # email = models.CharField(max_length=1000, null=True)
     officer_batch_number = models.CharField(max_length=100, unique=True)
     post_location = models.ForeignKey(PostLocation, on_delete=models.SET_NULL, null=True, blank=True)
 
