@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from docs.models import Application, UploadedDocument
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
-                     Interview, ToDo, Boot, OfficerProfile)
+                     Interview, ToDo, Boot, OfficerProfile, Notification)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_date
@@ -15,6 +15,15 @@ from django.shortcuts import render, get_object_or_404
 from datetime import datetime
 from datetime import date
 
+def send_notification(user, message):
+    notification = Notification.objects.create(user=user, message=message)
+    notification.save()
+
+def mark_notification_as_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+    notification.is_read = True
+    notification.save()
+    return redirect('dashboard')
 
 @login_required
 def immigration_dashboard(request):
@@ -192,7 +201,8 @@ def fulfiller_detail(request, id):
                     user=request.user,
                     message=message_to_requester
                 )
-
+            user = request.user  # Assuming the current user is the one to notify
+            send_notification(user, f"Your application status has change to {status}.")
             messages.success(request, 'Fulfiller details and message updated successfully.')
         except Exception as e:
             messages.warning(request, f"Error updating fulfiller details: {e}")
@@ -253,6 +263,8 @@ def add_post_location(request):
             postal_code=postal_code,
             country=country
         )
+        user = request.user  # Assuming the current user is the one to notify
+        send_notification(user, f"A location has been added {name}.")
         messages.success(request, "Post location added successfully.")
         return redirect('post_locations')
 
@@ -278,6 +290,8 @@ def edit_post_location(request, id):
         location.country = request.POST.get('country')
         location.save()
         messages.success(request, "Post location updated successfully.")
+        user = request.user  # Assuming the current user is the one to notify
+        send_notification(user, f"Post location was added {name}.")
         return redirect('post_locations')
 
     return render(request, 'immigration/edit_post_location.html', {'location': location})
@@ -294,6 +308,8 @@ def delete_post_location(request, id):
             return redirect('post_locations')
 
     location.delete()
+    user = request.user  # Assuming the current user is the one to notify
+    send_notification(user, f"Post location was deleted.")
     messages.success(request, "Post location deleted successfully.")
     return redirect('post_locations')
 
@@ -357,7 +373,8 @@ def create_user(request):
                     officer_batch_number=officer_batch_number,
                     post_location=post_location
                 )
-
+                user = request.user  # Assuming the current user is the one to notify
+                send_notification(user, f"Officer user account {username} was created.")
                 messages.success(request, f'{role.capitalize()} user created successfully!')
                 return redirect('list_officer_users')
             except Group.DoesNotExist:
@@ -385,6 +402,8 @@ def create_group(request):
             messages.error(request, 'Group already exists.')
         else:
             Group.objects.create(name=group_name)
+            user = request.user  # Assuming the current user is the one to notify
+            send_notification(user, f"Group {group_name} was created.")
             messages.success(request, f'Group "{group_name}" created successfully.')
             return redirect('list_officer_users')
 
@@ -427,6 +446,8 @@ def available_slots(request):
                 location=location,
                 is_available=True
             )
+            user = request.user  # Assuming the current user is the one to notify
+            send_notification(user, f"Interview slot {date_time} was created.")
             messages.success(request, "Interview slot added successfully!")
             return redirect('available_slots')
         except Exception as e:
@@ -501,6 +522,8 @@ def interview_view(request, interview_id):
                 interview_slot.save()
 
                 application.save()  # Save the application updates
+                user = request.user  # Assuming the current user is the one to notify
+                send_notification(user, f"Interview was postpone")
                 messages.success(request, "Interview postponed successfully, and a new slot assigned.")
             else:
                 messages.error(request, "No available interview slots for postponement.")
@@ -523,7 +546,8 @@ def interview_view(request, interview_id):
                 approver=None,  # Approver can be set later
                 status=0  # Default to pending (0)
             )
-
+            user = request.user  # Assuming the current user is the one to notify
+            send_notification(user, f"Interview is awaiting {application.user.get_full_name} approval ")
             messages.success(request, 'Interview details updated and ToDo created successfully.')
             return redirect('interview_list')
 
@@ -612,6 +636,8 @@ def approve_todo(request, todo_id):
 
     application.save()
     interview.save()
+    user = request.user  # Assuming the current user is the one to notify
+    send_notification(user, f"Interview for {application.user.get_full_name} is approved ")
 
     messages.success(request, "ToDo item has been approved successfully. Application and Interview are marked as completed.")
     return redirect('todo_list')
@@ -658,6 +684,8 @@ def reject_todo(request, todo_id):
         application.save()
         interview.save()
 
+        user = request.user  # Assuming the current user is the one to notify
+        send_notification(user, f"Interview for {application.user.get_full_name} is rejected ")
         messages.success(request, "ToDo item has been rejected successfully.")
         return redirect('todo_list')
 
@@ -729,6 +757,8 @@ def add_boot(request):
             group = Group.objects.get(id=group_id)
             post_location = PostLocation.objects.get(id=post_location_id)
             Boot.objects.create(name=name, description=description, assigned_to=assigned_to, group=group, post_location=post_location)
+            user = request.user  # Assuming the current user is the one to notify
+            send_notification(user, f"Boot {name} was added")
             messages.success(request, 'Boot added successfully.')
             return redirect('boot_list')
         else:
@@ -760,6 +790,8 @@ def change_assignment(request, boot_id):
             boot.group = group
             boot.post_location = post_location
             boot.save()
+            user = request.user  # Assuming the current user is the one to notify
+            send_notification(user, f"Boot {boot.name} was just updated ")
             messages.success(request, 'Boot assignment updated successfully.')
         else:
             messages.error(request, 'Please select valid user, group, and post location.')

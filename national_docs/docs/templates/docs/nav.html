@@ -1,21 +1,92 @@
-<nav>
-    <ul>
-        <li><a href="/profile">Profile</a></li>
-        <li><a href="#notifications">Notifications</a></li>
-        {% if user.is_superuser %}
-            <li><a href="/immigration/dashboard">Admin Dashboard</a></li>
-        {% elif user.groups.exists %}
-            {% for group in user.groups.all %}
-                {% if group.name == 'immigration' %}
-                    <li><a href="/immigration/queue-info">Queue Info</a></li>
-                    <li><a href="/immigration/dashboard">Admin Dashboard</a></li>
-                {% elif group.name == 'police' %}
-                    <li><a href="/police/dashboard">Police Dashboard</a></li>
-                {% elif group.name == 'tax' %}
-                    <li><a href="/tax/dashboard">Tax Dashboard</a></li>
+<style>
+        .badge-danger {
+            background-color: #dc3545;
+            color: white;
+            padding: 3px 7px;
+            border-radius: 50%;
+            font-size: 12px;
+        }
+
+        .dropdown-menu {
+            min-width: 200px;
+        }
+
+        .dropdown-menu li {
+            padding: 10px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .dropdown-menu li:last-child {
+            border-bottom: none;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 0;
+        }
+
+        .dropdown-menu li a:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Notifications
+                        {% if notifications.count > 0 %}
+                            <span class="badge badge-danger">{{ notifications.count }}</span>
+                        {% endif %}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% if notifications %}
+                            {% for notification in notifications %}
+                                <a class="dropdown-item" href="{% url 'mark_notification_as_read' notification.id %}">{{ notification.message }}</a>
+                            {% endfor %}
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/notifications">View all</a>
+                        {% else %}
+                            <a class="dropdown-item" href="#">No new notifications</a>
+                        {% endif %}
+                    </div>
+                </li>
+                {% if user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/immigration/dashboard">Admin Dashboard</a>
+                    </li>
+                {% elif user.groups.exists %}
+                    {% for group in user.groups.all %}
+                        {% if group.name == 'immigration' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/immigration/queue-info">Queue Info</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/immigration/dashboard">Admin Dashboard</a>
+                            </li>
+                        {% elif group.name == 'police' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/police/dashboard">Police Dashboard</a>
+                            </li>
+                        {% elif group.name == 'tax' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/tax/dashboard">Tax Dashboard</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
                 {% endif %}
-            {% endfor %}
-        {% endif %}
-        <li><a href="{% url 'logout' %}">Logout</a></li>
-    </ul>
-</nav>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>

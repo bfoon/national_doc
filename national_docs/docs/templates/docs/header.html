@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}National Documents Portal{% endblock %}</title>
     <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+                    {% include 'docs/base.html' %}  <!-- Include the navigation -->
+
     <style>
         body, html {
             margin: 0;
@@ -19,53 +21,44 @@
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
         }
-        header {
-            background-color: #3498db;
-            color: white;
-            padding: 0.5rem 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-        }
-        nav ul {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-        }
-        nav ul li {
-            margin-right: 20px;
-        }
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-        }
-        h1, h2 {
-            color: #2c3e50;
-        }
         .container {
             flex: 1;
             padding: 20px;
-            margin-top: 60px;
+            margin-top: 70px; /* Adjusted for fixed navbar */
         }
-        footer {
-            background-color: #3498db;
+        .logo {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .fixed-footer {
+            background-color: #343a40; /* Same as bg-dark */
             color: white;
             text-align: center;
             padding: 1rem;
             width: 100%;
-            margin-top: auto;
+            position: fixed;
+            bottom: 0;
+            left: 0;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h2>National Documents Portal</h2>
-    {% include 'docs/nav.html' %}  <!-- Include the navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo">
+                National Documents Portal
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                {% include 'docs/nav.html' %}  <!-- Include the navigation -->
+            </div>
+        </div>
+    </nav>
 </header>
 
 <div class="container">
@@ -74,13 +67,8 @@
     {% endblock %}
 </div>
 
-
-{% include 'docs/footer.html' %}  <!-- Include the footer -->
-
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+<footer class="fixed-footer">
+    <p>Developed by Akaine Consulting</p>
+</footer>
 </body>
 </html>

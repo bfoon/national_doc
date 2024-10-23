@@ -115,3 +115,15 @@ class Boot(models.Model):
 
     def __str__(self):
         return self.name
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)  # To track if the notification has been read
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']  # Order notifications by newest first
+
+    def __str__(self):
+        return f'Notification for {self.user.username}: {self.message}'

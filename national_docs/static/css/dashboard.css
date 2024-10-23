@@ -1,0 +1,126 @@
+body, html {
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #3498db;
+            color: white;
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+        }
+        nav ul li {
+            margin-right: 20px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .container {
+            flex: 1;
+            padding: 20px;
+            margin-top: 60px;
+        }
+
+    h1, h2 {
+        color: #2c3e50;
+    }
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+    .dashboard-item {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .dashboard-item h3 {
+        margin-top: 0;
+        color: #34495e;
+    }
+    .dashboard-item p {
+        margin-bottom: 10px;
+    }
+    .status {
+        font-weight: bold;
+        color: #27ae60;
+    }
+    .status.pending {
+        color: #f39c12;
+    }
+    .status.processing {
+        color: #3498db;
+    }
+    .status.expired {
+        color: #e74c3c;
+    }
+    .status.freezed {
+        color: #9b59b6;
+    }
+    .cta-button {
+        display: inline-block;
+        background-color: #3498db;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 4px;
+        text-decoration: none;
+        margin-top: 10px;
+        transition: background-color 0.3s ease;
+    }
+    .cta-button:hover {
+        background-color: #2980b9;
+    }
+    .print-button {
+        background-color: #2ecc71;
+    }
+    .print-button:hover {
+        background-color: #27ae60;
+    }
+    .warning {
+        background-color: #f39c12;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        margin-top: 5px;
+        display: inline-block;
+    }
+    .progress-bar {
+        width: 100%;
+        background-color: #e0e0e0;
+        padding: 3px;
+        border-radius: 3px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
+        margin-top: 10px;
+    }
+    .progress {
+        display: block;
+        height: 22px;
+        background-color: #3498db;
+        border-radius: 3px;
+        transition: width 500ms ease-in-out;
+    }
