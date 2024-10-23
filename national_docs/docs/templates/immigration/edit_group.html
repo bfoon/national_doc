@@ -1,0 +1,22 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+<div class="container my-5">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-2 rounded">
+            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'create_group' %}">Officer Users</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Group</li>
+        </ol>
+    </nav>
+
+    <h2>Edit Group</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="group_name">Group Name</label>
+            <input type="text" class="form-control" id="group_name" name="group_name" value="{{ group.name }}" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Update Group</button>
+    </form>
+</div>
+{% endblock %}

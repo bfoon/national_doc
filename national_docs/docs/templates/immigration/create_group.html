@@ -1,20 +1,49 @@
- {% extends 'docs/header.html' %}
- {% block content %}
-
+{% extends 'docs/header.html' %}
+{% block content %}
 <div class="container my-5">
-    <h2>Create New Group</h2>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-2 rounded">
+            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}">Officer Users</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit User</li>
+        </ol>
+    </nav>
+    <h2>Manage Groups</h2>
 
-    <form method="POST">
+    <form method="POST" class="mb-4">
         {% csrf_token %}
         <div class="form-group">
             <label for="group_name">Group Name</label>
             <input type="text" class="form-control" id="group_name" name="group_name" required>
         </div>
-
         <button type="submit" class="btn btn-primary">Create Group</button>
     </form>
 
+    <h3>Existing Groups</h3>
+    <table class="table table-bordered table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Group Name</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+                <tr>
+                    <td>{{ group.name }}</td>
+                    <td>
+                        <a href="{% url 'edit_group' group.id %}" class="btn btn-warning btn-sm">Edit</a>
+                        <a href="{% url 'delete_group' group.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2" class="text-center">No groups available</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     <a href="{% url 'list_officer_users' %}" class="btn btn-link mt-3">← Back to User List</a>
 </div>
-
 {% endblock %}

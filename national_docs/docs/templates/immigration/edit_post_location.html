@@ -1,6 +1,15 @@
  {% extends 'docs/header.html' %}
  {% block content %}
 <div class="container my-5">
+       <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-2 rounded">
+            <li class="breadcrumb-item">
+                    <a href="{% url 'post_locations' %}">Post Locations</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Edit Post</li>
+        </ol>
+    </nav>
     <h2>Edit Post Location</h2>
 
     <!-- Form Wrapper with Border -->

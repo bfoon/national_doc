@@ -1,0 +1,75 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+<div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-2 rounded">
+            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}">Officer Users</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit User</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h2>Edit User</h2>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="first_name">First Name</label>
+                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name</label>
+                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="officer_batch_number">Officer Batch Number</label>
+                    <input type="text" class="form-control" id="officer_batch_number" name="officer_batch_number" value="{{ officer_profile.officer_batch_number }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="post_location">Post Location</label>
+                    <select class="form-control" id="post_location" name="post_location" required>
+                        {% for location in post_locations %}
+                            <option value="{{ location.id }}" {% if location.id == officer_profile.post_location.id %}selected{% endif %}>{{ location.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="groups">Groups</label>
+                    <select multiple class="form-control" id="groups" name="groups">
+                        {% for group in groups %}
+                            <option value="{{ group.id }}" {% if group in user.groups.all %}selected{% endif %}>{{ group.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Update User</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-secondary text-white">
+            <h3>Current Groups</h3>
+        </div>
+        <div class="card-body">
+            <ul class="list-group">
+                {% for group in user.groups.all %}
+                    <li class="list-group-item">{{ group.name }}</li>
+                {% empty %}
+                    <li class="list-group-item">No groups assigned</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

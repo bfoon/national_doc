@@ -389,6 +389,67 @@ def create_user(request):
     return render(request, 'immigration/create_user.html', {'groups': groups, 'post_locations': post_locations})
 
 @login_required
+def edit_user(request, user_id):
+    # Ensure that only superusers can edit users
+    if not request.user.is_superuser:
+        messages.warning(request, "You do not have permission to edit users.")
+        return redirect('list_officer_users')
+
+    user = get_object_or_404(User, id=user_id)
+    officer_profile = get_object_or_404(OfficerProfile, user=user)
+
+    if request.method == 'POST':
+        user.username = request.POST.get('username')
+        user.first_name = request.POST.get('first_name')
+        user.last_name = request.POST.get('last_name')
+        user.email = request.POST.get('email')
+        user.save()
+
+        officer_profile.officer_batch_number = request.POST.get('officer_batch_number')
+        post_location_id = request.POST.get('post_location')
+        officer_profile.post_location = get_object_or_404(PostLocation, id=post_location_id)
+        officer_profile.save()
+
+        # Update user groups
+        group_ids = request.POST.getlist('groups')
+        user.groups.set(group_ids)
+
+        # Remove selected groups
+        remove_group_ids = request.POST.getlist('remove_groups')
+        for group_id in remove_group_ids:
+            group = Group.objects.get(id=group_id)
+            user.groups.remove(group)
+
+        messages.success(request, 'User updated successfully!')
+        return redirect('list_officer_users')
+
+    groups = Group.objects.all()
+    post_locations = PostLocation.objects.all()
+
+    return render(request, 'immigration/edit_officer_user.html', {
+        'user': user,
+        'officer_profile': officer_profile,
+        'groups': groups,
+        'post_locations': post_locations
+    })
+
+@login_required
+def delete_user(request, user_id):
+    # Ensure that only superusers can delete users
+    if not request.user.is_superuser:
+        messages.warning(request, "You do not have permission to delete users.")
+        return redirect('list_officer_users')
+
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        user.delete()
+        messages.success(request, 'User deleted successfully!')
+        return redirect('list_officer_users')
+
+    return render(request, 'immigration/delete_post_user.html', {'user': user})
+
+@login_required
 def create_group(request):
     # Ensure that only superusers can create groups
     if not request.user.is_superuser:
@@ -407,8 +468,50 @@ def create_group(request):
             messages.success(request, f'Group "{group_name}" created successfully.')
             return redirect('list_officer_users')
 
-    return render(request, 'immigration/create_group.html')
+    groups = Group.objects.all()
+    return render(request, 'immigration/create_group.html', {'groups': groups})
 
+@login_required
+def edit_group(request, group_id):
+    # Ensure that only superusers can edit groups
+    if not request.user.is_superuser:
+        messages.warning(request, "You do not have permission to edit groups.")
+        return redirect('list_officer_users')
+
+    group = get_object_or_404(Group, id=group_id)
+
+    if request.method == 'POST':
+        group_name = request.POST.get('group_name')
+
+        if Group.objects.filter(name=group_name).exclude(id=group_id).exists():
+            messages.error(request, 'Group name already exists.')
+        else:
+            group.name = group_name
+            group.save()
+            user = request.user  # Assuming the current user is the one to notify
+            send_notification(user, f"Group {group_name} was updated.")
+            messages.success(request, f'Group "{group_name}" updated successfully.')
+            return redirect('list_officer_users')
+
+    return render(request, 'immigration/edit_group.html', {'group': group})
+
+@login_required
+def delete_group(request, group_id):
+    # Ensure that only superusers can delete groups
+    if not request.user.is_superuser:
+        messages.warning(request, "You do not have permission to delete groups.")
+        return redirect('list_officer_users')
+
+    group = get_object_or_404(Group, id=group_id)
+
+    if request.method == 'POST':
+        group.delete()
+        user = request.user  # Assuming the current user is the one to notify
+        send_notification(user, f"Group {group.name} was deleted.")
+        messages.success(request, f'Group "{group.name}" deleted successfully.')
+        return redirect('list_officer_users')
+
+    return render(request, 'immigration/delete_group.html', {'group': group})
 
 
 @login_required

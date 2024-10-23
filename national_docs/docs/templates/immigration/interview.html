@@ -1,11 +1,17 @@
- {% extends 'docs/header.html' %}
- {% block content %}
+{% extends 'docs/header.html' %}
+{% block content %}
 <style>
     .border {
         border: 1px solid #007bff; /* Bootstrap primary color */
     }
     .rounded {
         border-radius: 0.5rem; /* Slightly rounded corners */
+    }
+    .passport-photo {
+        max-width: 100px; /* Adjust the size as needed */
+        border: 1px solid #ddd;
+        border-radius: 0.5rem;
+        margin-left: 20px;
     }
 </style>
 
@@ -21,7 +27,7 @@
     {% endif %}
 
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
+        <ol class="breadcrumb bg-light p-2 rounded">
             <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{% url 'interview_list' %}">Interview List</a></li>
             <li class="breadcrumb-item active" aria-current="page">Interview</li>
@@ -34,51 +40,62 @@
                 <div class="card-header bg-primary text-white">
                     <h4>Applicant Information</h4>
                 </div>
-                <div class="card-body">
-                    {% if interview.application.national_id_applications.first %}
-                        <p><strong>Full Name:</strong> {{ interview.application.national_id_applications.first.full_name }}</p>
-                        <p><strong>Email:</strong> {{ interview.application.national_id_applications.first.email }}</p>
-                        <p><strong>Phone:</strong> {{ interview.application.national_id_applications.first.phone }}</p>
-                        <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
-                    {% elif interview.application.resident_permit_applications.first %}
-                        <p><strong>Full Name:</strong> {{ interview.application.resident_permit_applications.first.full_name }}</p>
-                        <p><strong>Email:</strong> {{ interview.application.resident_permit_applications.first.email }}</p>
-                        <p><strong>Phone:</strong> {{ interview.application.resident_permit_applications.first.phone_number }}</p>
-                        <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
-                    {% elif interview.application.work_permit_applications.first %}
-                        <p><strong>Full Name:</strong> {{ interview.application.work_permit_applications.first.full_name }}</p>
-                        <p><strong>Email:</strong> {{ interview.application.work_permit_applications.first.email }}</p>
-                        <p><strong>Phone:</strong> {{ interview.application.work_permit_applications.first.phone }}</p>
-                        <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
-                    {% else %}
-                        <p>No applicant information available.</p>
-                    {% endif %}
-                    <p><strong>Interviewer:</strong> {{ interview.interviewer.get_full_name }}</p>
-
-                    <h4>Documents</h4>
-                    <ul>
+                <div class="card-body d-flex justify-content-between">
+                    <div>
                         {% if interview.application.national_id_applications.first %}
-                            <li><a href="{{ interview.application.national_id_applications.first.birth_certificate.url }}" target="_blank">Birth Certificate</a></li>
-                            <li><a href="{{ interview.application.national_id_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
+                            <p><strong>Full Name:</strong> {{ interview.application.national_id_applications.first.full_name }}</p>
+                            <p><strong>Email:</strong> {{ interview.application.national_id_applications.first.email }}</p>
+                            <p><strong>Phone:</strong> {{ interview.application.national_id_applications.first.phone }}</p>
+                            <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
                         {% elif interview.application.resident_permit_applications.first %}
-                            <li><a href="{{ interview.application.resident_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
-                            <li><a href="{{ interview.application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">Resident Permit Document</a></li>
+                            <p><strong>Full Name:</strong> {{ interview.application.resident_permit_applications.first.full_name }}</p>
+                            <p><strong>Email:</strong> {{ interview.application.resident_permit_applications.first.email }}</p>
+                            <p><strong>Phone:</strong> {{ interview.application.resident_permit_applications.first.phone_number }}</p>
+                            <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
                         {% elif interview.application.work_permit_applications.first %}
-                            <li><a href="{{ interview.application.work_permit_applications.first.work_contract.url }}" target="_blank">Work Contract</a></li>
-                            <li><a href="{{ interview.application.work_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
+                            <p><strong>Full Name:</strong> {{ interview.application.work_permit_applications.first.full_name }}</p>
+                            <p><strong>Email:</strong> {{ interview.application.work_permit_applications.first.email }}</p>
+                            <p><strong>Phone:</strong> {{ interview.application.work_permit_applications.first.phone }}</p>
+                            <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
+                        {% else %}
+                            <p>No applicant information available.</p>
                         {% endif %}
-
-                        {% for document in documents %}
-                            <li><a href="{{ document.document_file.url }}" target="_blank">{{ document.document_type }}</a></li>
-                        {% empty %}
-                            <li>No additional documents uploaded</li>
-                        {% endfor %}
-                    </ul>
+                        <p><strong>Interviewer:</strong> {{ interview.interviewer.get_full_name }}</p>
+                    </div>
+                    <div>
+                        {% if interview.application.national_id_applications.first %}
+                            <img src="{{ interview.application.national_id_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+                        {% elif interview.application.resident_permit_applications.first %}
+                            <img src="{{ interview.application.resident_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+                        {% elif interview.application.work_permit_applications.first %}
+                            <img src="{{ interview.application.work_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+                        {% endif %}
+                    </div>
                 </div>
+
+                <h4>Documents</h4>
+                <ul>
+                    {% if interview.application.national_id_applications.first %}
+                        <li><a href="{{ interview.application.national_id_applications.first.birth_certificate.url }}" target="_blank">Birth Certificate</a></li>
+                        <li><a href="{{ interview.application.national_id_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
+                    {% elif interview.application.resident_permit_applications.first %}
+                        <li><a href="{{ interview.application.resident_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
+                        <li><a href="{{ interview.application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">Resident Permit Document</a></li>
+                    {% elif interview.application.work_permit_applications.first %}
+                        <li><a href="{{ interview.application.work_permit_applications.first.work_contract.url }}" target="_blank">Work Contract</a></li>
+                        <li><a href="{{ interview.application.work_permit_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
+                    {% endif %}
+
+                    {% for document in documents %}
+                        <li><a href="{{ document.document_file.url }}" target="_blank">{{ document.document_type }}</a></li>
+                    {% empty %}
+                        <li>No additional documents uploaded</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
 
-       <!-- Questionnaire and Notes -->
+        <!-- Questionnaire and Notes -->
         <div class="col-md-6">
             <div class="card mb-4 border-primary">
                 <div class="card-header bg-primary text-white">
@@ -138,11 +155,8 @@
                 {% for note in interview.application.notes.all %}
                     <p><strong>{{ note.user.get_full_name }}:</strong> {{ note.message }}</p>
                 {% empty %}
-                    <p>No notes available for this interview.</p>
+                    <p>No notes available.</p>
                 {% endfor %}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

@@ -11,13 +11,25 @@
         </div>
     {% endif %}
     <h2>Manage Post Locations</h2>
+       <!-- Breadcrumb navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-2 rounded">
+            <li class="breadcrumb-item">
+                    <a href="{% url 'immigration_dashboard' %}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Post Locations</li>
+        </ol>
+    </nav>
 
-    <!-- Back to Dashboard Button -->
-    <a href="{% url 'immigration_dashboard' %}" class="btn btn-secondary mb-3">
-        ← Back to Dashboard
-    </a>
-
-    <a href="{% url 'add_post_location' %}" class="btn btn-primary mb-3">Add New Post Location</a>
+<!--    &lt;!&ndash; Back to Dashboard Button &ndash;&gt;-->
+<!--    <a href="{% url 'immigration_dashboard' %}" class="btn btn-secondary mb-3">-->
+<!--        ← Back to Dashboard-->
+<!--    </a>-->
+    <div class="d-flex justify-content-end">
+        <a href="{% url 'add_post_location' %}" class="btn btn-primary mb-3">
+            <i class="fas fa-plus"></i> Add
+        </a>
+    </div>
 
     <table class="table table-striped">
         <thead>

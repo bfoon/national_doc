@@ -21,7 +21,7 @@
                         {% if interview.application.post_location == boot.post_location %}
                             <li class="list-group-item">
                                 Queue Number: {{ interview.application.interview_queue_number }}
-                                {% if interview.status == 'scheduled' %}
+                                {% if interview.status == 'scheduled' or  interview.status == 'postponed' %}
                                     <form method="POST" style="display:inline;">
                                         {% csrf_token %}
                                         <input type="hidden" name="interview_id" value="{{ interview.id }}">
