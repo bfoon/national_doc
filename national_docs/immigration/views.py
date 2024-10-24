@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from docs.models import Application, UploadedDocument
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile, Notification)
@@ -14,6 +15,8 @@ from django.db import transaction
 from django.shortcuts import render, get_object_or_404
 from datetime import datetime
 from datetime import date
+import csv
+import pandas as pd
 
 def send_notification(user, message):
     notification = Notification.objects.create(user=user, message=message)
@@ -900,3 +903,74 @@ def change_assignment(request, boot_id):
             messages.error(request, 'Please select valid user, group, and post location.')
 
     return redirect('boot_list')
+
+@login_required
+def export_pdf(request):
+    # Implement your PDF export logic here
+    return HttpResponse("PDF export not implemented yet.")
+
+@login_required
+def export_excel(request):
+    if request.user.is_superuser or request.user.is_staff:
+        fulfillers = Fulfiller.objects.all()
+    else:
+        fulfillers = Fulfiller.objects.filter(action=request.user)
+
+    data = []
+    for fulfiller in fulfillers:
+        data.append({
+            'service_type': fulfiller.application.get_service_type(),
+            'created_at': fulfiller.created_at,
+            'updated_at': fulfiller.updated_at,
+            'location': fulfiller.location,
+            'action': fulfiller.action,
+            'schedule': fulfiller.schedule,
+            'priority': fulfiller.priority,
+            'status': fulfiller.status,
+            'progress': fulfiller.progress,
+        })
+
+    df = pd.DataFrame(data)
+
+    # Convert datetime fields to be timezone-unaware
+    df['created_at'] = pd.to_datetime(df['created_at']).dt.tz_localize(None)
+    df['updated_at'] = pd.to_datetime(df['updated_at']).dt.tz_localize(None)
+    df['schedule'] = pd.to_datetime(df['schedule']).dt.tz_localize(None)
+
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = 'attachment; filename="fulfillers.xlsx"'
+    df.to_excel(response, index=False)
+    return response
+
+@login_required
+def export_csv(request):
+    if request.user.is_superuser or request.user.is_staff:
+        fulfillers = Fulfiller.objects.all()
+    else:
+        fulfillers = Fulfiller.objects.filter(action=request.user)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="fulfillers.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['Service Type', 'Created At', 'Updated At', 'Location', 'Action', 'Schedule', 'Priority', 'Status', 'Progress'])
+    for fulfiller in fulfillers:
+        writer.writerow([
+            fulfiller.application.get_service_type(),
+            fulfiller.created_at,
+            fulfiller.updated_at,
+            fulfiller.location,
+            fulfiller.action,
+            fulfiller.schedule,
+            fulfiller.priority,
+            fulfiller.status,
+            fulfiller.progress,
+        ])
+    return response
+
+@login_required
+def export_webpage(request):
+    if request.user.is_superuser or request.user.is_staff:
+        fulfillers = Fulfiller.objects.all()
+    else:
+        fulfillers = Fulfiller.objects.filter(action=request.user)
+    return render(request, 'immigration/export_webpage.html', {'fulfillers': fulfillers})

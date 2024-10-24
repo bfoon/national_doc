@@ -29,4 +29,8 @@ urlpatterns = [
     path('boots/', views.boot_list, name='boot_list'),
     path('boots/add/', views.add_boot, name='add_boot'),
     path('boots/change-assignment/<int:boot_id>/', views.change_assignment, name='change_assignment'),
+    path('export/pdf/', views.export_pdf, name='export_pdf'),
+    path('export/excel/', views.export_excel, name='export_excel'),
+    path('export/csv/', views.export_csv, name='export_csv'),
+    path('export/webpage/', views.export_webpage, name='export_webpage'),
 ]

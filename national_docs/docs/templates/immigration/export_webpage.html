@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fulfiller Export</title>
+</head>
+<body>
+    <h1>Fulfiller Data</h1>
+    <table border="1">
+        <tr>
+            <th>Application</th>
+            <th>Created At</th>
+            <th>Updated At</th>
+            <th>Location</th>
+            <th>Action</th>
+            <th>Schedule</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Progress</th>
+        </tr>
+        {% for fulfiller in fulfillers %}
+        <tr>
+            <td>{{ fulfiller.application.get_service_type }}</td>
+            <td>{{ fulfiller.created_at }}</td>
+            <td>{{ fulfiller.updated_at }}</td>
+            <td>{{ fulfiller.location }}</td>
+            <td>{{ fulfiller.action }}</td>
+            <td>{{ fulfiller.schedule }}</td>
+            <td>{{ fulfiller.priority }}</td>
+            <td>{{ fulfiller.status }}</td>
+            <td>{{ fulfiller.progress }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
