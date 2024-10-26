@@ -120,7 +120,7 @@
 
                         <input type="hidden" id="duration" name="duration" value="0">
                         {% if not read_only %}
-                            <button type="submit" name="submit" class="btn btn-primary">Submit for Approval</button>
+                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationModal">Submit for Approval</button>
                             <button type="submit" name="postpone" class="btn btn-warning">Postpone Interview</button>
                         {% endif %}
                     </form>
@@ -161,6 +161,33 @@
         </div>
     </div>
 </div>
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>I, <strong>{{ interview.interviewer.get_full_name }}</strong>, hereby affirm that all presented documents are original, accurate to the best of my knowledge,
+                    and suitable for final review to issue a national document.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirmSubmit">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('confirmSubmit').addEventListener('click', function() {
+        document.getElementById('interview-form').submit();
+    });
+</script>
 
 <script>
     let startTime;

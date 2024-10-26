@@ -1,6 +1,25 @@
 {% extends 'docs/header.html' %}
 {% block content %}
 
+<style>
+    .signature {
+        font-family: 'Pacifico', cursive; /* Custom font for signature */
+        font-size: 0.75rem;
+        text-align: right;
+        margin-top: 10px;
+    }
+    .qr-code {
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+</style>
+
+<!-- Link to Google Fonts for the signature font -->
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
 <div class="container my-5">
     <h2>ToDo Details</h2>
    <!-- Breadcrumb navigation -->
@@ -21,13 +40,14 @@
         <div class="card-body">
             <p><strong>Application:</strong> {{ todo.application.get_service_type }}</p>
             <p><strong>Interviewee:</strong> {{ todo.interview.application.user.get_full_name }}</p>
-            <p><strong>User:</strong> {{ todo.user.get_full_name }}</p>
+            <p><strong>Interviewer:</strong> {{ todo.user.get_full_name }}</p>
             <p><strong>Interview Duration:</strong> {{ todo.interview.duration }} Min</p>
 
             <!-- Notes as a read-only textarea -->
             <div class="form-group">
                 <label for="notes"><strong>Notes:</strong></label>
                 <textarea id="notes" class="form-control" rows="5" readonly>{{ todo.interview.notes }}</textarea>
+                <div class="signature">{{ todo.user.get_full_name }}</div>
             </div>
 
             <p><strong>Approver:</strong>
@@ -55,19 +75,48 @@
             {% endif %}
 
             {% if todo.status == 0 %}
-                <a href="{% url 'approve_todo' todo.id %}" class="btn btn-success btn-sm">
+                <!-- Button to trigger the approve modal -->
+                <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#approveModal">
                     <i class="fas fa-check"></i> Approve
-                </a>
+                </button>
 
                 <!-- Button to trigger the reject modal -->
                 <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#rejectModal">
                     <i class="fas fa-times"></i> Reject
                 </button>
             {% endif %}
+             {% if todo.status == 1 %}
+            <!-- Print Receipt Button -->
+            <button type="button" class="btn btn-info btn-sm float-right" data-toggle="modal" data-target="#printModal">
+                <i class="fas fa-print"></i> Print Receipt
+            </button>
+            {% endif %}
         </div>
     </div>
 
     <a href="{% url 'todo_list' %}" class="btn btn-secondary">Back to ToDo List</a>
+</div>
+
+<!-- Approve Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Approval Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>I, <strong>{{ user.get_full_name }}</strong>, hereby affirm that all documents and interview notes have been thoroughly reviewed and verified.
+                    I confirm that the interview was conducted in a fair and unbiased manner.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirmApprove">Confirm</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Reject Modal -->
@@ -97,6 +146,44 @@
     </div>
 </div>
 
+<!-- Print Modal -->
+<div class="modal fade" id="printModal" tabindex="-1" role="dialog" aria-labelledby="printModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="printModalLabel">Print Receipt</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="receipt">
+                    <h5 class="text-center">Receipt</h5>
+                    <p><strong>Application:</strong> {{ todo.application.get_service_type }}</p>
+                    <p><strong>Interviewee:</strong> {{ todo.interview.application.user.get_full_name }}</p>
+                    <p><strong>Interviewer:</strong> {{ todo.user.get_full_name }}</p>
+                    <p><strong>Interview Date:</strong> {{ todo.interview.date_created }}</p>
+                    <p><strong>Approver:</strong> {{ todo.approver.get_full_name }}</p>
+                    <p>I, <strong>{{ todo.approver.get_full_name }}</strong>,hereby affirm that all documents and interview notes have been thoroughly reviewed and verified.
+                    I confirm that the interview was conducted in a fair and unbiased manner</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirmPrint">Print</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('confirmApprove').addEventListener('click', function() {
+        window.location.href = "{% url 'approve_todo' todo.id %}";
+    });
+
+    document.getElementById('confirmPrint').addEventListener('click', function() {
+        window.print();
+    });
+</script>
+
 {% endblock %}
-
-

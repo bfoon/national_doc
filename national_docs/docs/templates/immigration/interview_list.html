@@ -1,5 +1,5 @@
- {% extends 'docs/header.html' %}
- {% block content %}
+{% extends 'docs/header.html' %}
+{% block content %}
 
 <div class="container my-5">
      {% if messages %}
@@ -82,14 +82,18 @@
                         </span>
                     </td>
                 <td>
-                    {% if interview.status == 'waiting' or interview.status == 'canceled' %}
-                    <a href="{% url 'interview_view' interview.id %}" class="btn btn-primary">
-                        Details
-                    </a>
+                    {% if interview.application.interview_slot.date_time <= current_datetime %}
+                    {% if interview.status != 'waiting' %}
+                        <a href="{% url 'interview_view' interview.id %}" class="btn btn-primary">
+                            Start Interview
+                        </a>
                     {% else %}
-                    <a href="{% url 'interview_view' interview.id %}" class="btn btn-primary">
-                        Start Interview
-                    </a>
+                    <a href="{% url 'interview_view' interview.id %}" class="btn btn-primary btn-sm">
+                            <i class="fa fa-eye fa-sm"> view</i>
+                        </a>
+                   {% endif %}
+                    {% else %}
+                        <button type="button" class="btn btn-secondary" disabled>Start Interview</button>
                     {% endif %}
                 </td>
             </tr>

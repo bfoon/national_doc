@@ -569,13 +569,16 @@ def available_slots(request):
 @login_required
 def interview_list(request):
     user = request.user
+    current_datetime = timezone.now()
+
     if user.is_superuser:
-        interviews = Interview.objects.exclude(Q(status='completed') | Q(status='canceled')).order_by('date_created')
+        interviews = Interview.objects.exclude(Q(status='completed') | Q(status='canceled')).filter(application__interview_slot__date_time__lte=current_datetime).order_by('date_created')
     else:
-        interviews = Interview.objects.exclude(Q(status='completed') | Q(status='canceled')).filter(application__post_location=user.officerprofile.post_location).order_by('date_created')
+        interviews = Interview.objects.exclude(Q(status='completed') | Q(status='canceled')).filter(application__post_location=user.officerprofile.post_location, application__interview_slot__date_time__lte=current_datetime).order_by('date_created')
 
     return render(request, 'immigration/interview_list.html', {
         'interviews': interviews,
+        'current_datetime': current_datetime,
     })
 
 @login_required
@@ -799,16 +802,17 @@ def reject_todo(request, todo_id):
         'todo': todo,
     })
 
-
 @login_required
 def queue_info(request):
     user = request.user
+    current_date = timezone.now().date()
+
     if user.is_superuser:
         boots = Boot.objects.all()
-        interviews = Interview.objects.exclude(status__in=["waiting", "completed"]).order_by('application__interview_queue_number')
+        interviews = Interview.objects.exclude(status__in=["waiting", "completed"]).filter(application__interview_slot__date_time__lte=current_date).order_by('application__interview_queue_number')
     else:
         boots = Boot.objects.filter(post_location=user.officerprofile.post_location)
-        interviews = Interview.objects.exclude(status__in=["waiting", "completed", "canceled"]).filter(application__post_location=user.officerprofile.post_location).order_by('application__interview_queue_number')
+        interviews = Interview.objects.exclude(status__in=["waiting", "completed", "canceled"]).filter(application__post_location=user.officerprofile.post_location, application__interview_slot__date_time__lte=current_date).order_by('application__interview_queue_number')
 
     if request.method == 'POST':
         interview_id = request.POST.get('interview_id')
@@ -825,8 +829,9 @@ def queue_info(request):
 
 @login_required
 def fetch_interview_queue(request):
+    current_date = timezone.now().date()
     boots = Boot.objects.all()
-    interviews = Interview.objects.exclude(status__in=["waiting", "completed", "canceled"]).order_by('application__interview_queue_number')
+    interviews = Interview.objects.exclude(status__in=["waiting", "completed", "canceled"]).filter(application__interview_slot__date_time__lte=current_date).order_by('application__interview_queue_number')
     return render(request, 'immigration/interview_queue_partial.html', {
         'boots': boots,
         'interviews': interviews,
