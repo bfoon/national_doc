@@ -87,17 +87,24 @@
         </div>
 
         <!-- To-do -->
-        <div class="col-md-3">
-            <a href="/immigration/todos" class="text-decoration-none">
-                <div class="card text-center shadow">
-                    <div class="card-body">
-                        <i class="fas fa-list-check fa-2x text-success mb-3"></i>
-                        <h5 class="card-title">To-do</h5>
-                        <p class="card-text">View your tasks and pending actions.</p>
-                    </div>
-                </div>
-            </a>
+<div class="col-md-3">
+    <a href="/immigration/todos" class="text-decoration-none">
+        <div class="card text-center shadow" style="position: relative;">
+            <!-- Badge to display pending count -->
+            {% if pending_todo_count > 0 %}
+                <span class="badge rounded-circle bg-danger text-white" style="position: absolute; top: 10px; right: 10px; font-size: 0.75rem;">
+                    {{ pending_todo_count }}
+                </span>
+            {% endif %}
+            <div class="card-body">
+                <i class="fas fa-list-check fa-2x text-success mb-3"></i>
+                <h5 class="card-title">To-do</h5>
+                <p class="card-text">View your tasks and pending actions.</p>
+            </div>
         </div>
+    </a>
+</div>
+
 
         <!-- Interview -->
         <div class="col-md-3">

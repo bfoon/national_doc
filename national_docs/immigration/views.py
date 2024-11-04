@@ -30,7 +30,7 @@ def mark_notification_as_read(request, notification_id):
 
 @login_required
 def immigration_dashboard(request):
-    # Count the number of applications for each status
+    # Other counts
     new_requests_count = Application.objects.filter(status='pending').count()
     pending_requests_count = Application.objects.filter(status='processing').count()
     waiting_requests_count = Application.objects.filter(status='waiting').count()
@@ -39,14 +39,19 @@ def immigration_dashboard(request):
     today = date.today()
     interview_requests_count = Application.objects.filter(status='interview', interview_slot__date_time=today).count()
 
+    # Count for pending To-Dos
+    pending_todo_count = ToDo.objects.filter(status=0).count()
+
     context = {
         'new_requests_count': new_requests_count,
         'pending_requests_count': pending_requests_count,
         'waiting_requests_count': waiting_requests_count,
         'interview_requests_count': interview_requests_count,
+        'pending_todo_count': pending_todo_count,
     }
 
     return render(request, 'immigration/dashboard.html', context)
+
 
 @login_required
 def fulfillers_list(request):
@@ -656,7 +661,7 @@ def interview_view(request, interview_id):
                 status=0  # Default to pending (0)
             )
             user = request.user  # Assuming the current user is the one to notify
-            send_notification(user, f"Interview is awaiting {application.user.get_full_name} approval ")
+            send_notification(user, f"Interview is awaiting {application.user.get_full_name()} approval ")
             messages.success(request, 'Interview details updated and ToDo created successfully.')
             return redirect('interview_list')
 
