@@ -33,4 +33,6 @@ urlpatterns = [
     path('export/excel/', views.export_excel, name='export_excel'),
     path('export/csv/', views.export_csv, name='export_csv'),
     path('export/webpage/', views.export_webpage, name='export_webpage'),
+    path('notifications/mark-as-read/<int:notification_id>/', views.mark_notification_as_read,
+         name='mark_notification_as_read'),
 ]

@@ -22,11 +22,12 @@ def send_notification(user, message):
     notification = Notification.objects.create(user=user, message=message)
     notification.save()
 
+
 def mark_notification_as_read(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
     notification.is_read = True
     notification.save()
-    return redirect('dashboard')
+    return redirect('immigration_dashboard')
 
 @login_required
 def immigration_dashboard(request):
@@ -814,7 +815,7 @@ def queue_info(request):
 
     if user.is_superuser:
         boots = Boot.objects.all()
-        interviews = Interview.objects.exclude(status__in=["waiting", "completed"]).filter(application__interview_slot__date_time__lte=current_date).order_by('application__interview_queue_number')
+        interviews = Interview.objects.exclude(status__in=["waiting", "completed", "canceled"]).filter(application__interview_slot__date_time__lte=current_date).order_by('application__interview_queue_number')
     else:
         boots = Boot.objects.filter(post_location=user.officerprofile.post_location)
         interviews = Interview.objects.exclude(status__in=["waiting", "completed", "canceled"]).filter(application__post_location=user.officerprofile.post_location, application__interview_slot__date_time__lte=current_date).order_by('application__interview_queue_number')
