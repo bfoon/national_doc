@@ -325,6 +325,7 @@
         time: "{{ national_id_application.application.interview_slot.date_time|time:'H:i' }}",
         name: "{{ national_id_application.full_name }}",
         queueNumber: "{{ national_id_application.application.interview_queue_number }}"
+        token: "{{ national_id_application.application.token }}"
     });
 
     setAppointmentData('residentPermit', {
@@ -332,6 +333,7 @@
         time: "{{ resident_permit_application.application.interview_slot.date_time|time:'H:i' }}",
         name: "{{ resident_permit_application.full_name }}",
         queueNumber: "{{ resident_permit_application.application.interview_queue_number }}"
+        token: "{{ resident_permit_application.application.token }}"
     });
 
     setAppointmentData('workPermit', {
@@ -339,6 +341,7 @@
         time: "{{ work_permit_application.application.interview_slot.date_time|time:'H:i' }}",
         name: "{{ work_permit_application.full_name }}",
         queueNumber: "{{ work_permit_application.application.interview_queue_number }}"
+        token: "{{ work_permit_application.application.token }}"
     });
 </script>
 

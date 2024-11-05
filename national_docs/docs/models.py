@@ -1,5 +1,7 @@
+import uuid
 from django.db import models
 from django.contrib.auth.models import User
+from django.db import IntegrityError, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -47,6 +49,29 @@ class Application(models.Model):
     interview_queue_number = models.IntegerField(null=True, blank=True)
     post_location = models.ForeignKey('immigration.PostLocation', on_delete=models.SET_NULL,
                                       null=True, blank=True)
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+
+    def save(self, *args, **kwargs):
+        if not self.token:  # Ensure token is set if not already
+            self.token = uuid.uuid4()
+
+        retries = 5  # Limit retries to avoid infinite loops
+        for _ in range(retries):
+            try:
+                with transaction.atomic():
+                    super().save(*args, **kwargs)
+                break  # Exit loop if save is successful
+            except IntegrityError as e:
+                # Check if the error is due to a duplicate token
+                if 'duplicate key value violates unique constraint' in str(e):
+                    # Generate a new token and retry
+                    self.token = uuid.uuid4()
+                else:
+                    # If the IntegrityError is due to a different reason, raise it
+                    raise
+        else:
+            # Log or handle failure after retries, if necessary
+            raise IntegrityError("Unable to assign a unique token after multiple attempts.")
 
     def __str__(self):
         return f"Application {self.id} - {self.application_type} for {self.user.username}"
