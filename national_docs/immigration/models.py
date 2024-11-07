@@ -69,6 +69,10 @@ class InterviewSlot(models.Model):
 
 
 class Interview(models.Model):
+    """
+    Represents an interview conducted as part of the application process.
+    Tracks the details of the interview, including status, date, interviewer, etc.
+    """
     STATUS_CHOICES = [
         ('scheduled', 'Scheduled'),
         ('completed', 'Completed'),
@@ -84,9 +88,14 @@ class Interview(models.Model):
     questionnaire = models.TextField(null=True, blank=True)  # Questionnaire responses
     notes = models.TextField(null=True, blank=True)  # Interview notes
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='scheduled')
+    boot = models.ForeignKey('Boot', on_delete=models.SET_NULL, null=True, blank=True, related_name='interviews')
     def __str__(self):
         return f"Interview for {self.application.user.username} on {self.date_created}"
 
+    class Meta:
+        verbose_name = "Interview"
+        verbose_name_plural = "Interviews"
+        ordering = ['-date_created']  # To order interviews by most recent date_created by default
 
 class ToDo(models.Model):
     STATUS_CHOICES = [

@@ -11,74 +11,87 @@
         </div>
     {% endif %}
 
-    <h2>Interview Queue</h2>
-    <div id="interview-queue" class="row">
-        {% for boot in boots %}
-            <div class="col-md-4 boot-container" data-boot-id="{{ boot.id }}">
-                <h3>Boot {{ boot.name }}</h3>
-                <ul class="list-group">
-                    {% for interview in interviews %}
-                        {% if interview.application.post_location == boot.post_location %}
-                            <li class="list-group-item">
-                                Queue Number: {{ interview.application.interview_queue_number }}
-                                {% if interview.status == 'scheduled' or  interview.status == 'postponed' %}
-                                    <form method="POST" style="display:inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="interview_id" value="{{ interview.id }}">
-                                        <button type="submit" class="btn btn-primary btn-sm">Start Interview</button>
-                                    </form>
-                                {% elif interview.status == 'in_progress' %}
-                                    <span class="badge badge-success">In Progress</span>
-                                {% endif %}
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endfor %}
+    <h2>Interview Queue Management</h2>
+
+<!-- Display each boot -->
+<div id="interview-boots" class="row mb-4">
+    {% for boot in boots %}
+        <div class="col-md-4 boot-container" data-boot-id="{{ boot.id }}">
+            <h3>Boot {{ boot.name }}</h3>
+
+            <ul class="list-group mt-3" id="boot-queue-{{ boot.id }}">
+                {% for interview in boot.interviews.all %}  <!-- Access the interviews related to this boot -->
+                    {% if interview.status == 'in_progress' %}
+                        <li class="list-group-item">
+                            Queue Number: {{ interview.application.interview_queue_number }}
+                            <span class="badge badge-success">In Progress</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endfor %}
+</div>
+    <hr>
+
+    <!-- All scheduled queue numbers in one line below boots -->
+    <div id="all-queue-numbers" class="queue-line mb-4">
+        <h4>Scheduled Interview Queue</h4>
+        <ul class="list-inline">
+            {% for interview in interviews %}
+                {% if interview.status == 'scheduled' or interview.status == 'postponed' %}
+                    <li class="list-inline-item" data-interview-id="{{ interview.id }}">
+                        Queue Number: {{ interview.application.interview_queue_number }}
+                        <form method="POST" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="interview_id" value="{{ interview.id }}">
+                            <button type="submit" class="btn btn-primary btn-sm start-interview-btn">Start Interview</button>
+                        </form>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
     </div>
+
+    <!-- Hidden CSRF token for JavaScript -->
+    <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+
 </div>
 
 <script>
-    function fetchInterviewQueue() {
-        fetch("{% url 'fetch_interview_queue' %}")
-            .then(response => response.json())
-            .then(data => {
-                const interviewQueue = document.getElementById('interview-queue');
-                interviewQueue.innerHTML = '';  // Clear existing content
+    function attachStartInterviewHandlers() {
+        document.querySelectorAll('.start-interview-btn').forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const queueItem = this.closest('li');
+                const interviewId = queueItem.getAttribute('data-interview-id');
+                const csrfToken = document.getElementById('csrf-token').value; // Fetch CSRF token from hidden input
 
-                data.boots.forEach(boot => {
-                    const bootContainer = document.createElement('div');
-                    bootContainer.classList.add('col-md-4', 'boot-container');
-                    bootContainer.dataset.bootId = boot.id;
-
-                    bootContainer.innerHTML = `
-                        <h3>Boot ${boot.name}</h3>
-                        <ul class="list-group">
-                            ${boot.interviews.map(interview => `
-                                <li class="list-group-item">
-                                    Queue Number: ${interview.application.interview_queue_number}
-                                    ${interview.status === 'scheduled' ? `
-                                        <form method="POST" style="display:inline;">
-                                            <input type="hidden" name="csrfmiddlewaretoken" value="${data.csrf_token}">
-                                            <input type="hidden" name="interview_id" value="${interview.id}">
-                                            <button type="submit" class="btn btn-primary btn-sm">Start Interview</button>
-                                        </form>
-                                    ` : `
-                                        <span class="badge badge-success">In Progress</span>
-                                    `}
-                                </li>
-                            `).join('')}
-                        </ul>
-                    `;
-
-                    interviewQueue.appendChild(bootContainer);
-                });
-            })
-            .catch(error => console.error('Error fetching interview queue:', error));
+                fetch("{% url 'start_interview' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfToken // Set CSRF token in header
+                    },
+                    body: JSON.stringify({ interview_id: interviewId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Move the item to the respective boot section
+                        const bootQueue = document.getElementById(`boot-queue-${data.boot_id}`);
+                        queueItem.querySelector('.start-interview-btn').remove();
+                        queueItem.innerHTML += `<span class="badge badge-success">In Progress</span>`;
+                        bootQueue.appendChild(queueItem);
+                    } else {
+                        alert("Error starting interview");
+                    }
+                })
+                .catch(error => console.error('Error starting interview:', error));
+            });
+        });
     }
 
-    // Fetch the interview queue every 20 seconds
-    setInterval(fetchInterviewQueue, 20000);
+    document.addEventListener('DOMContentLoaded', attachStartInterviewHandlers);
 </script>
 {% endblock %}

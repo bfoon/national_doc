@@ -13,6 +13,11 @@
         border-radius: 0.5rem;
         margin-left: 20px;
     }
+    .token-number {
+        font-size: 0.6rem; /* Make the token number very small */
+        color: #6c757d; /* Set a subtle color for the token number */
+        margin-top: 5px; /* Add some space between the photo and the token number */
+    }
 </style>
 
 <div class="container my-5">
@@ -65,10 +70,13 @@
                     <div>
                         {% if interview.application.national_id_applications.first %}
                             <img src="{{ interview.application.national_id_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+                            <div class="token-number">{{ interview.application.token }}</div> <!-- Token number displayed here -->
                         {% elif interview.application.resident_permit_applications.first %}
                             <img src="{{ interview.application.resident_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+                            <div class="token-number">{{ interview.application.token }}</div> <!-- Token number displayed here -->
                         {% elif interview.application.work_permit_applications.first %}
                             <img src="{{ interview.application.work_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+                            <div class="token-number">{{ interview.application.token }}</div> <!-- Token number displayed here -->
                         {% endif %}
                     </div>
                 </div>

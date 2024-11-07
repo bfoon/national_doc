@@ -17,6 +17,8 @@ from datetime import datetime
 from datetime import date
 import csv
 import pandas as pd
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 def send_notification(user, message):
     notification = Notification.objects.create(user=user, message=message)
@@ -535,10 +537,11 @@ def available_slots(request):
         messages.warning(request, "You do not have permission to view available interview slots.")
         return redirect('todo_list')
 
+    # Retrieve interview slots sorted from newest to oldest
     if user.is_superuser:
-        interview_slots = InterviewSlot.objects.all()
+        interview_slots = InterviewSlot.objects.all().order_by('-date_time')
     else:
-        interview_slots = InterviewSlot.objects.filter(location=user.officerprofile.post_location)
+        interview_slots = InterviewSlot.objects.filter(location=user.officerprofile.post_location).order_by('-date_time')
 
     paginator = Paginator(interview_slots, 5)  # Show 5 slots per page
     page_number = request.GET.get('page')
@@ -558,7 +561,7 @@ def available_slots(request):
                 location=location,
                 is_available=True
             )
-            user = request.user  # Assuming the current user is the one to notify
+            # Notify the user about the new slot
             send_notification(user, f"Interview slot {date_time} was created.")
             messages.success(request, "Interview slot added successfully!")
             return redirect('available_slots')
@@ -641,7 +644,7 @@ def interview_view(request, interview_id):
                 send_notification(user, f"Interview was postpone")
                 messages.success(request, "Interview postponed successfully, and a new slot assigned.")
             else:
-                messages.error(request, "No available interview slots for postponement.")
+                messages.warning(request, "No available interview slots for postponement.")
             return redirect('interview_list')
 
         else:  # Handle submitting the interview questionnaire and notes
@@ -820,18 +823,59 @@ def queue_info(request):
         boots = Boot.objects.filter(post_location=user.officerprofile.post_location)
         interviews = Interview.objects.exclude(status__in=["waiting", "completed", "canceled"]).filter(application__post_location=user.officerprofile.post_location, application__interview_slot__date_time__lte=current_date).order_by('application__interview_queue_number')
 
-    if request.method == 'POST':
-        interview_id = request.POST.get('interview_id')
-        interview = get_object_or_404(Interview, id=interview_id)
-        interview.status = 'in_progress'
-        interview.save()
-        messages.success(request, 'Interview started successfully.')
-        return redirect(f'/immigration/interview/{interview_id}')
+    # if request.method == 'POST':
+    #     interview_id = request.POST.get('interview_id')
+    #     interview = get_object_or_404(Interview, id=interview_id)
+    #     interview.status = 'in_progress'
+    #     interview.save()
+    #     messages.success(request, 'Interview started successfully.')
+    #     return redirect(f'/immigration/interview/{interview_id}')
 
     return render(request, 'immigration/queue_info.html', {
         'boots': boots,
         'interviews': interviews,
     })
+
+@login_required
+def start_interview(request):
+    if request.method == 'POST':
+        # Parse JSON data
+        try:
+            data = json.loads(request.body)
+            interview_id = data.get('interview_id')
+        except (ValueError, KeyError):
+            return JsonResponse({"success": False, "message": "Invalid data received."}, status=400)
+
+        # Ensure interview_id is provided
+        if not interview_id:
+            return JsonResponse({"success": False, "message": "Interview ID not provided."}, status=400)
+
+        # Try to get the Interview object
+        try:
+            interview = Interview.objects.get(id=interview_id)
+
+            # Check if the interview is already in progress
+            if interview.status == 'in_progress':
+                return JsonResponse({"success": False, "message": "Interview is already in progress."}, status=400)
+
+            # Assign the user's boot automatically
+            # Get the user's assigned boot (assuming user has only one boot assigned)
+            user_boot = Boot.objects.filter(assigned_to=request.user).first()
+
+            if user_boot:
+                # If the user has a boot assigned, update the interview's boot
+                interview.boot = user_boot
+                interview.status = 'in_progress'
+                interview.save()
+
+                return JsonResponse({"success": True, "boot_id": user_boot.id})
+            else:
+                return JsonResponse({"success": False, "message": "No boot assigned to the user."}, status=400)
+
+        except Interview.DoesNotExist:
+            return JsonResponse({"success": False, "message": "Interview not found."}, status=404)
+
+    return JsonResponse({"success": False, "message": "Invalid request method."}, status=405)
 
 @login_required
 def fetch_interview_queue(request):
