@@ -5,7 +5,7 @@ const userData = {
             time: "",
             type: "National ID Card Interview",
             name: "",
-            queueNumber: ""
+            queueNumber: "",
             token: ""
         }
     },
@@ -15,7 +15,7 @@ const userData = {
             time: "",
             type: "Resident Permit Interview",
             name: "",
-            queueNumber: ""
+            queueNumber: "",
             token: ""
         }
     },
@@ -25,7 +25,7 @@ const userData = {
             time: "",
             type: "Work Permit Interview",
             name: "",
-            queueNumber: ""
+            queueNumber: "",
             token: ""
         }
     },
@@ -67,6 +67,20 @@ function printAppointment(applicationType) {
                 <p><strong>Token:</strong> ${appointment.token}</p>
             </div>
             <p>Please bring this appointment slip and all required documents to your interview.</p>
+        <div class="qrcode" id="qrcode"></div>
+            </div>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+            <script>
+                // Generate the QR code with the appointment token
+                new QRCode(document.getElementById("qrcode"), {
+                    text: "${appointment.token}",  // Use appointment.token as the QR code content
+                    width: 100,
+                    height: 100,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            </script>
         </body>
         </html>
     `);

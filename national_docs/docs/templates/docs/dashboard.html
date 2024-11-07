@@ -13,6 +13,8 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <header>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -199,18 +201,24 @@
                 <p id="appointment-info">National ID Card Interview on
                     {{ national_id_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
                 <p>Queue Number: <span id="queue-number">{{ national_id_application.application.interview_queue_number }}</span></p>
+                <div id="qrcode"></div>
+                <p style="font-size: smaller;">{{ national_id_application.application.token }}</p>
                 <a href="#" class="cta-button">Manage Appointments</a>
                 <a href="#" class="cta-button print-button" onclick="printAppointment('nationalId')">Print National ID Appointment</a>
                 {% elif resident_permit_application.application.status == 'interview' %}
                 <p id="appointment-info">National ID Card Interview on
                     {{ resident_permit_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
                 <p>Queue Number: <span id="queue-number">{{ resident_permit_application.application.interview_queue_number }}</span></p>
+               <div id="qrcode"></div>
+                <p style="font-size: smaller;">{{ resident_permit_application.application.token }}</p>
                 <a href="#" class="cta-button">Manage Appointments</a>
                 <a href="#" class="cta-button print-button" onclick="printAppointment('residentPermit')">Print Resident Permit Appointment</a>
                 {% elif work_permit_application.application.status == 'interview' %}
                 <p id="appointment-info">National ID Card Interview on
                     {{ work_permit_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
                 <p>Queue Number: <span id="queue-number">{{ work_permit_application.application.interview_queue_number }}</span></p>
+                <div id="qrcode"></div>
+                <p style="font-size: smaller;">{{ work_permit_application.application.token }}</p>
                 <a href="#" class="cta-button">Manage Appointments</a>
                 <a href="#" class="cta-button print-button" onclick="printAppointment('workPermit')">Print Work Permit Appointment</a>
 
@@ -324,7 +332,7 @@
         date: "{{ national_id_application.application.interview_slot.date_time|date:'Y-m-d' }}",
         time: "{{ national_id_application.application.interview_slot.date_time|time:'H:i' }}",
         name: "{{ national_id_application.full_name }}",
-        queueNumber: "{{ national_id_application.application.interview_queue_number }}"
+        queueNumber: "{{ national_id_application.application.interview_queue_number }}",
         token: "{{ national_id_application.application.token }}"
     });
 
@@ -332,7 +340,7 @@
         date: "{{ resident_permit_application.application.interview_slot.date_time|date:'Y-m-d' }}",
         time: "{{ resident_permit_application.application.interview_slot.date_time|time:'H:i' }}",
         name: "{{ resident_permit_application.full_name }}",
-        queueNumber: "{{ resident_permit_application.application.interview_queue_number }}"
+        queueNumber: "{{ resident_permit_application.application.interview_queue_number }}",
         token: "{{ resident_permit_application.application.token }}"
     });
 
@@ -340,8 +348,22 @@
         date: "{{ work_permit_application.application.interview_slot.date_time|date:'Y-m-d' }}",
         time: "{{ work_permit_application.application.interview_slot.date_time|time:'H:i' }}",
         name: "{{ work_permit_application.full_name }}",
-        queueNumber: "{{ work_permit_application.application.interview_queue_number }}"
+        queueNumber: "{{ work_permit_application.application.interview_queue_number }}",
         token: "{{ work_permit_application.application.token }}"
+    });
+</script>
+
+<script>
+    // Get the token value
+    const token = "{{ national_id_application.application.token }}";
+
+    // Generate QR code
+    new QRCode(document.getElementById("qrcode"), {
+        text: token,
+        width: 100,  // Adjust width as needed
+        height: 100, // Adjust height as needed
+        colorDark: "#000000",
+        colorLight: "#ffffff"
     });
 </script>
 
