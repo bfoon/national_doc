@@ -41,9 +41,9 @@ function setAppointmentData(serviceType, data) {
     userData[serviceType].appointment.token = data.token;
 }
 
-// Function to print appointment details
+// Function to print appointment details with QR code
 function printAppointment(applicationType) {
-    const appointment = userData[applicationType].appointment; // Get the specific appointment data
+    const appointment = userData[applicationType].appointment;
 
     const printWindow = window.open('', '_blank');
     printWindow.document.write(`
@@ -51,23 +51,26 @@ function printAppointment(applicationType) {
         <head>
             <title>Appointment Details</title>
             <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; }
+                body { font-family: Arial, sans-serif; line-height: 1.6; display: flex; flex-direction: column; align-items: center; }
                 h1 { color: #3498db; }
-                .appointment-details { border: 1px solid #ccc; padding: 20px; margin-top: 20px; }
+                .appointment-container { display: flex; justify-content: space-between; width: 100%; max-width: 600px; }
+                .appointment-details { border: 1px solid #ccc; padding: 20px; margin-top: 20px; width: 60%; }
+                .qrcode { margin-left: 20px; }
             </style>
         </head>
         <body>
             <h1>National Document Portal - Appointment Details</h1>
-            <div class="appointment-details">
-                <h2>${appointment.type}</h2>
-                <p><strong>Date:</strong> ${appointment.date}</p>
-                <p><strong>Time:</strong> ${appointment.time}</p>
-                <p><strong>Queue Number:</strong> ${appointment.queueNumber}</p>
-                <p><strong>Applicant:</strong> ${appointment.name}</p>
-                <p><strong>Token:</strong> ${appointment.token}</p>
-            </div>
-            <p>Please bring this appointment slip and all required documents to your interview.</p>
-        <div class="qrcode" id="qrcode"></div>
+            <div class="appointment-container">
+                <div class="appointment-details">
+                    <h2>${appointment.type}</h2>
+                    <p><strong>Date:</strong> ${appointment.date}</p>
+                    <p><strong>Time:</strong> ${appointment.time}</p>
+                    <p><strong>Queue Number:</strong> ${appointment.queueNumber}</p>
+                    <p><strong>Applicant:</strong> ${appointment.name}</p>
+                    <p><strong>Token:</strong> ${appointment.token}</p>
+                    <p>Please bring this appointment slip and all required documents to your interview.</p>
+                </div>
+                <div class="qrcode" id="qrcode"></div>
             </div>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
             <script>
@@ -87,3 +90,4 @@ function printAppointment(applicationType) {
     printWindow.document.close();
     printWindow.print();
 }
+
