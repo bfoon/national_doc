@@ -18,6 +18,7 @@
                 {% endif %}
                 <li class="list-group-item"><strong>Status:</strong> {{ application.application.status|capfirst }}</li>
                 <li class="list-group-item"><strong>Application Date:</strong> {{ application.created_at|date:"Y-m-d" }}</li>
+                <li class="list-group-item"><strong>Token:</strong> {{ application.application.token }}</li>
             </ul>
         </div>
     </div>
