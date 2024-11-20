@@ -87,10 +87,11 @@
             {% endif %}
              {% if todo.status == 1 %}
             <!-- Print Receipt Button -->
-            <button type="button" class="btn btn-info btn-sm float-right" data-toggle="modal" data-target="#printModal">
+            <a href="{% url 'todo_receipt_pdf' todo.id %}" class="btn btn-info btn-sm float-right">
                 <i class="fas fa-print"></i> Print Receipt
-            </button>
-            {% endif %}
+            </a>
+        {% endif %}
+
         </div>
     </div>
 

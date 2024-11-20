@@ -18,6 +18,13 @@ from datetime import date
 import csv
 import pandas as pd
 import json
+import qrcode
+from io import BytesIO
+import base64
+import tempfile
+from django.template.loader import get_template
+from weasyprint import HTML
+from django.templatetags.static import static
 from django.views.decorators.csrf import csrf_exempt
 
 def send_notification(user, message):
@@ -810,6 +817,52 @@ def reject_todo(request, todo_id):
     return render(request, 'immigration/reject_todo.html', {
         'todo': todo,
     })
+
+@login_required
+def generate_todo_receipt_pdf(request, todo_id):
+    # Fetch the ToDo item by id
+    todo = get_object_or_404(ToDo, id=todo_id)
+
+    # Generate QR code from the application token
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(todo.application.token)
+    qr.make(fit=True)
+
+    # Save QR code to a BytesIO object
+    img = qr.make_image(fill='black', back_color='white')
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    qr_code_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+    # Get the full URL for the logo
+    logo_url = request.build_absolute_uri(static('img/logo.png'))
+
+    # Load the receipt template and render it with context
+    template = get_template('immigration/todo_receipt.html')
+    context = {
+        'todo': todo,
+        'user': request.user,
+        'qr_code_base64': qr_code_base64,
+        'logo_url': logo_url,
+    }
+    html_content = template.render(context)
+
+    # Generate the PDF directly into the response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="ToDo_Receipt_{todo.id}.pdf"'
+
+    try:
+        # Write the PDF to the response
+        HTML(string=html_content).write_pdf(target=response)
+    except Exception as e:
+        return HttpResponse(f"Error generating PDF: {str(e)}", status=500)
+
+    return response
 
 @login_required
 def queue_info(request):

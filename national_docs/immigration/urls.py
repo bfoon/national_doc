@@ -23,6 +23,7 @@ urlpatterns = [
     path('todos/<int:todo_id>/', views.todo_detail, name='todo_detail'),
     path('todos/<int:todo_id>/approve/', views.approve_todo, name='approve_todo'),
     path('todo/reject/<int:todo_id>/', views.reject_todo, name='reject_todo'),
+    path('todo/<int:todo_id>/receipt-pdf/', views.generate_todo_receipt_pdf, name='todo_receipt_pdf'),
     path('interview/<int:interview_id>/', views.interview_view, name='interview_view'),  # Interview detail view
     path('queue-info/', views.queue_info, name='queue_info'),
     path('fetch-interview-queue/', views.fetch_interview_queue, name='fetch_interview_queue'),

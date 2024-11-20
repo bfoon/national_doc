@@ -1,0 +1,25 @@
+ {% extends 'docs/header.html' %}
+{% block content %}
+<h2>User Profiles</h2>
+<a href="{% url 'add_profile' %}" class="btn btn-primary">Add Profile</a>
+<table class="table">
+    <tr>
+        <th>Username</th>
+        <th>Date of Birth</th>
+        <th>Nationality</th>
+        <th>Phone</th>
+        <th>Actions</th>
+    </tr>
+    {% for profile in profiles %}
+    <tr>
+        <td>{{ profile.user.username }}</td>
+        <td>{{ profile.date_of_birth }}</td>
+        <td>{{ profile.nationality }}</td>
+        <td>{{ profile.phone }}</td>
+        <td>
+            <a href="{% url 'edit_profile' profile.pk %}" class="btn btn-sm btn-warning">Edit</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

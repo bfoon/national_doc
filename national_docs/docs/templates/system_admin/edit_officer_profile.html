@@ -1,0 +1,21 @@
+ {% extends 'docs/header.html' %}
+{% block content %}
+<h2>Edit Officer Profile</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="phone">Phone:</label>
+    <input type="text" name="phone" value="{{ officer_profile.phone }}" required>
+    <label for="officer_batch_number">Officer Batch Number:</label>
+    <input type="text" name="officer_batch_number" value="{{ officer_profile.officer_batch_number }}" required>
+    <label for="post_location_id">Post Location:</label>
+    <select name="post_location_id" id="post_location_id">
+        <option value="">Select Post Location</option>
+        {% for location in post_locations %}
+        <option value="{{ location.id }}" {% if location.id == officer_profile.post_location.id %}selected{% endif %}>{{ location.name }}</option>
+        {% endfor %}
+    </select>
+    <label for="profile_picture">Profile Picture:</label>
+    <input type="file" name="profile_picture">
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+</form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+<div class="container my-5 text-center">
+    <h2>Confirm Deletion</h2>
+    <p>Are you sure you want to delete the profile for <strong>{{ profile.user.username }}</strong>?</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete Profile</button>
+        <a href="{% url 'officer_profile_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

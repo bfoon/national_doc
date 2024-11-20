@@ -1,0 +1,20 @@
+ {% extends 'docs/header.html' %}
+{% block content %}
+<h2>Add User Profile</h2>
+<form method="post">
+    {% csrf_token %}
+    <label for="user_id">User:</label>
+    <select name="user_id" id="user_id" required>
+        {% for user in users %}
+        <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+    </select>
+    <label for="date_of_birth">Date of Birth:</label>
+    <input type="date" name="date_of_birth">
+    <label for="nationality">Nationality:</label>
+    <input type="text" name="nationality">
+    <label for="phone">Phone:</label>
+    <input type="text" name="phone">
+    <button type="submit" class="btn btn-primary">Create Profile</button>
+</form>
+{% endblock %}

@@ -1,0 +1,27 @@
+ {% extends 'docs/header.html' %}
+{% block content %}
+<h2>Add Officer Profile</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="user_id">User:</label>
+    <select name="user_id" id="user_id" required>
+        {% for user in users %}
+        <option value="{{ user.id }}">{{ user.username }}</option>
+        {% endfor %}
+    </select>
+    <label for="phone">Phone:</label>
+    <input type="text" name="phone" required>
+    <label for="officer_batch_number">Officer Batch Number:</label>
+    <input type="text" name="officer_batch_number" required>
+    <label for="post_location_id">Post Location:</label>
+    <select name="post_location_id" id="post_location_id">
+        <option value="">Select Post Location</option>
+        {% for location in post_locations %}
+        <option value="{{ location.id }}">{{ location.name }}</option>
+        {% endfor %}
+    </select>
+    <label for="profile_picture">Profile Picture:</label>
+    <input type="file" name="profile_picture">
+    <button type="submit" class="btn btn-primary">Create Profile</button>
+</form>
+{% endblock %}

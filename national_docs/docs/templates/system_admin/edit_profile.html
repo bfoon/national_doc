@@ -1,0 +1,53 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+<div class="container my-5">
+    <h2>Edit Profile</h2>
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" class="form-control" name="username" value="{{ profile.user.username }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" name="email" value="{{ profile.user.email }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Phone</label>
+            <input type="text" class="form-control" name="phone" value="{{ profile.phone }}">
+        </div>
+
+        {% if profile.type == 'officer' %}
+            <div class="form-group">
+                <label>Officer Batch Number</label>
+                <input type="text" class="form-control" name="officer_batch_number" value="{{ profile.officer_batch_number }}">
+            </div>
+            <div class="form-group">
+                <label>Post Location</label>
+                <select name="post_location" class="form-control">
+                    {% for location in post_locations %}
+                        <option value="{{ location.id }}" {% if profile.post_location and profile.post_location.id == location.id %}selected{% endif %}>
+                            {{ location.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        {% elif profile.type == 'user' %}
+            <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" class="form-control" name="date_of_birth" value="{{ profile.date_of_birth }}">
+            </div>
+            <div class="form-group">
+                <label>Nationality</label>
+                <input type="text" class="form-control" name="nationality" value="{{ profile.nationality }}">
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'officer_profile_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

@@ -5,6 +5,22 @@
     <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
             <!-- Profile Link -->
+
+            {% if user.groups.all %}
+                {% for group in user.groups.all %}
+                    {% if group.name == 'sysadmin' %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/system-admin/officer_profiles">Admin</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            {% elif user.is_superuser %}
+            <li class="nav-item">
+                  <a class="nav-link" href="/system-admin/officer_profiles">Admin</a>
+            </li>
+            {% endif %}
+
+
             <li class="nav-item">
                 <a class="nav-link" href="/profile">Profile</a>
             </li>

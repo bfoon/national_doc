@@ -23,6 +23,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('docs.urls')),
     path('immigration/', include('immigration.urls')),
+    path('police/', include('immigration.urls')),
+    path('system-admin/', include('system_admin.urls')),
+
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

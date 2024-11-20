@@ -1,0 +1,54 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+<div class="container my-5">
+    <h2>View Profile</h2>
+    <table class="table table-bordered">
+        <tr>
+            <th>Type</th>
+            <td>{{ profile.type|title }}</td>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <td>{{ profile.user.username }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ profile.user.email }}</td>
+        </tr>
+        <tr>
+            <th>Phone</th>
+            <td>{{ profile.phone }}</td>
+        </tr>
+        {% if profile.type == 'officer' %}
+            <tr>
+                <th>Batch Number</th>
+                <td>{{ profile.officer_batch_number }}</td>
+            </tr>
+            <tr>
+                <th>Post Location</th>
+                <td>{{ profile.post_location.name }}</td>
+            </tr>
+            <tr>
+                <th>Profile Picture</th>
+                <td>
+                    {% if profile.profile_picture %}
+                        <img src="{{ profile.profile_picture.url }}" width="100" height="100" alt="Profile Picture">
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+        {% elif profile.type == 'user' %}
+            <tr>
+                <th>Date of Birth</th>
+                <td>{{ profile.date_of_birth }}</td>
+            </tr>
+            <tr>
+                <th>Nationality</th>
+                <td>{{ profile.nationality }}</td>
+            </tr>
+        {% endif %}
+    </table>
+    <a href="{% url 'officer_profile_list' %}" class="btn btn-secondary">Back to Profiles</a>
+</div>
+{% endblock %}

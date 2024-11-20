@@ -37,6 +37,8 @@ def login_page(request):
                 return redirect('dashboard')  # Superuser dashboard URL
             elif user.groups.filter(name__in=['immigration', 'police', 'tax', 'admin']).exists():
                 return redirect('immigration_dashboard')  # Immigration dashboard URL
+            elif user.groups.filter(name__in=['sysadmin']):
+                return redirect('officer_profiles')
             else:
                 return redirect('dashboard')  # Default dashboard URL for other users
 
