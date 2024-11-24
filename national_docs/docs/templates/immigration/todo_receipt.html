@@ -24,6 +24,13 @@
             height: auto;
             padding: 10px;
         }
+        .receipt-number {
+            color: red;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+        }
         .signature {
             font-family: 'Pacifico', cursive;
             font-size: 1rem;
@@ -46,7 +53,13 @@
         <!-- Logo Image at Top Right Corner -->
         <img src="{{ logo_url }}" alt="National Document Logo" class="logo">
 
-        <h2 class="text-center">Receipt</h2>
+        <!-- Receipt Title -->
+        <h2 class="text-center">Notional Document</h2>
+
+        <!-- Receipt Number -->
+        <p class="receipt-number">Receipt #{{ todo.application.id }}</p>
+
+        <!-- Receipt Details -->
         <p><strong>Application:</strong> {{ todo.application.get_service_type }}</p>
         <p><strong>Interviewee:</strong> {{ todo.interview.application.user.get_full_name }}</p>
         <p><strong>Interviewer:</strong> {{ todo.user.get_full_name }}</p>
