@@ -65,62 +65,65 @@ function printAppointment(applicationType) {
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    margin: 20px;
-                }
-                h1 {
-                    color: #3498db;
-                    text-align: center;
+                    margin: 0;
+                    padding: 20px;
+                    background-color: #f9f9f9;
                 }
                 .appointment-container {
                     border: 1px solid #ccc;
                     padding: 20px;
-                    width: 100%;
-                    max-width: 600px;
+                    width: 400px;
+                    background-color: #fff;
                     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                    position: relative;
-                    margin-top: 20px;
-                }
-                .appointment-details, .qrcode-container {
-                    display: inline-block;
-                    vertical-align: top;
+                    text-align: center;
+                    margin: auto;
                 }
                 .appointment-details {
-                    width: 70%;
+                    margin-bottom: 20px;
                 }
                 .qrcode-container {
-                    width: 25%;
-                    text-align: center;
+                    margin: 20px 0;
                 }
                 #qrcode {
-                    margin-top: 10px;
                     display: inline-block;
+                }
+                h2 {
+                    font-size: 1.5em;
+                    margin-bottom: 10px;
+                    color: #333;
+                }
+                p {
+                    margin: 5px 0;
+                    font-size: 1em;
+                    color: #555;
+                }
+                strong {
+                    color: #000;
                 }
             </style>
         </head>
         <body>
-            <h1>National Document Portal - Appointment Details</h1>
             <div class="appointment-container">
+                <h2>${appointment.type}</h2>
                 <div class="appointment-details">
-                    <h2>${appointment.type}</h2>
                     <p><strong>Date:</strong> ${appointment.date}</p>
                     <p><strong>Time:</strong> ${appointment.time}</p>
                     <p><strong>Queue Number:</strong> ${appointment.queueNumber}</p>
                     <p><strong>Applicant:</strong> ${appointment.name}</p>
                     <p><strong>Token:</strong> ${appointment.token}</p>
-                    <p>Please bring this appointment slip and all required documents to your interview.</p>
                 </div>
                 <div class="qrcode-container">
                     <div id="qrcode"></div>
-                    <p>Scan for Details</p>
                 </div>
+                <p>Please bring this appointment slip and all required documents to your interview.</p>
             </div>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
             <script>
                 // Generate the QR code with the appointment token
                 new QRCode(document.getElementById("qrcode"), {
                     text: "${appointment.token}",
-                    width: 100,
-                    height: 100,
+                    width: 120,
+                    height: 120,
                     colorDark: "#000000",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
@@ -136,3 +139,4 @@ function printAppointment(applicationType) {
         printWindow.print();
     }, 500);
 }
+
