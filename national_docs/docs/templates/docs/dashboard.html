@@ -327,46 +327,51 @@
  {% load static %}
 <script src="{% static 'js/dashboard-print.js' %}"></script>
 <script>
-     // Set the appointment data from Django template variables
-    setAppointmentData('nationalId', {
-        date: "{{ national_id_application.application.interview_slot.date_time|date:'Y-m-d' }}",
-        time: "{{ national_id_application.application.interview_slot.date_time|time:'H:i' }}",
-        name: "{{ national_id_application.full_name }}",
-        queueNumber: "{{ national_id_application.application.interview_queue_number }}",
-        token: "{{ national_id_application.application.token }}"
-    });
+    // Check which application type is available and set the token accordingly
+    let token = null;
 
-    setAppointmentData('residentPermit', {
-        date: "{{ resident_permit_application.application.interview_slot.date_time|date:'Y-m-d' }}",
-        time: "{{ resident_permit_application.application.interview_slot.date_time|time:'H:i' }}",
-        name: "{{ resident_permit_application.full_name }}",
-        queueNumber: "{{ resident_permit_application.application.interview_queue_number }}",
-        token: "{{ resident_permit_application.application.token }}"
-    });
+    if ("{{ national_id_application }}" && "{{ national_id_application.application.token }}") {
+        token = "{{ national_id_application.application.token }}";
+        setAppointmentData('nationalId', {
+            date: "{{ national_id_application.application.interview_slot.date_time|date:'Y-m-d' }}",
+            time: "{{ national_id_application.application.interview_slot.date_time|time:'H:i' }}",
+            name: "{{ national_id_application.full_name }}",
+            queueNumber: "{{ national_id_application.application.interview_queue_number }}",
+            token: token
+        });
+    } else if ("{{ resident_permit_application }}" && "{{ resident_permit_application.application.token }}") {
+        token = "{{ resident_permit_application.application.token }}";
+        setAppointmentData('residentPermit', {
+            date: "{{ resident_permit_application.application.interview_slot.date_time|date:'Y-m-d' }}",
+            time: "{{ resident_permit_application.application.interview_slot.date_time|time:'H:i' }}",
+            name: "{{ resident_permit_application.full_name }}",
+            queueNumber: "{{ resident_permit_application.application.interview_queue_number }}",
+            token: token
+        });
+    } else if ("{{ work_permit_application }}" && "{{ work_permit_application.application.token }}") {
+        token = "{{ work_permit_application.application.token }}";
+        setAppointmentData('workPermit', {
+            date: "{{ work_permit_application.application.interview_slot.date_time|date:'Y-m-d' }}",
+            time: "{{ work_permit_application.application.interview_slot.date_time|time:'H:i' }}",
+            name: "{{ work_permit_application.full_name }}",
+            queueNumber: "{{ work_permit_application.application.interview_queue_number }}",
+            token: token
+        });
+    }
 
-    setAppointmentData('workPermit', {
-        date: "{{ work_permit_application.application.interview_slot.date_time|date:'Y-m-d' }}",
-        time: "{{ work_permit_application.application.interview_slot.date_time|time:'H:i' }}",
-        name: "{{ work_permit_application.full_name }}",
-        queueNumber: "{{ work_permit_application.application.interview_queue_number }}",
-        token: "{{ work_permit_application.application.token }}"
-    });
+    // If a token is found, generate the QR code
+    if (token) {
+        new QRCode(document.getElementById("qrcode"), {
+            text: token,
+            width: 100, // Adjust width as needed
+            height: 100, // Adjust height as needed
+            colorDark: "#000000",
+            colorLight: "#ffffff"
+        });
+    } else {
+        console.error("No valid token found for National ID, Resident Permit, or Work Permit.");
+    }
 </script>
-
-<script>
-    // Get the token value
-    const token = "{{ national_id_application.application.token }}";
-
-    // Generate QR code
-    new QRCode(document.getElementById("qrcode"), {
-        text: token,
-        width: 100,  // Adjust width as needed
-        height: 100, // Adjust height as needed
-        colorDark: "#000000",
-        colorLight: "#ffffff"
-    });
-</script>
-
 
 <footer class="fixed-footer">
     <p>Developed by Akaine Consulting</p>
