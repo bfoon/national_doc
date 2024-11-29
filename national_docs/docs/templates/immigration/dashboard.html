@@ -1,11 +1,39 @@
- {% extends 'docs/header.html' %}
- {% block content %}
+{% extends 'docs/header.html' %}
+{% block content %}
 
-<!-- Add the Font Awesome link to the header (if not already included) -->
+<!-- Add the Font Awesome link for icons (if not already included) -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
+<style>
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
+
+    .card-title {
+        font-weight: bold;
+    }
+
+    .shadow {
+        border-radius: 10px;
+    }
+</style>
+
 <div class="container my-5">
-     {% if messages %}
+    <!-- Display Messages -->
+    {% if messages %}
         <div class="messages">
             {% for message in messages %}
                 <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
@@ -15,17 +43,19 @@
         </div>
     {% endif %}
 
-    <h2>Dashboard</h2>
+    <!-- Dashboard Header -->
+    <h2 class="mb-4 text-center">Dashboard</h2>
 
-    <div class="row">
+    <!-- Status Tiles -->
+    <div class="row text-center">
         <!-- New Requests Tile -->
         <div class="col-md-3">
-            <div class="card text-white bg-info mb-3 shadow">
+            <div class="card text-white bg-info mb-4 shadow">
                 <div class="card-header">
                     <i class="fas fa-file-alt"></i> New Requests
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ new_requests_count }}</h5>
+                    <h5 class="card-title display-4">{{ new_requests_count }}</h5>
                     <p class="card-text">Number of new applications awaiting processing.</p>
                 </div>
             </div>
@@ -33,12 +63,12 @@
 
         <!-- Pending Requests Tile -->
         <div class="col-md-3">
-            <div class="card text-white bg-warning mb-3 shadow">
+            <div class="card text-white bg-warning mb-4 shadow">
                 <div class="card-header">
                     <i class="fas fa-spinner"></i> Pending Requests
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ pending_requests_count }}</h5>
+                    <h5 class="card-title display-4">{{ pending_requests_count }}</h5>
                     <p class="card-text">Applications currently being processed.</p>
                 </div>
             </div>
@@ -46,25 +76,25 @@
 
         <!-- Waiting Requests Tile -->
         <div class="col-md-3">
-            <div class="card text-white bg-danger mb-3 shadow">
+            <div class="card text-white bg-danger mb-4 shadow">
                 <div class="card-header">
                     <i class="fas fa-exclamation-circle"></i> Waiting Requests
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ waiting_requests_count }}</h5>
+                    <h5 class="card-title display-4">{{ waiting_requests_count }}</h5>
                     <p class="card-text">Applications waiting for additional information.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Interviews for Today Tile -->
+        <!-- Interviews Today Tile -->
         <div class="col-md-3">
-            <div class="card text-white bg-success mb-3 shadow">
+            <div class="card text-white bg-success mb-4 shadow">
                 <div class="card-header">
                     <i class="fas fa-calendar-check"></i> Interviews Today
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{ interview_requests_count }}</h5>
+                    <h5 class="card-title display-4">{{ interview_requests_count }}</h5>
                     <p class="card-text">Number of interviews scheduled for today.</p>
                 </div>
             </div>
@@ -72,11 +102,11 @@
     </div>
 
     <!-- Menu Items Section -->
-    <div class="row mt-4">
+    <div class="row mt-4 text-center">
         <!-- Fulfiller -->
         <div class="col-md-3">
             <a href="/immigration/fulfiller" class="text-decoration-none">
-                <div class="card text-center shadow">
+                <div class="card shadow">
                     <div class="card-body">
                         <i class="fas fa-tasks fa-2x text-primary mb-3"></i>
                         <h5 class="card-title">Fulfiller</h5>
@@ -87,29 +117,27 @@
         </div>
 
         <!-- To-do -->
-<div class="col-md-3">
-    <a href="/immigration/todos" class="text-decoration-none">
-        <div class="card text-center shadow" style="position: relative;">
-            <!-- Badge to display pending count -->
-            {% if pending_todo_count > 0 %}
-                <span class="badge rounded-circle bg-danger text-white" style="position: absolute; top: 10px; right: 10px; font-size: 0.75rem;">
-                    {{ pending_todo_count }}
-                </span>
-            {% endif %}
-            <div class="card-body">
-                <i class="fas fa-list-check fa-2x text-success mb-3"></i>
-                <h5 class="card-title">To-do</h5>
-                <p class="card-text">View your tasks and pending actions.</p>
-            </div>
+        <div class="col-md-3">
+            <a href="/immigration/todos" class="text-decoration-none">
+                <div class="card shadow" style="position: relative;">
+                    {% if pending_todo_count > 0 %}
+                        <span class="badge rounded-circle bg-danger text-white">
+                            {{ pending_todo_count }}
+                        </span>
+                    {% endif %}
+                    <div class="card-body">
+                        <i class="fas fa-list-check fa-2x text-success mb-3"></i>
+                        <h5 class="card-title">To-do</h5>
+                        <p class="card-text">View your tasks and pending actions.</p>
+                    </div>
+                </div>
+            </a>
         </div>
-    </a>
-</div>
-
 
         <!-- Interview -->
         <div class="col-md-3">
             <a href="/immigration/interviews" class="text-decoration-none">
-                <div class="card text-center shadow">
+                <div class="card shadow">
                     <div class="card-body">
                         <i class="fas fa-user-clock fa-2x text-warning mb-3"></i>
                         <h5 class="card-title">Interview</h5>
@@ -122,7 +150,7 @@
         <!-- Schedule Management -->
         <div class="col-md-3">
             <a href="/immigration/available_slots" class="text-decoration-none">
-                <div class="card text-center shadow">
+                <div class="card shadow">
                     <div class="card-body">
                         <i class="fas fa-calendar-alt fa-2x text-danger mb-3"></i>
                         <h5 class="card-title">Schedule Management</h5>
@@ -135,7 +163,7 @@
         <!-- Post Location Settings -->
         <div class="col-md-3 mt-3">
             <a href="/immigration/post_locations" class="text-decoration-none">
-                <div class="card text-center shadow">
+                <div class="card shadow">
                     <div class="card-body">
                         <i class="fas fa-map-marker-alt fa-2x text-info mb-3"></i>
                         <h5 class="card-title">Post Location Settings</h5>
@@ -145,19 +173,19 @@
             </a>
         </div>
 
-        <!-- List Officer Users -->
+        <!-- Officer Users -->
         <div class="col-md-3 mt-3">
             <a href="/immigration/list_officer_users" class="text-decoration-none">
-                <div class="card text-center shadow">
+                <div class="card shadow">
                     <div class="card-body">
                         <i class="fas fa-users fa-2x text-dark mb-3"></i>
                         <h5 class="card-title">Officer Users</h5>
-                        <p class="card-text">View and manage Immigration, Police, and Tax officers.</p>
+                        <p class="card-text">View and manage officers.</p>
                     </div>
                 </div>
             </a>
         </div>
-        </div>
-        </div>
+    </div>
+</div>
 
 {% endblock %}

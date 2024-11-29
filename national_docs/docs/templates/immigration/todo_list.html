@@ -1,8 +1,32 @@
- {% extends 'docs/header.html' %}
- {% block content %}
-<div class="container my-5">
-    <h2>ToDo List</h2>
+{% extends 'docs/header.html' %}
+{% block content %}
+<style>
+    /* Custom Badge Colors */
+    .badge-success { background-color: #28a745; }
+    .badge-danger { background-color: #dc3545; }
+    .badge-warning { background-color: #ffc107; color: #212529; }
 
+    /* Button Group Styling */
+    .btn-group .btn {
+        margin-right: 5px;
+    }
+
+    /* Table Hover Styling */
+    .table-hover tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.1);
+    }
+
+    /* Modal Header Custom Style */
+    .modal-header {
+        background: linear-gradient(45deg, #ffc107, #ff5722);
+        color: white;
+    }
+</style>
+
+<div class="container my-5">
+
+
+    <!-- Messages Section -->
     {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -13,104 +37,106 @@
         </div>
     {% endif %}
 
-    <!-- Breadcrumb navigation -->
+    <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-2 rounded">
+        <ol class="breadcrumb bg-light p-3 rounded">
             <li class="breadcrumb-item">
-                    <a href="{% url 'immigration_dashboard' %}">Dashboard</a>
+                <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a>
             </li>
             <li class="breadcrumb-item active" aria-current="page">ToDo List</li>
         </ol>
     </nav>
+    <h2 class="mb-4">ToDo List</h2>
 
-    <table class="table table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th>Application</th>
-                <th>Interviewee</th>
-                <th>Interviewer</th>
-                <th>Approver</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for todo in todos %}
-            <tr>
-                <td>{{ todo.application.get_service_type }}</td>
-                <td>{{ todo.interview.application.user.get_full_name }}</td>
-                <td>{{ todo.user.get_full_name }}</td>
-                <td>{% if todo.approver %}{{ todo.approver.get_full_name }}{% else %}N/A{% endif %}</td>
-                <td>
-                    {% if todo.status == 1 %}
-                        <span class="badge badge-success">Approved</span>
-                     {% elif todo.status == 2 %}
-                        <span class="badge badge-danger">Rejected</span>
-                    {% else %}
-                        <span class="badge badge-warning">Pending</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <!-- Use a button group or inline-block to keep buttons side by side -->
-                    <div class="btn-group" role="group">
-                        <a href="{% url 'todo_detail' todo.id %}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i> View
-                        </a>
-                        {% if todo.status == 0 %}
-                        <!-- Button to trigger modal -->
-                        <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#approveModal">
-                            <i class="fas fa-check"></i> Approve
-                        </button>
+    <!-- ToDo Table -->
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Application</th>
+                    <th>Interviewee</th>
+                    <th>Interviewer</th>
+                    <th>Approver</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for todo in todos %}
+                <tr>
+                    <td>{{ todo.application.get_service_type }}</td>
+                    <td>{{ todo.interview.application.user.get_full_name }}</td>
+                    <td>{{ todo.user.get_full_name }}</td>
+                    <td>{% if todo.approver %}{{ todo.approver.get_full_name }}{% else %}N/A{% endif %}</td>
+                    <td>
+                        {% if todo.status == 1 %}
+                            <span class="badge badge-success">Approved</span>
+                        {% elif todo.status == 2 %}
+                            <span class="badge badge-danger">Rejected</span>
+                        {% else %}
+                            <span class="badge badge-warning">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- Actions Button Group -->
+                        <div class="btn-group" role="group">
+                            <!-- View Button -->
+                            <a href="{% url 'todo_detail' todo.id %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> View
+                            </a>
 
-                         <!-- Approval Confirmation Modal -->
-                        <div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header bg-warning text-dark">
-                                        <h5 class="modal-title" id="approveModalLabel">Confirm Approval</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p><strong>Warning:</strong> This action is irreversible. Once you approve this item, there will be no rolling back. Please proceed with caution.</p>
-                                        <hr>
-                                        <p class="text-danger">
-                                            <strong>Disclaimer:</strong> By approving this item, you certify that:
-                                        </p>
-                                        <ul>
-                                            <li>You have thoroughly reviewed and verified all associated documents and interview notes.</li>
-                                            <li>You are fully responsible for this action and its consequences.</li>
-                                        </ul>
-                                        <p class="text-primary">
-                                            Please ensure that you are acting fairly and without bias in this approval process.
-                                        </p>
-                                        <hr>
-                                        <p>Click "I Confirm" below to approve the item or "Cancel" to go back.</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <form method="POST" action="{% url 'approve_todo' todo.id %}">
-                                            {% csrf_token %}
-                                            <button type="submit" class="btn btn-success">I Confirm</button>
-                                        </form>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                            {% if todo.status == 0 %}
+                            <!-- Approve Button -->
+                            <button type="button" class="btn btn-success btn-sm" data-toggle="modal" data-target="#approveModal{{ todo.id }}">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+
+                            <!-- Approval Confirmation Modal -->
+                            <div class="modal fade" id="approveModal{{ todo.id }}" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel{{ todo.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="approveModalLabel{{ todo.id }}">Confirm Approval</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p class="mb-3">
+                                                <strong>Warning:</strong> This action is irreversible. Once approved, changes cannot be reverted. Please proceed with caution.
+                                            </p>
+                                            <hr>
+                                            <p>
+                                                <strong>Disclaimer:</strong> By approving this item, you confirm:
+                                            </p>
+                                            <ul>
+                                                <li>All associated documents and interview notes have been thoroughly reviewed and verified.</li>
+                                                <li>You are fully responsible for this action and its consequences.</li>
+                                            </ul>
+                                            <p class="mt-3 text-primary">Ensure fairness and accuracy in your decision.</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form method="POST" action="{% url 'approve_todo' todo.id %}">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-success btn-sm">I Confirm</button>
+                                            </form>
+                                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
-
-                    {% endif %}
-                    </div>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-center">No ToDo items found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">No ToDo items found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
-
 
 {% endblock %}
