@@ -1,5 +1,62 @@
 {% extends 'docs/header.html' %}
 {% block content %}
+<style>
+    .boot-container {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .boot-container h3 {
+        font-size: 1.25rem;
+        color: #007bff;
+        margin-bottom: 10px;
+    }
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .list-group-item .badge {
+        font-size: 0.85rem;
+    }
+    #all-queue-numbers {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+    #all-queue-numbers h4 {
+        color: #343a40;
+    }
+    .list-inline-item {
+        margin-right: 10px;
+        padding: 10px 15px;
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .list-inline-item form {
+        margin-left: 10px;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    .queue-line ul {
+        padding: 0;
+        list-style: none;
+    }
+</style>
+
 <div class="container my-5">
     {% if messages %}
         <div class="messages">
@@ -11,32 +68,32 @@
         </div>
     {% endif %}
 
-    <h2>Interview Queue Management</h2>
+    <h2 class="mb-4">Interview Queue Management</h2>
 
-<!-- Display each boot -->
-<div id="interview-boots" class="row mb-4">
-    {% for boot in boots %}
-        <div class="col-md-4 boot-container" data-boot-id="{{ boot.id }}">
-            <h3>Boot {{ boot.name }}</h3>
+    <!-- Display each boot -->
+    <div id="interview-boots" class="row mb-4">
+        {% for boot in boots %}
+            <div class="col-md-4 boot-container" data-boot-id="{{ boot.id }}">
+                <h3>Boot {{ boot.name }}</h3>
 
-            <ul class="list-group mt-3" id="boot-queue-{{ boot.id }}">
-                {% for interview in boot.interviews.all %}  <!-- Access the interviews related to this boot -->
-                    {% if interview.status == 'in_progress' %}
-                        <li class="list-group-item">
-                            Queue Number: {{ interview.application.interview_queue_number }}
-                            <span class="badge badge-success">In Progress</span>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        </div>
-    {% endfor %}
-</div>
+                <ul class="list-group mt-3" id="boot-queue-{{ boot.id }}">
+                    {% for interview in boot.interviews.all %}
+                        {% if interview.status == 'in_progress' %}
+                            <li class="list-group-item">
+                                Queue Number: {{ interview.application.interview_queue_number }}
+                                <span class="badge badge-success">In Progress</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
     <hr>
 
-    <!-- All scheduled queue numbers in one line below boots -->
+    <!-- All scheduled queue numbers in one section -->
     <div id="all-queue-numbers" class="queue-line mb-4">
-        <h4>Scheduled Interview Queue</h4>
+        <h4 class="mb-3">Scheduled Interview Queue</h4>
         <ul class="list-inline">
             {% for interview in interviews %}
                 {% if interview.status == 'scheduled' or interview.status == 'postponed' %}
@@ -45,7 +102,9 @@
                         <form method="POST" class="d-inline">
                             {% csrf_token %}
                             <input type="hidden" name="interview_id" value="{{ interview.id }}">
-                            <button type="submit" class="btn btn-primary btn-sm start-interview-btn">Start Interview</button>
+                            <button type="submit" class="btn btn-primary btn-sm start-interview-btn">
+                                Start Interview
+                            </button>
                         </form>
                     </li>
                 {% endif %}
@@ -53,45 +112,41 @@
         </ul>
     </div>
 
-    <!-- Hidden CSRF token for JavaScript -->
+    <!-- CSRF token for JavaScript -->
     <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
-
 </div>
 
 <script>
-    function attachStartInterviewHandlers() {
+    document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.start-interview-btn').forEach(button => {
             button.addEventListener('click', function(event) {
                 event.preventDefault();
                 const queueItem = this.closest('li');
                 const interviewId = queueItem.getAttribute('data-interview-id');
-                const csrfToken = document.getElementById('csrf-token').value; // Fetch CSRF token from hidden input
+                const csrfToken = document.getElementById('csrf-token').value;
 
                 fetch("{% url 'start_interview' %}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken // Set CSRF token in header
+                        'X-CSRFToken': csrfToken
                     },
                     body: JSON.stringify({ interview_id: interviewId })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Move the item to the respective boot section
                         const bootQueue = document.getElementById(`boot-queue-${data.boot_id}`);
                         queueItem.querySelector('.start-interview-btn').remove();
                         queueItem.innerHTML += `<span class="badge badge-success">In Progress</span>`;
                         bootQueue.appendChild(queueItem);
                     } else {
-                        alert("Error starting interview");
+                        alert('Error starting the interview. Please try again.');
                     }
                 })
-                .catch(error => console.error('Error starting interview:', error));
+                .catch(error => console.error('Error:', error));
             });
         });
-    }
-
-    document.addEventListener('DOMContentLoaded', attachStartInterviewHandlers);
+    });
 </script>
 {% endblock %}

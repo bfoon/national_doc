@@ -20,18 +20,44 @@
             background-color: white;
             padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             width: 100%;
             max-width: 400px;
+            text-align: center;
         }
-        .error {
-            color: #e74c3c;
+        .logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 1rem;
         }
-        .text-primary a {
-            color: inherit;
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+        .form-group label {
+            font-weight: 600;
+        }
+        .btn-primary {
+            background-color: #0069d9;
+            border-color: #0069d9;
+            padding: 0.5rem 1.5rem;
+            font-size: 1rem;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .links {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .links a {
+            color: #0069d9;
             text-decoration: none;
         }
-        .text-primary a:hover {
+        .links a:hover {
             text-decoration: underline;
         }
     </style>
@@ -39,9 +65,11 @@
 <body>
 
     <div class="container">
-        <h1 class="text-center text-primary mb-4">
-            <a href="{% url 'landing_page' %}">Login to National Document Portal</a>
-        </h1>
+        <!-- Gambia Government Logo -->
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Coat_of_arms_of_The_Gambia.svg/1024px-Coat_of_arms_of_The_Gambia.svg.png"
+             alt="Gambia Government Logo" class="logo">
+
+        <h1>National Document Portal</h1>
 
         {% if form.errors %}
             <div class="alert alert-danger">
@@ -54,18 +82,18 @@
 
             <div class="form-group">
                 <label for="username">Username or Email</label>
-                <input type="text" id="username" name="username" class="form-control" required>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username or email" required>
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">Login</button>
         </form>
 
-        <div class="d-flex justify-content-between mt-3">
+        <div class="links d-flex justify-content-between mt-3">
             <a href="#" class="text-primary">Forgot Password?</a>
             <a href="/register" class="text-primary">Create Account</a>
         </div>

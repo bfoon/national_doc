@@ -8,12 +8,15 @@
     <!-- Bootstrap CSS -->
 
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 
 <header>
     <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
@@ -33,36 +36,106 @@
     </nav>
 </header>
 
-<style>
+ <style>
         body, html {
             margin: 0;
             padding: 0;
             scroll-behavior: smooth;
-            height: 100%;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
             display: flex;
             flex-direction: column;
+            min-height: 100vh;
         }
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
+
+        .navbar {
+            background-color: #343a40;
         }
-        .container {
-            flex: 1;
-            padding: 20px;
-            margin-top: 70px; /* Adjusted for fixed navbar */
+
+        .navbar-brand {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
         }
-        .logo {
+
+        .navbar-brand .logo {
             height: 40px;
             margin-right: 10px;
         }
-        .fixed-footer {
-            background-color: #343a40; /* Same as bg-dark */
+
+        .container {
+            margin-top: 80px;
+            flex: 1;
+        }
+
+        h2, h3 {
+            color: #343a40;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .dashboard-item {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .dashboard-item h3 {
+            margin-bottom: 15px;
+            font-size: 1.25rem;
+        }
+
+        .dashboard-item p {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .cta-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #0056b3;
+        }
+
+        .status.text-muted {
+            color: #6c757d;
+        }
+
+        .status.text-warning {
+            color: #ffc107;
+        }
+
+        .status.text-success {
+            color: #28a745;
+        }
+
+        footer {
+            background-color: #343a40;
             color: white;
             text-align: center;
-            padding: 1rem;
-            width: 100%;
-            bottom: 0;
-            left: 0;
+            padding: 15px;
+            margin-top: auto;
+        }
+
+        #notesModal .modal-content {
+            border-radius: 10px;
+        }
+
+        .modal-header, .modal-footer {
+            border: none;
         }
     </style>
 
@@ -229,33 +302,46 @@
             <div class="dashboard-item">
                 <h3>Upload Document</h3>
                 {% if national_id_application.application.status == 'waiting' %}
-                <p>Status: <span class="status">{{ national_id_application.application.status }}</span></p>
+                    <p>Status: <span class="status text-warning">{{ national_id_application.application.status }}</span></p>
                 {% elif resident_permit_application.application.status == 'waiting' %}
-                <p>Status: <span class="status">{{ resident_permit_application.application.status }}</span></p>
+                    <p>Status: <span class="status text-warning">{{ resident_permit_application.application.status }}</span></p>
                 {% elif work_permit_application.application.status == 'waiting' %}
-                <p>Status: <span class="status">{{ work_permit_application.application.status }}</span></p>
+                    <p>Status: <span class="status text-warning">{{ work_permit_application.application.status }}</span></p>
                 {% endif %}
                 {% if national_id_application.application.status == 'waiting' %}
-                    <a href="{% url 'upload_document' national_id_application.application.id %}" class="cta-button">Upload Document</a>
-                <button class="btn btn-info" data-toggle="modal" data-target="#notesModal">
-                <i class="fas fa-info-circle"></i> View Notes
-                </button>
+                    <div class="button-group mt-2 p-2">
+                        <a href="{% url 'upload_document' national_id_application.application.id %}" class="btn btn-sm btn-primary mr-2">
+                            <i class="fas fa-upload"></i> Upload Document
+                        </a>
+                        <button class="btn btn-sm btn-info mt-2" data-toggle="modal" data-target="#notesModal">
+                            <i class="fas fa-info-circle"></i> View Notes
+                        </button>
+                    </div>
                 {% elif resident_permit_application.application.status == 'waiting' %}
-                    <a href="{% url 'upload_document' resident_permit_application.application.id %}" class="cta-button">Upload Document</a>
-                <button class="btn btn-info" data-toggle="modal" data-target="#notesModal">
-                <i class="fas fa-info-circle"></i> View Notes
-                </button>
+                    <div class="button-group mt-2 p-2">
+                        <a href="{% url 'upload_document' resident_permit_application.application.id %}" class="btn btn-sm btn-primary mr-2">
+                            <i class="fas fa-upload"></i> Upload Document
+                        </a>
+                        <button class="btn btn-sm btn-info mt-2" data-toggle="modal" data-target="#notesModal">
+                            <i class="fas fa-info-circle"></i> View Notes
+                        </button>
+                    </div>
                 {% elif work_permit_application.application.status == 'waiting' %}
-                    <a href="{% url 'upload_document' work_permit_application.application.id %}" class="cta-button">Upload Document</a>
-                <button class="btn btn-info" data-toggle="modal" data-target="#notesModal">
-                <i class="fas fa-info-circle"></i> View Notes
-                </button>
+                    <div class="button-group mt-2 p-2">
+                        <a href="{% url 'upload_document' work_permit_application.application.id %}" class="btn btn-sm btn-primary mr-2">
+                            <i class="fas fa-upload"></i> Upload Document
+                        </a>
+                        <button class="btn btn-sm btn-info mt-2" data-toggle="modal" data-target="#notesModal">
+                            <i class="fas fa-info-circle"></i> View Notes
+                        </button>
+                    </div>
                 {% else %}
                     <p>Document upload is not available at this stage.</p>
                 {% endif %}
             </div>
         </div>
     </div>
+
 <script src="{% static 'js/dashboard.js' %}"></script>
 <!-- Modal for Viewing Application Details -->
 <div class="modal fade" id="applicationModal" tabindex="-1" role="dialog" aria-labelledby="applicationModalLabel" aria-hidden="true">

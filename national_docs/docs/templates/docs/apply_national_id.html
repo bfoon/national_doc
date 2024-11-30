@@ -1,91 +1,91 @@
- {% extends 'docs/header.html' %}
+{% extends 'docs/header.html' %}
 {% block content %}
 <style>
+
     .application-form {
-        background-color: white;
-        border-radius: 8px;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         margin-top: 20px;
     }
-    .form-group {
-        margin-bottom: 20px;
+
+    .form-group label {
+        font-weight: bold;
     }
+
     .document-upload {
-        border: 2px dashed #bdc3c7;
+        border: 2px dashed #cfd8dc;
         padding: 20px;
         text-align: center;
-        cursor: pointer;
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        transition: border-color 0.3s ease;
     }
+
+    .document-upload:hover {
+        border-color: #90caf9;
+    }
+
     .submit-button {
-        background-color: #3498db;
+        background-color: #007bff;
         color: white;
-        padding: 10px 20px;
         border: none;
-        border-radius: 4px;
-        font-size: 18px;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
+
     .submit-button:hover {
-        background-color: #2980b9;
+        background-color: #0056b3;
     }
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.4);
-    }
+
     .modal-content {
-        background-color: #fff;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 600px;
-        border-radius: 8px;
+        border-radius: 10px;
     }
+
+    .modal-header, .modal-footer {
+        border: none;
+    }
+
     .close {
         color: #aaa;
-        float: right;
-        font-size: 28px;
+        font-size: 24px;
         font-weight: bold;
     }
-    .close:hover, .close:focus {
+
+    .close:hover {
         color: black;
-        text-decoration: none;
         cursor: pointer;
     }
 </style>
 
 <div class="container">
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-2 rounded">
+        <ol class="breadcrumb bg-light p-3 rounded">
             <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
             <li class="breadcrumb-item active" aria-current="page">Apply for National ID</li>
         </ol>
     </nav>
 
     <div class="application-form">
-        <h2>National ID Card Application</h2>
+        <h2 class="mb-4">National ID Card Application</h2>
         <form id="national-id-form" method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
                 <label for="full-name">Full Name</label>
-                <input type="text" id="full-name" name="full-name" class="form-control" required>
+                <input type="text" class="form-control" id="full-name" name="full-name" placeholder="Enter your full name" required>
             </div>
             <div class="form-group">
                 <label for="date-of-birth">Date of Birth</label>
-                <input type="date" id="date-of-birth" name="date-of-birth" class="form-control" required>
+                <input type="date" class="form-control" id="date-of-birth" name="date-of-birth" required>
             </div>
             <div class="form-group">
                 <label for="place-of-birth">Place of Birth</label>
-                <input type="text" id="place-of-birth" name="place-of-birth" class="form-control" required>
+                <input type="text" class="form-control" id="place-of-birth" name="place-of-birth" placeholder="Enter your place of birth" required>
             </div>
             <div class="form-group">
                 <label for="gender">Gender</label>
@@ -98,18 +98,17 @@
             </div>
             <div class="form-group">
                 <label for="address">Current Address</label>
-                <textarea id="address" name="address" class="form-control" rows="3" required></textarea>
+                <textarea id="address" name="address" class="form-control" rows="3" placeholder="Enter your current address" required></textarea>
             </div>
             <div class="form-group">
                 <label for="phone">Phone Number</label>
-                <input type="text" id="phone" name="phone" class="form-control" required>
+                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" required>
             </div>
             <div class="form-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" class="form-control" required>
+                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address" required>
             </div>
 
-            <!-- New Closest Post Location Dropdown -->
             <div class="form-group">
                 <label for="post-location">Closest Post Location</label>
                 <select id="post-location" name="post-location" class="form-control" required>
@@ -120,87 +119,93 @@
                 </select>
             </div>
 
-            <h2>Document Upload</h2>
+            <h4 class="mt-4 mb-3">Document Upload</h4>
             <div class="form-group">
                 <label for="birth-certificate">Birth Certificate</label>
                 <div class="document-upload" id="birth-certificate-upload">
-                    <p>Click to upload or drag and drop your Birth Certificate here</p>
+                    <p>Click or drag to upload your Birth Certificate</p>
                     <input type="file" id="birth-certificate" name="birth-certificate" accept=".pdf,.jpg,.png" style="display: none;" required>
                 </div>
             </div>
             <div class="form-group">
-                <label for="passport-photo">Passport-sized Photograph</label>
+                <label for="passport-photo">Passport Photo</label>
                 <div class="document-upload" id="passport-photo-upload">
-                    <p>Click to upload or drag and drop your Passport Photo here</p>
+                    <p>Click or drag to upload your Passport Photo</p>
                     <input type="file" id="passport-photo" name="passport-photo" accept=".jpg,.png" style="display: none;" required>
                 </div>
             </div>
 
-            <button type="submit" class="submit-button">Submit Application</button>
+            <button type="submit" class="submit-button mt-4">Submit Application</button>
         </form>
+        <br>
     </div>
 </div>
 
 <!-- Disclaimer Modal -->
-<div id="disclaimerModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h3>Important Disclaimer</h3>
-        <p>By submitting this application, I confirm that the information provided is accurate and truthful. I understand that providing false information for national documents is punishable by the laws of The Gambia under the legal code governing national documents.</p>
-        <button class="btn btn-primary" onclick="closeModal()">I Understand</button>
+<div id="disclaimerModal" class="modal fade">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Important Disclaimer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>By submitting this application, I confirm that the information provided is accurate and truthful. Providing false information is a violation of The Gambia's legal code governing national documents.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal">I Understand</button>
+            </div>
+        </div>
     </div>
 </div>
 
-
-
 <script>
-    // Handle document upload UI
-    function setupFileUpload(uploadAreaId, fileInputId) {
-        const uploadArea = document.getElementById(uploadAreaId);
-        const fileInput = document.getElementById(fileInputId);
+    document.addEventListener('DOMContentLoaded', function () {
+        // Function to handle file upload UI interactions
+        function setupFileUpload(uploadAreaId, fileInputId) {
+            const uploadArea = document.getElementById(uploadAreaId);
+            const fileInput = document.getElementById(fileInputId);
 
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.backgroundColor = '#e8f4fc';
-        });
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.backgroundColor = 'transparent';
-        });
-        uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadArea.style.backgroundColor = 'transparent';
-            fileInput.files = e.dataTransfer.files;
-            updateUploadText(uploadArea, e.dataTransfer.files[0].name);
-        });
-        fileInput.addEventListener('change', () => {
-            if (fileInput.files.length > 0) {
-                updateUploadText(uploadArea, fileInput.files[0].name);
-            }
-        });
-    }
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('border-primary');
+            });
+            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('border-primary'));
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('border-primary');
+                fileInput.files = e.dataTransfer.files;
+                uploadArea.querySelector('p').textContent = `Selected: ${e.dataTransfer.files[0].name}`;
+            });
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    uploadArea.querySelector('p').textContent = `Selected: ${fileInput.files[0].name}`;
+                }
+            });
+        }
 
-    function updateUploadText(uploadArea, fileName) {
-        uploadArea.querySelector('p').textContent = `File selected: ${fileName}`;
-    }
+        // Initialize file upload areas
+        setupFileUpload('birth-certificate-upload', 'birth-certificate');
+        setupFileUpload('passport-photo-upload', 'passport-photo');
 
-    setupFileUpload('birth-certificate-upload', 'birth-certificate');
-    setupFileUpload('passport-photo-upload', 'passport-photo');
+        // Handle form submission and modal logic
+        const form = document.getElementById('national-id-form');
+        const disclaimerModal = document.getElementById('disclaimerModal');
 
-    // Show modal before form submission
-    const form = document.getElementById('national-id-form');
-    form.addEventListener('submit', function(event) {
-        event.preventDefault();  // Prevent immediate submission
-        showModal();
+        form.addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent immediate submission
+            $('#disclaimerModal').modal('show'); // Show modal
+        });
+
+        // Submit form when "I Understand" button is clicked in the modal
+        document.querySelector('#disclaimerModal .btn-primary').addEventListener('click', function () {
+            form.submit(); // Submit form after acknowledgment
+        });
     });
-
-    function showModal() {
-        document.getElementById('disclaimerModal').style.display = 'block';
-    }
-
-    function closeModal() {
-        document.getElementById('disclaimerModal').style.display = 'none';
-        form.submit();  // Submit the form after the disclaimer is acknowledged
-    }
 </script>
+
+
 {% endblock %}

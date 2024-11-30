@@ -9,46 +9,77 @@
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        body, html {
+        body {
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
             scroll-behavior: smooth;
         }
+
         .hero {
-            background: url('https://images.unsplash.com/photo-1590650153855-d9e808231d41?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1590650153855-d9e808231d41?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            padding-top: 80px;
+            text-align: center;
         }
+
         .hero-content {
             background: rgba(0, 0, 0, 0.7);
             padding: 2rem;
-            border-radius: 15px;
-            text-align: center;
+            border-radius: 10px;
         }
+
         .btn-primary {
             background-color: #2989d8;
             border-color: #2989d8;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 20px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
+
         .btn-primary:hover {
             background-color: #1e5799;
-            border-color: #1e5799;
+            transform: translateY(-3px);
         }
+
+        .card {
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
         .icon {
-            font-size: 2rem;
-            margin-bottom: 10px;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
             color: #2989d8;
         }
-       #documentsList {
-        list-style-type: disc;
-        margin-left: 20px;
-    }
-    .view-documents-btn {
-        margin-top: 10px;
-    }
+
+        .modal-header {
+            background-color: #2989d8;
+            color: white;
+        }
+
+        .modal-footer .btn {
+            border-radius: 20px;
+        }
+
+        footer {
+            background-color: #2989d8;
+            color: white;
+            padding: 1rem;
+        }
+
+        footer p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -61,106 +92,97 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#home">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#services">Services</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#about">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#contact">Contact</a>
-                </li>
+                <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
             </ul>
         </div>
     </nav>
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        <div class="hero-content text-white">
-            <h2>Seamless National Documents Solutions</h2>
-            <p>Simplifying your documentation process for a smoother life experience.</p>
-            <a href="/login" class="btn btn-primary">Apply Now</a>
+        <div class="hero-content">
+            <h1>Seamless National Document Solutions</h1>
+            <p>Streamline your documentation process for a stress-free experience.</p>
+            <a href="/login" class="btn btn-primary">Get Started</a>
         </div>
     </section>
 
     <!-- Services Section -->
-<section id="services" class="py-5 text-center">
-    <div class="container">
-        <h2>Our Services</h2>
-        <div class="row mt-4">
-            <div class="col-md-3">
-                <div class="card h-100 shadow-sm" data-documents='["Birth Certificate", "Proof of Address", "Passport Photo"]' data-service="National ID Card">
-                    <div class="card-body">
-                        <div class="icon"><i class="fas fa-id-card"></i></div>
-                        <h5 class="card-title">National ID Card</h5>
-                        <p class="card-text">Obtain your official national identification card quickly and efficiently.</p>
-                        <button class="btn btn-primary view-documents-btn">View Required Documents</button>
+    <section id="services" class="py-5 text-center">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="row mt-5">
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm" data-documents='["Birth Certificate", "Proof of Address", "Passport Photo"]' data-service="National ID Card">
+                        <div class="card-body">
+                            <div class="icon"><i class="fas fa-id-card"></i></div>
+                            <h5 class="card-title">National ID Card</h5>
+                            <p>Get your official national ID quickly and hassle-free.</p>
+                            <button class="btn btn-primary view-documents-btn">View Requirements</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card h-100 shadow-sm" data-documents='["Passport", "Proof of Entry", "Purpose of Stay Document"]' data-service="Resident Permit">
-                    <div class="card-body">
-                        <div class="icon"><i class="fas fa-home"></i></div>
-                        <h5 class="card-title">Resident Permit</h5>
-                        <p class="card-text">Secure your residency status with our streamlined permit process.</p>
-                        <button class="btn btn-primary view-documents-btn">View Required Documents</button>
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm" data-documents='["Passport", "Proof of Entry", "Purpose of Stay Document"]' data-service="Resident Permit">
+                        <div class="card-body">
+                            <div class="icon"><i class="fas fa-home"></i></div>
+                            <h5 class="card-title">Resident Permit</h5>
+                            <p>Secure your residency with a streamlined process.</p>
+                            <button class="btn btn-primary view-documents-btn">View Requirements</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card h-100 shadow-sm" data-documents='["Employment Contract", "Passport", "Proof of Address"]' data-service="Work Permit">
-                    <div class="card-body">
-                        <div class="icon"><i class="fas fa-briefcase"></i></div>
-                        <h5 class="card-title">Work Permit</h5>
-                        <p class="card-text">Get authorized to work legally with our hassle-free work permit service.</p>
-                        <button class="btn btn-primary view-documents-btn">View Required Documents</button>
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm" data-documents='["Employment Contract", "Passport", "Proof of Address"]' data-service="Work Permit">
+                        <div class="card-body">
+                            <div class="icon"><i class="fas fa-briefcase"></i></div>
+                            <h5 class="card-title">Work Permit</h5>
+                            <p>Obtain a legal work permit with ease.</p>
+                            <button class="btn btn-primary view-documents-btn">View Requirements</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card h-100 shadow-sm" data-documents='["Taxpayer ID Form", "Proof of Identity"]' data-service="TIN Number">
-                    <div class="card-body">
-                        <div class="icon"><i class="fas fa-file-invoice"></i></div>
-                        <h5 class="card-title">TIN Number</h5>
-                        <p class="card-text">Register for your Taxpayer Identification Number with ease.</p>
-                        <button class="btn btn-primary view-documents-btn">View Required Documents</button>
+                <div class="col-md-3">
+                    <div class="card h-100 shadow-sm" data-documents='["Taxpayer ID Form", "Proof of Identity"]' data-service="TIN Number">
+                        <div class="card-body">
+                            <div class="icon"><i class="fas fa-file-invoice"></i></div>
+                            <h5 class="card-title">TIN Number</h5>
+                            <p>Register for your Taxpayer Identification Number effortlessly.</p>
+                            <button class="btn btn-primary view-documents-btn">View Requirements</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- Modal for Required Documents -->
-<div class="modal fade" id="documentsModal" tabindex="-1" role="dialog" aria-labelledby="documentsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="documentsModalLabel"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <ul id="documentsList"></ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    <!-- Modal for Document Requirements -->
+    <div class="modal fade" id="documentsModal" tabindex="-1" role="dialog" aria-labelledby="documentsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="documentsModalLabel"></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul id="documentsList"></ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
 
     <!-- About Section -->
     <section id="about" class="py-5 bg-light text-center">
         <div class="container">
             <h2>About Us</h2>
-                        <p class="mt-4">We are a government-backed agency dedicated to providing efficient and reliable document services to citizens and residents. Our mission is to simplify the documentation process and ensure that everyone has access to the necessary documents for their daily lives.</p>
+            <p>We provide efficient and reliable document services for citizens and residents. Our goal is to simplify documentation processes for everyone.</p>
         </div>
     </section>
 
@@ -168,14 +190,13 @@
     <section id="contact" class="py-5 text-center">
         <div class="container">
             <h2>Contact Us</h2>
-            <p class="mt-4">Have any questions or need assistance? Reach out to us through the following channels:</p>
             <div class="row mt-4">
                 <div class="col-md-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <div class="icon"><i class="fas fa-phone"></i></div>
                             <h5 class="card-title">Phone</h5>
-                            <p class="card-text">+123 456 7890</p>
+                            <p>+123 456 7890</p>
                         </div>
                     </div>
                 </div>
@@ -184,7 +205,7 @@
                         <div class="card-body">
                             <div class="icon"><i class="fas fa-envelope"></i></div>
                             <h5 class="card-title">Email</h5>
-                            <p class="card-text">info@nationaldocuments.com</p>
+                            <p>info@nationaldocuments.com</p>
                         </div>
                     </div>
                 </div>
@@ -193,7 +214,7 @@
                         <div class="card-body">
                             <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
                             <h5 class="card-title">Address</h5>
-                            <p class="card-text">123 Main Street, City, Country</p>
+                            <p>123 Main Street, City, Country</p>
                         </div>
                     </div>
                 </div>
@@ -201,45 +222,38 @@
         </div>
     </section>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Get all "View Required Documents" buttons
-        const viewDocumentsButtons = document.querySelectorAll('.view-documents-btn');
-
-        viewDocumentsButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                // Get the parent card
-                const card = this.closest('.card');
-                const serviceName = card.getAttribute('data-service');
-                const documents = JSON.parse(card.getAttribute('data-documents'));
-
-                // Set modal title
-                const modalTitle = document.getElementById('documentsModalLabel');
-                modalTitle.textContent = `Required Documents for ${serviceName}`;
-
-                // Populate document list
-                const documentsList = document.getElementById('documentsList');
-                documentsList.innerHTML = ''; // Clear existing content
-                documents.forEach(doc => {
-                    const li = document.createElement('li');
-                    li.textContent = doc;
-                    documentsList.appendChild(li);
-                });
-
-                // Show the modal
-                $('#documentsModal').modal('show');
-            });
-        });
-    });
-</script>
-
-
     <!-- Footer -->
-    <footer class="bg-primary text-white text-center py-3">
+    <footer>
         <p>© 2024 National Document Services. All rights reserved.</p>
     </footer>
 
-    <!-- Bootstrap JS and dependencies -->
+    <!-- Scripts -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('.view-documents-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const card = this.closest('.card');
+                    const serviceName = card.getAttribute('data-service');
+                    const documents = JSON.parse(card.getAttribute('data-documents'));
+
+                    const modalTitle = document.getElementById('documentsModalLabel');
+                    const documentsList = document.getElementById('documentsList');
+
+                    modalTitle.textContent = `Required Documents for ${serviceName}`;
+                    documentsList.innerHTML = '';
+                    documents.forEach(doc => {
+                        const li = document.createElement('li');
+                        li.textContent = doc;
+                        documentsList.appendChild(li);
+                    });
+
+                    $('#documentsModal').modal('show');
+                });
+            });
+        });
+    </script>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

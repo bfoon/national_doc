@@ -1,46 +1,78 @@
- {% extends 'docs/header.html' %}
- {% block content %}
+{% extends 'docs/header.html' %}
+{% block content %}
 <div class="container my-5">
-    <h2>Add Boot</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" class="form-control" id="name" name="name" required>
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
+            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'boot_list' %}">Boot List</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Add Boot</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Add New Boot</h3>
         </div>
-        <div class="form-group">
-            <label for="description">Description</label>
-            <textarea class="form-control" id="description" name="description"></textarea>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <!-- Name Field -->
+                <div class="form-group">
+                    <label for="name" class="font-weight-bold">Boot Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter boot name" required>
+                </div>
+
+                <!-- Description Field -->
+                <div class="form-group">
+                    <label for="description" class="font-weight-bold">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter a brief description"></textarea>
+                </div>
+
+                <!-- Assign To Field -->
+                <div class="form-group">
+                    <label for="assigned_to" class="font-weight-bold">Assign To</label>
+                    <select class="form-control" id="assigned_to" name="assigned_to" required>
+                        <option value="" disabled selected>Select a user</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Group Field -->
+                <div class="form-group">
+                    <label for="group" class="font-weight-bold">Group</label>
+                    <select class="form-control" id="group" name="group" required>
+                        <option value="" disabled selected>Select a group</option>
+                        {% for group in groups %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Post Location Field -->
+                <div class="form-group">
+                    <label for="post_location" class="font-weight-bold">Post Location</label>
+                    <select class="form-control" id="post_location" name="post_location" required>
+                        <option value="" disabled selected>Select a post location</option>
+                        {% for post_location in post_locations %}
+                            <option value="{{ post_location.id }}">{{ post_location.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary mr-2">
+                        <i class="fas fa-save"></i> Save Boot
+                    </button>
+                    <a href="{% url 'boot_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="assigned_to">Assign To</label>
-            <select class="form-control" id="assigned_to" name="assigned_to" required>
-                <option value="">Select a user</option>
-                {% for user in users %}
-                    <option value="{{ user.id }}">{{ user.get_full_name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="group">Group</label>
-            <select class="form-control" id="group" name="group" required>
-                <option value="">Select a group</option>
-                {% for group in groups %}
-                    <option value="{{ group.id }}">{{ group.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="post_location">Post Location</label>
-            <select class="form-control" id="post_location" name="post_location" required>
-                <option value="">Select a post location</option>
-                {% for post_location in post_locations %}
-                    <option value="{{ post_location.id }}">{{ post_location.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary">Add Boot</button>
-        <a href="{% url 'boot_list' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+    </div>
 </div>
 {% endblock %}

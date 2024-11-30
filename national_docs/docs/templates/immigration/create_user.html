@@ -1,52 +1,85 @@
- {% extends 'docs/header.html' %}
- {% block content %}
+{% extends 'docs/header.html' %}
+{% block content %}
 <div class="container my-5">
-    <h2>Create New Officer Account</h2>
-    <form method="POST">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="username">Username</label>
-            <input type="text" class="form-control" id="username" name="username" required>
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
+            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}">Officer Users</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create Officer</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">Create New Officer Account</h3>
         </div>
-        <div class="form-group">
-            <label for="first_name">First Name</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" required>
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="username" class="font-weight-bold">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="email" class="font-weight-bold">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="first_name" class="font-weight-bold">First Name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter first name" required>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="last_name" class="font-weight-bold">Last Name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter last name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="font-weight-bold">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter a secure password" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="role" class="font-weight-bold">Role</label>
+                        <select class="form-control" id="role" name="role" required>
+                            <option value="" disabled selected>Select role</option>
+                            {% for group in groups %}
+                                <option value="{{ group.name }}">{{ group.name|capfirst }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="post_location" class="font-weight-bold">Post Location</label>
+                        <select class="form-control" id="post_location" name="post_location" required>
+                            <option value="" disabled selected>Select post location</option>
+                            {% for post_location in post_locations %}
+                                <option value="{{ post_location.id }}">{{ post_location.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="officer_batch_number" class="font-weight-bold">Officer Batch Number</label>
+                    <input type="text" class="form-control" id="officer_batch_number" name="officer_batch_number" placeholder="Enter batch number" required>
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-user-plus"></i> Create User
+                    </button>
+                    <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </a>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="last_name">Last Name</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" class="form-control" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input type="password" class="form-control" id="password" name="password" required>
-        </div>
-        <div class="form-group">
-            <label for="role">Role</label>
-            <select class="form-control" id="role" name="role" required>
-                {% for group in groups %}
-                    <option value="{{ group.name }}">{{ group.name|capfirst }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="post_location">Post Location</label>
-            <select class="form-control" id="post_location" name="post_location" required>
-                {% for post_location in post_locations %}
-                    <option value="{{ post_location.id }}">{{ post_location.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="officer_batch_number">Officer Batch Number</label>
-            <input type="text" class="form-control" id="officer_batch_number" name="officer_batch_number" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Create User</button>
-        <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">Cancel</a>
-    </form>
+    </div>
 </div>
 {% endblock %}
-

@@ -1,5 +1,5 @@
- {% extends 'docs/header.html' %}
- {% block content %}
+{% extends 'docs/header.html' %}
+{% block content %}
 <div class="container my-5">
     {% if messages %}
         <div class="messages">
@@ -12,75 +12,96 @@
     {% endif %}
 
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-2 rounded">
+        <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
             <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}">Officer List</a></li>
             <li class="breadcrumb-item active" aria-current="page">Boot List</li>
         </ol>
     </nav>
 
-    <h2>Boot List</h2>
-    <a href="{% url 'add_boot' %}" class="btn btn-primary mb-3">Add Boot</a>
-    <ul class="list-group">
-        {% for boot in boots %}
-            <li class="list-group-item">
-                {{ boot.name }} - {{ boot.description }}
-                {% if boot.assigned_to %}
-                    <br><strong>Assigned to:</strong> {{ boot.assigned_to.get_full_name }}
-                    <form method="POST" action="{% url 'change_assignment' boot.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <select name="assigned_to" onchange="this.form.submit()">
-                            <option value="{{ boot.assigned_to.id }}">{{ boot.assigned_to.get_full_name }}</option>
-                            {% for user in users %}
-                                {% if user != boot.assigned_to %}
-                                    <option value="{{ user.id }}">{{ user.get_full_name }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                        <select name="group" onchange="this.form.submit()">
-                            <option value="{{ boot.group.id }}">{{ boot.group.name }}</option>
-                            {% for group in groups %}
-                                {% if group != boot.group %}
-                                    <option value="{{ group.id }}">{{ group.name }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                        <select name="post_location" onchange="this.form.submit()">
-                            <option value="{{ boot.post_location.id }}">{{ boot.post_location.name }}</option>
-                            {% for post_location in post_locations %}
-                                {% if post_location != boot.post_location %}
-                                    <option value="{{ post_location.id }}">{{ post_location.name }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    </form>
-                {% else %}
-                    <br><strong>Assigned to:</strong> Not assigned
-                    <form method="POST" action="{% url 'change_assignment' boot.id %}" style="display:inline;">
-                        {% csrf_token %}
-                        <select name="assigned_to" onchange="this.form.submit()">
-                            <option value="">Select a user</option>
-                            {% for user in users %}
-                                <option value="{{ user.id }}">{{ user.get_full_name }}</option>
-                            {% endfor %}
-                        </select>
-                        <select name="group" onchange="this.form.submit()">
-                            <option value="">Select a group</option>
-                            {% for group in groups %}
-                                <option value="{{ group.id }}">{{ group.name }}</option>
-                            {% endfor %}
-                        </select>
-                        <select name="post_location" onchange="this.form.submit()">
-                            <option value="">Select a post location</option>
-                            {% for post_location in post_locations %}
-                                <option value="{{ post_location.id }}">{{ post_location.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'list_officer_users' %}" class="btn btn-secondary mt-3">← Back to Officer List</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Boot List</h2>
+        <a href="{% url 'add_boot' %}" class="btn btn-primary shadow-sm">
+            <i class="fas fa-plus"></i> Add Boot
+        </a>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                {% for boot in boots %}
+                    <li class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">{{ boot.name }}</h5>
+                                <p class="mb-1 text-muted">{{ boot.description }}</p>
+                                <p class="mb-0">
+                                    <strong>Assigned to:</strong>
+                                    {% if boot.assigned_to %}
+                                        {{ boot.assigned_to.get_full_name }}
+                                    {% else %}
+                                        <span class="text-danger">Not assigned</span>
+                                    {% endif %}
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Group:</strong>
+                                    {% if boot.group %}
+                                        {{ boot.group.name }}
+                                    {% else %}
+                                        <span class="text-danger">Not assigned</span>
+                                    {% endif %}
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Post Location:</strong>
+                                    {% if boot.post_location %}
+                                        {{ boot.post_location.name }}
+                                    {% else %}
+                                        <span class="text-danger">Not assigned</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div>
+                                <form method="POST" action="{% url 'change_assignment' boot.id %}">
+                                    {% csrf_token %}
+                                    <div class="form-group mb-0">
+                                        <select name="assigned_to" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
+                                            <option value="">{{ boot.assigned_to.get_full_name|default:"Select a user" }}</option>
+                                            {% for user in users %}
+                                                {% if user != boot.assigned_to %}
+                                                    <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        <select name="group" class="form-control form-control-sm mb-2" onchange="this.form.submit()">
+                                            <option value="">{{ boot.group.name|default:"Select a group" }}</option>
+                                            {% for group in groups %}
+                                                {% if group != boot.group %}
+                                                    <option value="{{ group.id }}">{{ group.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                        <select name="post_location" class="form-control form-control-sm" onchange="this.form.submit()">
+                                            <option value="">{{ boot.post_location.name|default:"Select a post location" }}</option>
+                                            {% for post_location in post_locations %}
+                                                {% if post_location != boot.post_location %}
+                                                    <option value="{{ post_location.id }}">{{ post_location.name }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-center text-muted">No boots found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <a href="{% url 'list_officer_users' %}" class="btn btn-secondary mt-4 shadow-sm">
+        <i class="fas fa-arrow-left"></i> Back to Officer List
+    </a>
 </div>
 {% endblock %}
