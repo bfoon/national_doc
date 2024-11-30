@@ -156,98 +156,105 @@
 
     <div class="dashboard-grid">
         <!-- National ID Card Section -->
-        <div class="dashboard-item">
-    <h3>National ID Card</h3>
-        <p>Status:
-            <span class="status {% if national_id_application %}{% if national_id_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
+            <div class="dashboard-item">
+                <h3>
+                    <i class="fas fa-id-card"></i> National ID Card
+                </h3>
+                <p>Status:
+                    <span class="status {% if national_id_application %}{% if national_id_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
+                        {% if national_id_application %}
+                            {{ national_id_application.application.status|capfirst }}
+                        {% else %}
+                            Not Applied
+                        {% endif %}
+                    </span>
+                </p>
+                <p>Required Documents:</p>
+                <ul>
+                    <li>Birth Certificate</li>
+                    <li>Proof of Address</li>
+                    <li>Passport-sized Photograph</li>
+                </ul>
                 {% if national_id_application %}
-                    {{ national_id_application.application.status|capfirst }}
+                    <a class="btn btn-sm btn-info mt-2" data-toggle="modal" data-target="#applicationModal"
+                       data-application-id="{{ national_id_application.application.id }}"
+                       data-application-type="National ID Card"
+                       data-fetch-url="{% url 'fetch_application_details' %}">
+                        <i class="fas fa-eye"></i> View Application
+                    </a>
                 {% else %}
-                    Not Applied
+                    <a href="{% url 'apply_national_id' %}" class="btn btn-sm btn-primary mt-2">
+                        <i class="fas fa-plus-circle"></i> Apply Now
+                    </a>
                 {% endif %}
-            </span>
-        </p>
-            {% if national_id_application_date %}
-            <p>Application date:
-                {{ national_id_application_date|date:"Y-m-d" }}
-            </p>
-            {% endif %}
+            </div>
 
-            {% if national_id_application.application and national_id_application.application.status != "canceled" %}
-               <!-- Trigger buttons for viewing application details -->
-                <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
-                   data-application-id="{{ national_id_application.application.id }}"
-                   data-application-type="National ID Card"
-                   data-fetch-url="{% url 'fetch_application_details' %}">
-                   View Application
-                </a>
-            {% else %}
-                <a href="{% url 'apply_national_id' %}" class="cta-button">Apply Now</a>
-            {% endif %}
-        </div>
+            <div class="dashboard-item">
+                <h3>
+                    <i class="fas fa-home"></i> Resident Permit
+                </h3>
+                <p>Status:
+                    <span class="status {% if resident_permit_application %}{% if resident_permit_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
+                        {% if resident_permit_application %}
+                            {{ resident_permit_application.application.status|capfirst }}
+                        {% else %}
+                            Not Applied
+                        {% endif %}
+                    </span>
+                </p>
+                <p>Required Documents:</p>
+                <ul>
+                    <li>Passport</li>
+                    <li>Proof of Entry</li>
+                    <li>Purpose of Stay Document</li>
+                </ul>
+                {% if resident_permit_application %}
+                    <a class="btn btn-sm btn-info mt-2" data-toggle="modal" data-target="#applicationModal"
+                       data-application-id="{{ resident_permit_application.application.id }}"
+                       data-application-type="Resident Permit"
+                       data-fetch-url="{% url 'fetch_application_details' %}">
+                        <i class="fas fa-eye"></i> View Application
+                    </a>
+                {% else %}
+                    <a href="{% url 'apply_resident_permit' %}" class="btn btn-sm btn-primary mt-2">
+                        <i class="fas fa-plus-circle"></i> Apply Now
+                    </a>
+                {% endif %}
+            </div>
 
-        <!-- Resident Permit Section -->
-        <div class="dashboard-item">
-            <h3>Resident Permit</h3>
-            <p>Status:
-                <span class="status {% if resident_permit_application %}{% if resident_permit_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
-                    {% if resident_permit_application %}
-                        {{ resident_permit_application.application.status|capfirst }}
-                    {% else %}
-                        Not Applied
-                    {% endif %}
-                </span>
-            </p>
+            <div class="dashboard-item">
+                <h3>
+                    <i class="fas fa-briefcase"></i> Work Permit
+                </h3>
+                <p>Status:
+                    <span class="status {% if work_permit_application %}{% if work_permit_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
+                        {% if work_permit_application %}
+                            {{ work_permit_application.application.status|capfirst }}
+                        {% else %}
+                            Not Applied
+                        {% endif %}
+                    </span>
+                </p>
+                <p>Required Documents:</p>
+                <ul>
+                    <li>Employment Contract</li>
+                    <li>Passport</li>
+                    <li>Proof of Address</li>
+                </ul>
+                {% if work_permit_application %}
+                    <a class="btn btn-sm btn-info mt-2" data-toggle="modal" data-target="#applicationModal"
+                       data-application-id="{{ work_permit_application.application.id }}"
+                       data-application-type="Work Permit"
+                       data-fetch-url="{% url 'fetch_application_details' %}">
+                        <i class="fas fa-eye"></i> View Application
+                    </a>
+                {% else %}
+                    <a href="{% url 'apply_work_permit' %}" class="btn btn-sm btn-primary mt-2">
+                        <i class="fas fa-plus-circle"></i> Apply Now
+                    </a>
+                {% endif %}
+            </div>
 
-            {% if resident_permit_application_date %}
-            <p>Application date:
-                {{ resident_permit_application_date|date:"Y-m-d" }}
-            </p>
-            {% endif %}
-
-            {% if resident_permit_application.application and resident_permit_application.application.status != "canceled" %}
-                <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
-                        data-application-id="{{ resident_permit_application.application.id }}"
-                        data-application-type="Resident Permit"
-                        data-fetch-url="{% url 'fetch_application_details' %}">
-
-                    View Application
-                </a>
-            {% else %}
-                <a href="{% url 'apply_resident_permit' %}" class="cta-button">Apply Now</a>
-            {% endif %}
-        </div>
-
-        <!-- Work Permit Section -->
-        <div class="dashboard-item">
-            <h3>Work Permit</h3>
-            <p>Status:
-                <span class="status {% if work_permit_application %}{% if work_permit_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
-                    {% if work_permit_application %}
-                        {{ work_permit_application.application.status|capfirst }}
-                    {% else %}
-                        Not Applied
-                    {% endif %}
-                </span>
-            </p>
-
-            {% if work_permit_application_date %}
-            <p>Application date:
-                {{ work_permit_application_date|date:"Y-m-d" }}
-            </p>
-            {% endif %}
-
-            {% if work_permit_application.application and work_permit_application.application.status != "canceled" %}
-                <a class="cta-button" data-toggle="modal" data-target="#applicationModal"
-                        data-application-id="{{ work_permit_application.application.id }}"
-                        data-application-type="Work Permit"
-                        data-fetch-url="{% url 'fetch_application_details' %}">
-                    View Application
-                </a>
-            {% else %}
-                <a href="{% url 'apply_work_permit' %}" class="cta-button">Apply Now</a>
-            {% endif %}
-        </div>
             <!-- New Driver's License item -->
             <div class="dashboard-item">
                 <h3>Driver's License</h3>
