@@ -66,16 +66,23 @@
 
     <div class="container">
         <!-- Gambia Government Logo -->
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Coat_of_arms_of_The_Gambia.svg/1024px-Coat_of_arms_of_The_Gambia.svg.png"
-             alt="Gambia Government Logo" class="logo">
+        <a href="{% url 'landing_page' %}">
+        <img src="/media/Coat_of_arms_of_The_Gambia.svg"
+         alt="Gambia Government Logo" class="logo">
+        </a>
+
 
         <h1>National Document Portal</h1>
 
-        {% if form.errors %}
-            <div class="alert alert-danger">
-                Invalid username or password. Please try again.
-            </div>
-        {% endif %}
+         {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
         <form method="post" action="{% url 'login' %}">
             {% csrf_token %}

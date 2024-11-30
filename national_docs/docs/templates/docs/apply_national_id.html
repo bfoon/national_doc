@@ -64,6 +64,15 @@
 </style>
 
 <div class="container">
+     {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb bg-light p-3 rounded">
             <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
