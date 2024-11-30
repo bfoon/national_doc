@@ -44,7 +44,7 @@ def login_page(request):
 
         else:
             # Add an error message and re-render the login page
-            messages.error(request, 'Invalid username or password')
+            messages.warning(request, 'Invalid username or password')
 
     return render(request, 'docs/login_page.html')
 

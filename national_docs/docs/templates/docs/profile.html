@@ -1,7 +1,41 @@
- {% extends 'docs/header.html' %}
- {% block content %}
+{% extends 'docs/header.html' %}
+{% block content %}
 
-<div class="container mt-4">
+<style>
+    .breadcrumb {
+        background-color: #f8f9fa;
+        font-size: 0.9rem;
+    }
+    .card-header {
+        font-size: 1.2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .card-body p {
+        margin-bottom: 0.5rem;
+    }
+    .btn-primary {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    .btn-primary:hover {
+        background-color: #004085;
+        border-color: #004085;
+    }
+    .btn-secondary {
+        margin-left: 10px;
+    }
+    .action-buttons {
+        margin-top: 20px;
+    }
+    .profile-container {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<div class="container profile-container">
     {% if messages %}
         <div class="messages">
             {% for message in messages %}
@@ -11,9 +45,10 @@
             {% endfor %}
         </div>
     {% endif %}
+
     <!-- Breadcrumb navigation -->
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-2 rounded">
+        <ol class="breadcrumb p-2 rounded">
             <li class="breadcrumb-item">
                 {% if request.user.is_superuser %}
                     <a href="{% url 'dashboard' %}">Dashboard</a>
@@ -30,11 +65,11 @@
     <!-- Profile Header -->
     <h2 class="mb-4">User Profile</h2>
 
-        <!-- Profile Card -->
-        <div class="card mb-4">
-        <div class="card-header bg-primary text-white d-flex justify-content-between">
-            <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>
-            <strong>{{ profile.officer_batch_number }}</strong>
+    <!-- Profile Card -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div>{{ request.user.first_name }} {{ request.user.last_name }}</div>
+            <div>{{ profile.officer_batch_number }}</div>
         </div>
 
         <div class="card-body">
@@ -47,15 +82,22 @@
     </div>
 
     <!-- Action buttons -->
-    <div class="text-center">
-        <a href="{% url 'edit_profile' %}" class="btn btn-primary">Edit Profile</a>
-
+    <div class="text-center action-buttons">
+        <a href="{% url 'edit_profile' %}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Profile
+        </a>
         {% if request.user.is_superuser %}
-            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
         {% elif belongs_to_special_group %}
-            <a href="{% url 'immigration_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+            <a href="{% url 'immigration_dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
         {% else %}
-            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
         {% endif %}
     </div>
 </div>
