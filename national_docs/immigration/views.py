@@ -27,11 +27,12 @@ from weasyprint import HTML
 from django.templatetags.static import static
 from django.views.decorators.csrf import csrf_exempt
 
+@login_required
 def send_notification(user, message):
     notification = Notification.objects.create(user=user, message=message)
     notification.save()
 
-
+@login_required
 def mark_notification_as_read(request, notification_id):
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
     notification.is_read = True

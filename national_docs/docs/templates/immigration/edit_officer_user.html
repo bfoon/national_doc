@@ -1,6 +1,7 @@
 {% extends 'docs/header.html' %}
 {% block content %}
 <div class="container my-5">
+    <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb bg-light p-2 rounded">
             <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
@@ -9,35 +10,36 @@
         </ol>
     </nav>
 
+    <!-- Edit User Card -->
     <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white">
-            <h2>Edit User</h2>
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0"><i class="fas fa-user-edit"></i> Edit User</h2>
         </div>
         <div class="card-body">
             <form method="POST">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="username">Username</label>
+                    <label for="username"><i class="fas fa-user"></i> Username</label>
                     <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="first_name">First Name</label>
+                    <label for="first_name"><i class="fas fa-id-card"></i> First Name</label>
                     <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="last_name">Last Name</label>
+                    <label for="last_name"><i class="fas fa-id-card-alt"></i> Last Name</label>
                     <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="email">Email</label>
+                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
                     <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="officer_batch_number">Officer Batch Number</label>
+                    <label for="officer_batch_number"><i class="fas fa-user-tag"></i> Officer Batch Number</label>
                     <input type="text" class="form-control" id="officer_batch_number" name="officer_batch_number" value="{{ officer_profile.officer_batch_number }}" required>
                 </div>
                 <div class="form-group">
-                    <label for="post_location">Post Location</label>
+                    <label for="post_location"><i class="fas fa-map-marker-alt"></i> Post Location</label>
                     <select class="form-control" id="post_location" name="post_location" required>
                         {% for location in post_locations %}
                             <option value="{{ location.id }}" {% if location.id == officer_profile.post_location.id %}selected{% endif %}>{{ location.name }}</option>
@@ -45,28 +47,37 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="groups">Groups</label>
+                    <label for="groups"><i class="fas fa-users"></i> Groups</label>
                     <select multiple class="form-control" id="groups" name="groups">
                         {% for group in groups %}
                             <option value="{{ group.id }}" {% if group in user.groups.all %}selected{% endif %}>{{ group.name }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Update User</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Update User
+                </button>
+                <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Cancel
+                </a>
             </form>
         </div>
     </div>
 
+    <!-- Current Groups Card -->
     <div class="card shadow-sm">
         <div class="card-header bg-secondary text-white">
-            <h3>Current Groups</h3>
+            <h3 class="mb-0"><i class="fas fa-users-cog"></i> Current Groups</h3>
         </div>
         <div class="card-body">
             <ul class="list-group">
                 {% for group in user.groups.all %}
-                    <li class="list-group-item">{{ group.name }}</li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ group.name }}
+                        <span class="badge badge-primary badge-pill"><i class="fas fa-user-shield"></i></span>
+                    </li>
                 {% empty %}
-                    <li class="list-group-item">No groups assigned</li>
+                    <li class="list-group-item text-muted">No groups assigned</li>
                 {% endfor %}
             </ul>
         </div>

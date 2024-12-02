@@ -1,19 +1,36 @@
 {% extends 'docs/header.html' %}
 {% block content %}
 <div class="container my-5">
-     <nav aria-label="breadcrumb">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
         <ol class="breadcrumb bg-light p-2 rounded">
             <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}">Officer Users</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Edit User</li>
+            <li class="breadcrumb-item active" aria-current="page">Delete User</li>
         </ol>
     </nav>
-    <h2>Delete User</h2>
-    <p>Are you sure you want to delete user <strong>{{ user.username }}</strong>?</p>
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h2 class="text-danger"><i class="fas fa-user-times"></i> Delete User</h2>
+    </div>
+
+    <!-- Confirmation Message -->
+    <div class="alert alert-warning">
+        <p>Are you sure you want to delete the user <strong>{{ user.username }}</strong>? This action cannot be undone.</p>
+    </div>
+
+    <!-- Form with Action Buttons -->
     <form method="POST">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Delete</button>
-        <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">Cancel</a>
+        <div class="d-flex justify-content-start">
+            <button type="submit" class="btn btn-danger mr-2">
+                <i class="fas fa-check"></i> Confirm Delete
+            </button>
+            <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
     </form>
 </div>
 {% endblock %}
