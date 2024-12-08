@@ -33,7 +33,7 @@ class Fulfiller(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     location = models.ForeignKey(PostLocation, on_delete=models.CASCADE, null=True, related_name='fulfillers')
-    action = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name='fulfillers')
+    action = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     schedule = models.DateField(null=True)
     priority = models.CharField(max_length=50, null=True, default='low')
     status = models.CharField(max_length=50, choices=[('open', 'Open'), ('closed', 'Closed')], default='open')

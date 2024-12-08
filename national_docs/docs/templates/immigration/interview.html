@@ -1,23 +1,46 @@
 {% extends 'docs/header.html' %}
 {% block content %}
 <style>
-    .border {
-        border: 1px solid #007bff; /* Bootstrap primary color */
-    }
-    .rounded {
-        border-radius: 0.5rem; /* Slightly rounded corners */
-    }
-    .passport-photo {
-        max-width: 100px; /* Adjust the size as needed */
-        border: 1px solid #ddd;
-        border-radius: 0.5rem;
-        margin-left: 20px;
-    }
-    .token-number {
-        font-size: 0.6rem; /* Make the token number very small */
-        color: #6c757d; /* Set a subtle color for the token number */
-        margin-top: 5px; /* Add some space between the photo and the token number */
-    }
+    /* General Border Styling */
+.border {
+    border: 1px solid #007bff;     /* Bootstrap primary color for a clean, vibrant border */
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1); /* Subtle shadow for depth */
+}
+
+/* Rounded Corners */
+.rounded {
+    border-radius: 0.5rem;         /* Slightly rounded corners for a modern look */
+}
+
+/* Passport Photo Styling */
+.passport-photo {
+    max-width: 120px;              /* Slightly larger for better visibility */
+    border: 2px solid #dee2e6;     /* Soft gray border for a clean, professional look */
+    border-radius: 0.5rem;         /* Rounded corners to match the design */
+    margin-left: 20px;             /* Consistent spacing from adjacent elements */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for subtle depth */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
+}
+
+/* Hover Effect for Passport Photo */
+.passport-photo:hover {
+    transform: scale(1.05);        /* Slight zoom on hover for interactivity */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+.token-number {
+    font-size: 0.7rem;           /* Slightly increased font size for readability */
+    color: #6c757d;              /* Subtle gray color for a professional look */
+    margin-top: 8px;             /* Increased spacing for better separation from the photo */
+    letter-spacing: 0.5px;       /* Slight letter spacing for clarity */
+    font-weight: 600;            /* Slightly bolder font for emphasis */
+    text-transform: uppercase;   /* Convert the token to uppercase for uniformity */
+    padding: 2px 6px;            /* Small padding for a touch of spacing */
+    background-color: #f8f9fa;   /* Light background to make the token stand out subtly */
+    border: 1px solid #dee2e6;   /* Soft border for definition */
+    border-radius: 4px;          /* Rounded corners for a polished look */
+}
+
 </style>
 
 <div class="container my-5">
@@ -41,48 +64,63 @@
 
     <div class="row">
         <div class="col-md-6">
-            <div class="card mb-4 border-primary">
+            <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h4>Applicant Information</h4>
                 </div>
                 <div class="card-body d-flex justify-content-between">
-                    <div>
+                <div>
+                    {% with national_id=interview.application.national_id_applications.first %}
+                    {% with resident_permit=interview.application.resident_permit_applications.first %}
+                    {% with work_permit=interview.application.work_permit_applications.first %}
+
+                    {% if national_id %}
+                        <p><strong>Full Name:</strong> {{ national_id.full_name }}</p>
+                        <p><strong>Email:</strong> {{ national_id.email }}</p>
+                        <p><strong>Phone:</strong> {{ national_id.phone }}</p>
+                        <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
+                    {% elif resident_permit %}
+                        <p><strong>Full Name:</strong> {{ resident_permit.full_name }}</p>
+                        <p><strong>Email:</strong> {{ resident_permit.email }}</p>
+                        <p><strong>Phone:</strong> {{ resident_permit.phone_number }}</p>
+                        <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
+                    {% elif work_permit %}
+                        <p><strong>Full Name:</strong> {{ work_permit.full_name }}</p>
+                        <p><strong>Email:</strong> {{ work_permit.email }}</p>
+                        <p><strong>Phone:</strong> {{ work_permit.phone }}</p>
+                        <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
+                    {% else %}
+                        <p class="text-muted">No applicant information available.</p>
+                    {% endif %}
+
+                    <p><strong>Interviewer:</strong> {{ interview.interviewer.get_full_name }}</p>
+
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
+
+                     <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#applicantDetailModal">
+                        <i class="fas fa-eye"></i> View Details
+                    </button>
+
+                </div>
+                    <div class="text-center">
                         {% if interview.application.national_id_applications.first %}
-                            <p><strong>Full Name:</strong> {{ interview.application.national_id_applications.first.full_name }}</p>
-                            <p><strong>Email:</strong> {{ interview.application.national_id_applications.first.email }}</p>
-                            <p><strong>Phone:</strong> {{ interview.application.national_id_applications.first.phone }}</p>
-                            <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
-                        {% elif interview.application.resident_permit_applications.first %}
-                            <p><strong>Full Name:</strong> {{ interview.application.resident_permit_applications.first.full_name }}</p>
-                            <p><strong>Email:</strong> {{ interview.application.resident_permit_applications.first.email }}</p>
-                            <p><strong>Phone:</strong> {{ interview.application.resident_permit_applications.first.phone_number }}</p>
-                            <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
-                        {% elif interview.application.work_permit_applications.first %}
-                            <p><strong>Full Name:</strong> {{ interview.application.work_permit_applications.first.full_name }}</p>
-                            <p><strong>Email:</strong> {{ interview.application.work_permit_applications.first.email }}</p>
-                            <p><strong>Phone:</strong> {{ interview.application.work_permit_applications.first.phone }}</p>
-                            <p><strong>Service:</strong> {{ interview.application.get_service_type }}</p>
-                        {% else %}
-                            <p>No applicant information available.</p>
-                        {% endif %}
-                        <p><strong>Interviewer:</strong> {{ interview.interviewer.get_full_name }}</p>
-                    </div>
-                    <div>
-                        {% if interview.application.national_id_applications.first %}
-                            <img src="{{ interview.application.national_id_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+                            <img src="{{ interview.application.national_id_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo"  class="img-thumbnail mb-2" style="max-width: 150px;">
                             <div class="token-number">{{ interview.application.token }}</div> <!-- Token number displayed here -->
                         {% elif interview.application.resident_permit_applications.first %}
-                            <img src="{{ interview.application.resident_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+                            <img src="{{ interview.application.resident_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo"  class="img-thumbnail mb-2" style="max-width: 150px;">
                             <div class="token-number">{{ interview.application.token }}</div> <!-- Token number displayed here -->
                         {% elif interview.application.work_permit_applications.first %}
-                            <img src="{{ interview.application.work_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+                            <img src="{{ interview.application.work_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo"  class="img-thumbnail mb-2" style="max-width: 150px;">
                             <div class="token-number">{{ interview.application.token }}</div> <!-- Token number displayed here -->
                         {% endif %}
                     </div>
                 </div>
 
-                <h4>Documents</h4>
-                <ul>
+                <div class="card-footer">
+                <h5 class="mb-3">Documents</h5>
+                <ul class="list-unstyled">
                     {% if interview.application.national_id_applications.first %}
                         <li><a href="{{ interview.application.national_id_applications.first.birth_certificate.url }}" target="_blank">Birth Certificate</a></li>
                         <li><a href="{{ interview.application.national_id_applications.first.passport_photo.url }}" target="_blank">Passport Photo</a></li>
@@ -102,94 +140,227 @@
                 </ul>
             </div>
         </div>
+        </div>
 
-        <!-- Questionnaire and Notes -->
+      <!-- Questionnaire and Notes -->
         <div class="col-md-6">
-            <div class="card mb-4 border-primary">
+            <div class="card mb-4 border-0 shadow-sm">
                 <div class="card-header bg-primary text-white">
-                    <h4>Interview Questionnaire</h4>
+                    <h4 class="mb-0">Interview Questionnaire</h4>
                 </div>
                 <div class="card-body">
                     <form method="POST" id="interview-form">
                         {% csrf_token %}
+
+                        <!-- Questionnaire Field -->
                         <div class="form-group">
-                            <label for="questionnaire">Questionnaire</label>
-                            <textarea class="form-control" id="questionnaire" name="questionnaire" rows="5" {% if read_only %}readonly{% endif %}>{{ interview.questionnaire }}</textarea>
+                            <label for="questionnaire" class="font-weight-bold">Questionnaire</label>
+                            <textarea
+                                class="form-control"
+                                id="questionnaire"
+                                name="questionnaire"
+                                rows="5"
+                                placeholder="Enter questionnaire details..."
+                                {% if read_only %}readonly{% endif %}
+                            >{{ interview.questionnaire }}</textarea>
                         </div>
 
+                        <!-- Interview Notes Field -->
                         <div class="form-group">
-                            <label for="notes">Interview Notes</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="5" {% if read_only %}readonly{% endif %}>{{ interview.notes }}</textarea>
+                            <label for="notes" class="font-weight-bold">Interview Notes</label>
+                            <textarea
+                                class="form-control"
+                                id="notes"
+                                name="notes"
+                                rows="5"
+                                placeholder="Enter interview notes..."
+                                {% if read_only %}readonly{% endif %}
+                            >{{ interview.notes }}</textarea>
                         </div>
 
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#notesModal">
-                            <i class="fas fa-info-circle"></i> View Notes
-                        </button>
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#notesModal">
+                                <i class="fas fa-info-circle"></i> View Notes
+                            </button>
+
+                            {% if not read_only %}
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#confirmationModal">
+                                    <i class="fas fa-check-circle"></i> Submit for Approval
+                                </button>
+                                <button type="submit" name="postpone" class="btn btn-warning btn-sm">
+                                    <i class="fas fa-clock"></i> Postpone Interview
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
 
                         <input type="hidden" id="duration" name="duration" value="0">
-                        {% if not read_only %}
-                             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#confirmationModal">Submit for Approval</button>
-                            <button type="submit" name="postpone" class="btn btn-warning">Postpone Interview</button>
-                        {% endif %}
                     </form>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Interview Timer -->
-    {% if not read_only %}
-    <div class="mt-5">
-        <h5>Interview Timer</h5>
-        <p id="timer">00:00:00</p>
-        <button id="start-timer" class="btn btn-success">Start Interview</button>
-        <button id="stop-timer" class="btn btn-danger">Stop Interview</button>
+ <!-- Interview Timer -->
+{% if not read_only %}
+<div class="mt-5 text-center">
+    <h5 class="font-weight-bold mb-3">Interview Timer</h5>
+    <div class="d-inline-flex align-items-center mb-3">
+        <span id="timer" class="display-4 font-weight-bold text-primary mr-3">00:00:00</span>
     </div>
-    {% endif %}
+    <div class="btn-group">
+        <button id="start-timer" class="btn btn-success">
+            <i class="fas fa-play-circle"></i> Start Interview
+        </button>
+        <button id="stop-timer" class="btn btn-danger" disabled>
+            <i class="fas fa-stop-circle"></i> Stop Interview
+        </button>
+        <button id="reset-timer" class="btn btn-warning">
+            <i class="fas fa-redo-alt"></i> Reset Timer
+        </button>
+    </div>
 </div>
+{% endif %}
 
 <!-- Modal for Viewing Notes -->
 <div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="notesModalLabel">Interview Notes</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <!-- Display the notes here -->
-                {% for note in interview.application.notes.all %}
-                    <p><strong>{{ note.user.get_full_name }}:</strong> {{ note.message }}</p>
-                {% empty %}
-                    <p>No notes available.</p>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Confirmation Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="notesModalLabel"><i class="fas fa-sticky-note"></i> Interview Notes</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>I, <strong>{{ interview.interviewer.get_full_name }}</strong>, hereby affirm that all presented documents are original, accurate to the best of my knowledge,
-                    and suitable for final review to issue a national document.</p>
+                {% if interview.application.notes.all %}
+                    <ul class="list-group list-group-flush">
+                        {% for note in interview.application.notes.all %}
+                            <li class="list-group-item">
+                                <p class="mb-1"><strong>{{ note.user.get_full_name }}</strong> <small class="text-muted">on {{ note.created_at|date:"Y-m-d H:i" }}</small></p>
+                                <p class="text-muted">{{ note.message }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted text-center">No notes available.</p>
+                {% endif %}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="confirmSubmit">Confirm</button>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal for Viewing Applicant Details -->
+<div class="modal fade" id="applicantDetailModal" tabindex="-1" role="dialog" aria-labelledby="applicantDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="applicantDetailModalLabel"><i class="fas fa-user"></i> Applicant Details</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+           <div class="modal-body">
+                <!-- Applicant Information -->
+                <h5>Applicant Information</h5>
+                 {% if application.national_id_applications.first %}
+                <p><strong>Full Name:</strong> {{application.national_id_applications.first.full_name }}</p>
+                <p><strong>Email:</strong> {{ application.national_id_applications.first.email }}</p>
+                <p><strong>Phone Number:</strong> {{ application.national_id_applications.first.phone_number }}</p>
+                {% elif application.resident_permit_applications.first %}
+                <p><strong>Full Name:</strong> {{application.resident_permit_applications.first.full_name }}</p>
+                <p><strong>Email:</strong> {{ application.resident_permit_applications.first.email }}</p>
+                <p><strong>Phone Number:</strong> {{ application.resident_permit_applications.first.phone_number }}</p>
+                {% elif application.work_permit_applications.first %}
+                <p><strong>Full Name:</strong> {{application.work_permit_applications.first.full_name }}</p>
+                <p><strong>Email:</strong> {{ application.work_permit_applications.first.email }}</p>
+                <p><strong>Phone Number:</strong> {{ application.work_permit_applications.first.phone_number }}</p>
+                {% endif %}
+
+                <!-- Application Information -->
+                <h5>Application Information</h5>
+                <p><strong>Application Type:</strong> {{ application.application_type|capfirst }}</p>
+
+                <!-- Conditional Information based on Service Type -->
+                {% if application.national_id_applications.first %}
+                    <h5>National ID Application Details</h5>
+                    <ul>
+                        <li><strong>Birth Certificate:</strong>
+                            <a href="{{ application.national_id_applications.first.birth_certificate.url }}" target="_blank">View Document</a>
+                        </li>
+                        <li><strong>Passport Photo:</strong>
+                            <a href="{{ application.national_id_applications.first.passport_photo.url }}" target="_blank">View Document</a>
+                        </li>
+                    </ul>
+                {% elif application.resident_permit_applications.first %}
+                    <h5>Resident Permit Application Details</h5>
+                    <ul>
+                        <li><strong>Purpose of Stay:</strong> {{ application.resident_permit_applications.first.purpose_of_stay }}</li>
+                        <li><strong>Passport Number:</strong> {{ application.resident_permit_applications.first.passport_number }}</li>
+                        <li><strong>Date of Entry:</strong> {{ application.resident_permit_applications.first.date_of_entry }}</li>
+                        <li><strong>Resident Permit Document:</strong>
+                            <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">View Document</a>
+                        </li>
+                        <li><strong>Passport Photo:</strong>
+                            <a href="{{ application.resident_permit_applications.first.passport_photo.url }}" target="_blank">View Document</a>
+                        </li>
+                    </ul>
+                {% elif application.work_permit_applications.first %}
+                    <h5>Work Permit Application Details</h5>
+                    <ul>
+                        <li><strong>Job Title:</strong> {{ application.work_permit_applications.first.job_title }}</li>
+                        <li><strong>Work Contract:</strong>
+                            <a href="{{ application.work_permit_applications.first.work_contract.url }}" target="_blank">View Document</a>
+                        </li>
+                        <li><strong>Passport Photo:</strong>
+                            <a href="{{ application.work_permit_applications.first.passport_photo.url }}" target="_blank">View Document</a>
+                        </li>
+                    </ul>
+               {% else %}
+                    <p class="text-muted">No applicant information available.</p>
+                {% endif %}
+                <p><strong>Interviewer:</strong> {{ interview.interviewer.get_full_name }}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="confirmationModalLabel"><i class="fas fa-exclamation-circle"></i> Confirmation</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="lead text-justify">
+                    I, <strong>{{ interview.interviewer.get_full_name }}</strong>, hereby affirm that all presented documents are original, accurate to the best of my knowledge, and suitable for final review to issue a national document.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmSubmit">
+                    <i class="fas fa-check-circle"></i> Confirm
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
 
 <script>
     document.getElementById('confirmSubmit').addEventListener('click', function() {
@@ -198,37 +369,52 @@
 </script>
 
 <script>
-    let startTime;
     let timerInterval;
+    let startTime;
+    let elapsedTime = 0;
+    const timerDisplay = document.getElementById('timer');
+    const startButton = document.getElementById('start-timer');
+    const stopButton = document.getElementById('stop-timer');
+    const resetButton = document.getElementById('reset-timer');
 
-    document.getElementById('start-timer').addEventListener('click', function() {
-        startTime = new Date();
-        timerInterval = setInterval(updateTimer, 1000);
-    });
+    function formatTime(ms) {
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+        const seconds = String(totalSeconds % 60).padStart(2, '0');
+        return `${hours}:${minutes}:${seconds}`;
+    }
 
-    document.getElementById('stop-timer').addEventListener('click', function() {
+    function startTimer() {
+        startTime = Date.now() - elapsedTime;
+        timerInterval = setInterval(() => {
+            elapsedTime = Date.now() - startTime;
+            timerDisplay.textContent = formatTime(elapsedTime);
+        }, 1000);
+        startButton.disabled = true;
+        stopButton.disabled = false;
+        resetButton.disabled = true;
+    }
+
+    function stopTimer() {
         clearInterval(timerInterval);
-        saveDuration();
-    });
-
-    document.getElementById('interview-form').addEventListener('submit', function() {
-        saveDuration();
-    });
-
-    function updateTimer() {
-        const now = new Date();
-        const elapsedTime = new Date(now - startTime);
-        const hours = String(elapsedTime.getUTCHours()).padStart(2, '0');
-        const minutes = String(elapsedTime.getUTCMinutes()).padStart(2, '0');
-        const seconds = String(elapsedTime.getUTCSeconds()).padStart(2, '0');
-        document.getElementById('timer').textContent = `${hours}:${minutes}:${seconds}`;
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        resetButton.disabled = false;
     }
 
-    function saveDuration() {
-        const now = new Date();
-        const elapsedTime = new Date(now - startTime);
-        const durationInMinutes = Math.floor(elapsedTime / 60000);
-        document.getElementById('duration').value = durationInMinutes;
+    function resetTimer() {
+        clearInterval(timerInterval);
+        elapsedTime = 0;
+        timerDisplay.textContent = '00:00:00';
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        resetButton.disabled = false;
     }
+
+    startButton.addEventListener('click', startTimer);
+    stopButton.addEventListener('click', stopTimer);
+    resetButton.addEventListener('click', resetTimer)
+
 </script>
 {% endblock %}

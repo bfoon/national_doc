@@ -25,6 +25,7 @@ import tempfile
 from django.template.loader import get_template
 from weasyprint import HTML
 from django.templatetags.static import static
+from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 
 @login_required
@@ -130,116 +131,118 @@ def filler_search(request):
     # Render the filtered results as HTML
     return render(request, 'immigration/filler_search.html', {'fulfillers': fulfillers})
 
+def update_fulfiller_details(fulfiller, request):
+    """Updates the fulfiller details from the POST request."""
+    fulfiller.location_id = request.POST.get('location')
+    fulfiller.action = request.user
+    fulfiller.schedule = request.POST.get('schedule')
+    fulfiller.priority = request.POST.get('priority')
+    fulfiller.status = request.POST.get('status')
+    fulfiller.progress = request.POST.get('progress')
+    fulfiller.save()
+
+def assign_interview_slot(application, request, questionnaire, notes_text):
+    """Assigns an available interview slot to the application."""
+    interview_slot = InterviewSlot.objects.filter(
+        current_interviewees__lt=F('max_interviewees'),
+        date_time__gte=timezone.now(),
+        is_available=True,
+        location=application.post_location
+    ).order_by('date_time').first()
+
+    if interview_slot:
+        application.interview_slot = interview_slot
+        application.interview_queue_number = interview_slot.current_interviewees + 1
+        interview_slot.current_interviewees += 1
+
+        if interview_slot.current_interviewees >= interview_slot.max_interviewees:
+            interview_slot.is_available = False
+        interview_slot.save()
+
+        Interview.objects.create(
+            application=application,
+            interviewer=request.user,
+            questionnaire=questionnaire,
+            notes=notes_text,
+            status='scheduled'
+        )
+        return True
+    else:
+        messages.warning(request, 'No available interview slots.')
+        return False
+
+def send_requester_note(application, user, message):
+    """Creates a note for the requester if a message is provided."""
+    if message:
+        Note.objects.create(
+            application=application,
+            user=user,
+            message=message
+        )
+
 @login_required
 def fulfiller_detail(request, id):
     user = request.user
     fulfiller = get_object_or_404(Fulfiller, id=id)
-
-    # Ensure the user can only see fulfillers in their post location if not a superuser
-    if not user.is_superuser and fulfiller.application.post_location != user.officerprofile.post_location:
-        messages.error(request, "You do not have permission to view this fulfiller.")
-        return redirect('fulfillers_list')
-
     application = fulfiller.application
-    doc_uploads = UploadedDocument.objects.filter(application=application)  # Get the queryset
 
-    # No need to check if doc_uploads exists; just set it to an empty list if no documents found
-    if not doc_uploads.exists():
-        doc_uploads = []  # Ensure this is an empty list
+    # Permission check for non-superusers
+    if not user.is_superuser and getattr(user, 'officerprofile', None) and fulfiller.application.post_location != user.officerprofile.post_location:
+        messages.warning(request, "You do not have permission to view this fulfiller.")
+        return redirect('fulfiller')
 
+    # Fetch related data
+    doc_uploads = UploadedDocument.objects.filter(application=application)
     notes = Note.objects.filter(application=application).order_by('-created_at')
     post_locations = PostLocation.objects.all()
 
     if request.method == 'POST':
         try:
-            # Get data from POST request
-            location = request.POST.get('location')
-            # action_user_id = request.POST.get('action')
-            schedule = request.POST.get('schedule')
-            priority = request.POST.get('priority')
-            status = request.POST.get('status')
-            progress = request.POST.get('progress')
-            message_to_requester = request.POST.get('message')
-            questionnaire = request.POST.get('questionnaire')  # Get questionnaire responses
-            notes_text = request.POST.get('notes')  # Get additional notes
+            # Update fulfiller details
+            update_fulfiller_details(fulfiller, request)
 
-            # Update the fulfiller details
-            fulfiller.location_id = location
+            # Handle interview slot assignment
+            application_status = request.POST.get('state')
+            questionnaire = request.POST.get('questionnaire')
+            notes_text = request.POST.get('notes')
 
-            fulfiller.action = request.user
-            fulfiller.schedule = schedule
-            fulfiller.priority = priority
-            fulfiller.status = status
-            fulfiller.progress = progress
-            fulfiller.save()
+            if application_status == 'interview' and not application.interview_slot:
+                if not assign_interview_slot(application, request, questionnaire, notes_text):
+                    return redirect('fulfiller_detail', id=fulfiller.id)
 
             # Update application status
-            application_status = request.POST.get('state')
-            if application_status == 'interview':
-                # Check if the application already has an interview slot
-                if not application.interview_slot:
-                    # Find available interview slot at the closest location
-                    interview_slot = InterviewSlot.objects.filter(
-                        current_interviewees__lt=F('max_interviewees'),
-                        date_time__gte=timezone.now(),
-                        is_available=True,
-                        location=application.post_location  # Ensure the slot is at the application's post location
-                    ).order_by('date_time').first()
-
-                    if interview_slot:
-                        # Assign interview slot to the application
-                        application.interview_slot = interview_slot
-                        application.interview_queue_number = interview_slot.current_interviewees + 1
-
-                        # Increment the current interviewees count in the interview slot
-                        interview_slot.current_interviewees += 1
-                        if interview_slot.current_interviewees >= interview_slot.max_interviewees:
-                            interview_slot.is_available = False
-                        interview_slot.save()
-
-                        # Create an Interview instance
-                        Interview.objects.create(
-                            application=application,
-                            interviewer=request.user,  # Assuming the logged-in user is the interviewer
-                            questionnaire=questionnaire,
-                            notes=notes_text,
-                            status='scheduled'
-                        )
-                    else:
-                        messages.warning(request, 'No available interview slots.')
-                        return redirect('fulfiller_detail', id=fulfiller.id)
-
-            # Update the application status
             application.status = application_status
             application.save()
 
-            # Capture the message to the requester if provided
-            if message_to_requester:
-                Note.objects.create(
-                    application=application,
-                    user=request.user,
-                    message=message_to_requester
-                )
-            user = request.user  # Assuming the current user is the one to notify
-            send_notification(user, f"Your application status has change to {status}.")
+            # Send note to requester if applicable
+            message_to_requester = request.POST.get('message')
+            send_requester_note(application, user, message_to_requester)
+
+            # Send notification
+            status = request.POST.get('status')
+            send_notification(user, f"Your application status has changed to {status}.")
+
             messages.success(request, 'Fulfiller details and message updated successfully.')
+
+        except ValidationError as e:
+            messages.warning(request, f"Validation error: {e}")
         except Exception as e:
             messages.warning(request, f"Error updating fulfiller details: {e}")
 
         return redirect('fulfiller_detail', id=fulfiller.id)
 
+    # Get all users for the template
     users = User.objects.all()
 
+    # Render the template with context data
     return render(request, 'immigration/fulfiller_detail.html', {
         'fulfiller': fulfiller,
         'application': application,
-        'doc_uploads': doc_uploads,  # This is now always an iterable
+        'doc_uploads': doc_uploads,
         'post_locations': post_locations,
         'users': users,
         'notes': notes,
     })
-
-
 
 @login_required
 def post_locations(request):
