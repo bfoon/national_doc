@@ -361,12 +361,22 @@
 </div>
 </div>
 
-
 <script>
-    document.getElementById('confirmSubmit').addEventListener('click', function() {
+    document.getElementById('confirmSubmit').addEventListener('click', function () {
+        updateDuration();
         document.getElementById('interview-form').submit();
     });
+
+    document.getElementById('interview-form').addEventListener('submit', function () {
+        updateDuration();
+    });
+
+    function updateDuration() {
+        const durationField = document.getElementById('duration');
+        durationField.value = elapsedTime; // Store elapsed time in milliseconds
+    }
 </script>
+
 
 <script>
     let timerInterval;
