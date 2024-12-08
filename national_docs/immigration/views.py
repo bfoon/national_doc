@@ -40,38 +40,63 @@ def mark_notification_as_read(request, notification_id):
     notification.save()
     return redirect('immigration_dashboard')
 
+
 @login_required
 def immigration_dashboard(request):
     user = request.user
-    # Other counts
 
+    # Default counts to avoid potential NameError
+    new_requests_count = 0
+    pending_requests_count = 0
+    waiting_requests_count = 0
+    interview_requests_count = 0
+    pending_todo_count = 0
 
-    # Ensure the user has an officer profile
-    if hasattr(user, 'officerprofile') and user.officerprofile.post_location:
+    # Check if the user is a superuser
+    if user.is_superuser:
+        # Superusers can see all data
+        new_requests_count = Application.objects.filter(status='pending').count()
+        pending_requests_count = Application.objects.filter(status='processing').count()
+        waiting_requests_count = Application.objects.filter(status='waiting').count()
+
+        today = date.today()
+        interview_requests_count = Application.objects.filter(
+            status='interview',
+            interview_slot__date_time__date=today
+        ).count()
+
+        pending_todo_count = ToDo.objects.filter(status=0).count()
+
+    elif hasattr(user, 'officerprofile') and user.officerprofile.post_location:
+        # For regular users, filter by post location
         post_location = user.officerprofile.post_location
 
-        new_requests_count = Application.objects.filter(status='pending',
-                                                        post_location=post_location).count()
+        new_requests_count = Application.objects.filter(
+            status='pending',
+            post_location=post_location
+        ).count()
 
-        pending_requests_count = Application.objects.filter(status='processing',
-                                                            post_location=post_location).count()
+        pending_requests_count = Application.objects.filter(
+            status='processing',
+            post_location=post_location
+        ).count()
 
-        waiting_requests_count = Application.objects.filter(status='waiting',
-                                                            post_location=post_location).count()
+        waiting_requests_count = Application.objects.filter(
+            status='waiting',
+            post_location=post_location
+        ).count()
 
-        # Filter interviews based on the officer's post location
         today = date.today()
         interview_requests_count = Application.objects.filter(
             status='interview',
             interview_slot__date_time__date=today,
             post_location=post_location
         ).count()
-    else:
-        # If the user doesn't have an officer profile or post location, set count to 0
-        interview_requests_count = 0
 
-    # Count for pending To-Dos
-    pending_todo_count = ToDo.objects.filter(status=0).count()
+        pending_todo_count = ToDo.objects.filter(
+            status=0,
+            application__post_location=post_location
+        ).count()
 
     context = {
         'new_requests_count': new_requests_count,
@@ -238,9 +263,9 @@ def fulfiller_detail(request, id):
             if message_to_requester:
                 send_requester_note(application, user, message_to_requester)
 
-            # Send notification to the applicant
-            applicant = application.user  # Assuming `application` has a `user` field for the applicant
-            send_notification(applicant, f"Your application status has changed to {application.status}.")
+            # # Send notification to the applicant
+            # applicant = application.user  # Assuming `application` has a `user` field for the applicant
+            # send_notification(applicant, f"Your application status has changed to {application.status}.")
 
             messages.success(request, 'Fulfiller details and message updated successfully.')
 
@@ -326,8 +351,8 @@ def add_post_location(request):
             postal_code=postal_code,
             country=country
         )
-        user = request.user  # Assuming the current user is the one to notify
-        send_notification(user, f"A location has been added {name}.")
+        # user = request.user  # Assuming the current user is the one to notify
+        # send_notification(user, f"A location has been added {name}.")
         messages.success(request, "Post location added successfully.")
         return redirect('post_locations')
 
@@ -353,8 +378,8 @@ def edit_post_location(request, id):
         location.country = request.POST.get('country')
         location.save()
         messages.success(request, "Post location updated successfully.")
-        user = request.user  # Assuming the current user is the one to notify
-        send_notification(user, f"Post location was added {name}.")
+        # user = request.user  # Assuming the current user is the one to notify
+        # send_notification(user, f"Post location was added {name}.")
         return redirect('post_locations')
 
     return render(request, 'immigration/edit_post_location.html', {'location': location})
@@ -436,8 +461,8 @@ def create_user(request):
                     officer_batch_number=officer_batch_number,
                     post_location=post_location
                 )
-                user = request.user  # Assuming the current user is the one to notify
-                send_notification(user, f"Officer user account {username} was created.")
+                # user = request.user  # Assuming the current user is the one to notify
+                # send_notification(user, f"Officer user account {username} was created.")
                 messages.success(request, f'{role.capitalize()} user created successfully!')
                 return redirect('list_officer_users')
             except Group.DoesNotExist:
@@ -692,8 +717,8 @@ def interview_view(request, interview_id):
                 interview_slot.save()
 
                 application.save()  # Save the application updates
-                user = request.user  # Assuming the current user is the one to notify
-                send_notification(user, f"Interview was postpone")
+                # user = request.user  # Assuming the current user is the one to notify
+                # send_notification(user, f"Interview was postpone")
                 messages.success(request, "Interview postponed successfully, and a new slot assigned.")
             else:
                 messages.warning(request, "No available interview slots for postponement.")
