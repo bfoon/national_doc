@@ -8,6 +8,7 @@ urlpatterns = [
     # Fulfillers
     path('fulfiller/', views.fulfillers_list, name='fulfiller'),
     path('fulfiller/search/', views.filler_search, name='filler_search'),
+    path('fulfiller/<int:fulfiller_id>/send-note/', views.send_note_to_requester, name='send_note_to_requester'),
     path('fulfiller_detail/<int:id>/', views.fulfiller_detail, name='fulfiller_detail'),
 
     # Post Locations

@@ -42,14 +42,33 @@ def mark_notification_as_read(request, notification_id):
 
 @login_required
 def immigration_dashboard(request):
+    user = request.user
     # Other counts
-    new_requests_count = Application.objects.filter(status='pending').count()
-    pending_requests_count = Application.objects.filter(status='processing').count()
-    waiting_requests_count = Application.objects.filter(status='waiting').count()
 
-    # Count interviews scheduled for today
-    today = date.today()
-    interview_requests_count = Application.objects.filter(status='interview', interview_slot__date_time=today).count()
+
+    # Ensure the user has an officer profile
+    if hasattr(user, 'officerprofile') and user.officerprofile.post_location:
+        post_location = user.officerprofile.post_location
+
+        new_requests_count = Application.objects.filter(status='pending',
+                                                        post_location=post_location).count()
+
+        pending_requests_count = Application.objects.filter(status='processing',
+                                                            post_location=post_location).count()
+
+        waiting_requests_count = Application.objects.filter(status='waiting',
+                                                            post_location=post_location).count()
+
+        # Filter interviews based on the officer's post location
+        today = date.today()
+        interview_requests_count = Application.objects.filter(
+            status='interview',
+            interview_slot__date_time__date=today,
+            post_location=post_location
+        ).count()
+    else:
+        # If the user doesn't have an officer profile or post location, set count to 0
+        interview_requests_count = 0
 
     # Count for pending To-Dos
     pending_todo_count = ToDo.objects.filter(status=0).count()
@@ -134,7 +153,7 @@ def filler_search(request):
 def update_fulfiller_details(fulfiller, request):
     """Updates the fulfiller details from the POST request."""
     fulfiller.location_id = request.POST.get('location')
-    fulfiller.action = request.user
+    fulfiller.action_id = request.user.id
     fulfiller.schedule = request.POST.get('schedule')
     fulfiller.priority = request.POST.get('priority')
     fulfiller.status = request.POST.get('status')
@@ -216,18 +235,19 @@ def fulfiller_detail(request, id):
 
             # Send note to requester if applicable
             message_to_requester = request.POST.get('message')
-            send_requester_note(application, user, message_to_requester)
+            if message_to_requester:
+                send_requester_note(application, user, message_to_requester)
 
-            # Send notification
-            status = request.POST.get('status')
-            send_notification(user, f"Your application status has changed to {status}.")
+            # Send notification to the applicant
+            applicant = application.user  # Assuming `application` has a `user` field for the applicant
+            send_notification(applicant, f"Your application status has changed to {application.status}.")
 
             messages.success(request, 'Fulfiller details and message updated successfully.')
 
         except ValidationError as e:
             messages.warning(request, f"Validation error: {e}")
         except Exception as e:
-            messages.warning(request, f"Error updating fulfiller details: {e}")
+            messages.success(request, f"Error updating fulfiller details: {e}")
 
         return redirect('fulfiller_detail', id=fulfiller.id)
 
@@ -243,6 +263,27 @@ def fulfiller_detail(request, id):
         'users': users,
         'notes': notes,
     })
+
+@login_required
+def send_note_to_requester(request, fulfiller_id):
+    if request.method == 'POST':
+        fulfiller = get_object_or_404(Fulfiller, id=fulfiller_id)
+        message_text = request.POST.get('message')
+
+        if message_text:
+            Note.objects.create(
+                application=fulfiller.application,
+                user=request.user,
+                message=message_text
+            )
+            messages.success(request, 'Message sent successfully to the requester.')
+        else:
+            messages.warning(request, 'Please enter a message before sending.')
+
+        return redirect('fulfiller_detail', id=fulfiller_id)
+    else:
+        messages.error(request, 'Invalid request method.')
+        return redirect('fulfiller_detail', id=fulfiller_id)
 
 @login_required
 def post_locations(request):

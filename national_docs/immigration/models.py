@@ -26,7 +26,15 @@ class OfficerProfile(models.Model):
     post_location = models.ForeignKey(PostLocation, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.user.username}'s Profile"
+        full_name = self.user.get_full_name() or self.user.username
+        return f"{full_name} ({self.officer_batch_number})"
+
+    def get_full_name(self):
+        return f"{self.user.first_name} {self.user.last_name}"
+
+    class Meta:
+        verbose_name = "Officer Profile"
+        verbose_name_plural = "Officer Profiles"
 
 class Fulfiller(models.Model):
     application = models.OneToOneField(Application, on_delete=models.CASCADE, null=True, related_name='fulfiller')

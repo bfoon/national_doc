@@ -2,65 +2,90 @@
 {% block content %}
 <style>
 
-    .application-form {
-        background-color: #ffffff;
-        border-radius: 10px;
-        padding: 25px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        margin-top: 20px;
-    }
+    /* Container for the Application Form */
+.application-form {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    transition: box-shadow 0.3s ease;
+}
 
-    .form-group label {
-        font-weight: bold;
-    }
+.application-form:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
 
-    .document-upload {
-        border: 2px dashed #cfd8dc;
-        padding: 20px;
-        text-align: center;
-        background-color: #f9f9f9;
-        border-radius: 5px;
-        transition: border-color 0.3s ease;
-    }
+/* Form Group Labels */
+.form-group label {
+    font-weight: bold;
+    color: #2c3e50; /* Dark blue for better readability */
+    margin-bottom: 8px;
+}
 
-    .document-upload:hover {
-        border-color: #90caf9;
-    }
+/* Document Upload Box */
+.document-upload {
+    border: 2px dashed #cfd8dc;
+    padding: 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    color: #6c757d; /* Subtle text color */
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+}
 
-    .submit-button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+.document-upload:hover {
+    border-color: #90caf9;
+    background-color: #e3f2fd; /* Light blue background on hover */
+    color: #1976d2; /* Darker blue for text on hover */
+}
 
-    .submit-button:hover {
-        background-color: #0056b3;
-    }
+/* Submit Button Styling */
+.submit-button {
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
 
-    .modal-content {
-        border-radius: 10px;
-    }
+.submit-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px); /* Slight lift effect */
+}
 
-    .modal-header, .modal-footer {
-        border: none;
-    }
+/* Modal Content Styling */
+.modal-content {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 
-    .close {
-        color: #aaa;
-        font-size: 24px;
-        font-weight: bold;
-    }
+/* Modal Header and Footer */
+.modal-header,
+.modal-footer {
+    border: none;
+    background-color: #f8f9fa;
+}
 
-    .close:hover {
-        color: black;
-        cursor: pointer;
-    }
+/* Close Button in Modal */
+.close {
+    color: #aaa;
+    font-size: 24px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.close:hover,
+.close:focus {
+    color: #343a40;
+    cursor: pointer;
+    outline: none;
+}
+
 </style>
 
 <div class="container">
@@ -80,74 +105,96 @@
         </ol>
     </nav>
 
-    <div class="application-form">
-        <h2 class="mb-4">National ID Card Application</h2>
-        <form id="national-id-form" method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="full-name">Full Name</label>
-                <input type="text" class="form-control" id="full-name" name="full-name" placeholder="Enter your full name" required>
-            </div>
-            <div class="form-group">
-                <label for="date-of-birth">Date of Birth</label>
-                <input type="date" class="form-control" id="date-of-birth" name="date-of-birth" required>
-            </div>
-            <div class="form-group">
-                <label for="place-of-birth">Place of Birth</label>
-                <input type="text" class="form-control" id="place-of-birth" name="place-of-birth" placeholder="Enter your place of birth" required>
-            </div>
-            <div class="form-group">
-                <label for="gender">Gender</label>
-                <select id="gender" name="gender" class="form-control" required>
-                    <option value="">Select Gender</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="address">Current Address</label>
-                <textarea id="address" name="address" class="form-control" rows="3" placeholder="Enter your current address" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address" required>
-            </div>
+<div class="application-form">
+    <h2 class="mb-4">National ID Card Application</h2>
+    <form id="national-id-form" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
 
-            <div class="form-group">
-                <label for="post-location">Closest Post Location</label>
-                <select id="post-location" name="post-location" class="form-control" required>
-                    <option value="">Select Closest Post</option>
-                    {% for post in post_locations %}
-                        <option value="{{ post.id }}">{{ post.name }} - {{ post.district }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <!-- Full Name -->
+        <div class="form-group">
+            <label for="full-name">Full Name</label>
+            <input type="text" class="form-control" id="full-name" name="full-name" placeholder="Enter your full name" required>
+        </div>
 
-            <h4 class="mt-4 mb-3">Document Upload</h4>
-            <div class="form-group">
-                <label for="birth-certificate">Birth Certificate</label>
-                <div class="document-upload" id="birth-certificate-upload">
-                    <p>Click or drag to upload your Birth Certificate</p>
-                    <input type="file" id="birth-certificate" name="birth-certificate" accept=".pdf,.jpg,.png" style="display: none;" required>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="passport-photo">Passport Photo</label>
-                <div class="document-upload" id="passport-photo-upload">
-                    <p>Click or drag to upload your Passport Photo</p>
-                    <input type="file" id="passport-photo" name="passport-photo" accept=".jpg,.png" style="display: none;" required>
-                </div>
-            </div>
+        <!-- Date of Birth -->
+        <div class="form-group">
+            <label for="date-of-birth">Date of Birth</label>
+            <input type="date" class="form-control" id="date-of-birth" name="date-of-birth" required>
+        </div>
 
-            <button type="submit" class="submit-button mt-4">Submit Application</button>
-        </form>
-        <br>
-    </div>
+        <!-- Place of Birth -->
+        <div class="form-group">
+            <label for="place-of-birth">Place of Birth</label>
+            <input type="text" class="form-control" id="place-of-birth" name="place-of-birth" placeholder="Enter your place of birth" required>
+        </div>
+
+        <!-- Gender -->
+        <div class="form-group">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" class="form-control" required>
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <!-- Current Address -->
+        <div class="form-group">
+            <label for="address">Current Address</label>
+            <textarea id="address" name="address" class="form-control" rows="3" placeholder="Enter your current address" required></textarea>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your phone number" required>
+        </div>
+
+        <!-- Email Address -->
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email address" required>
+        </div>
+
+        <!-- Closest Post Location -->
+        <div class="form-group">
+            <label for="post-location">Closest Post Location</label>
+            <select id="post-location" name="post-location" class="form-control" required>
+                <option value="">Select Closest Post</option>
+                {% for post in post_locations %}
+                    <option value="{{ post.id }}">{{ post.name }} - {{ post.district }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Document Upload Section -->
+        <h4 class="mt-4 mb-3">Document Upload</h4>
+
+        <!-- Birth Certificate Upload -->
+        <div class="form-group">
+            <label for="birth-certificate">Birth Certificate</label>
+            <div class="document-upload" id="birth-certificate-upload">
+                <p>Click or drag to upload your Birth Certificate</p>
+                <input type="file" id="birth-certificate" name="birth-certificate" accept=".pdf,.jpg,.png" hidden required>
+            </div>
+            <p id="birth-certificate-file-name" class="text-muted mt-2"></p>
+        </div>
+
+        <!-- Passport Photo Upload -->
+        <div class="form-group">
+            <label for="passport-photo">Passport Photo</label>
+            <div class="document-upload" id="passport-photo-upload">
+                <p>Click or drag to upload your Passport Photo</p>
+                <input type="file" id="passport-photo" name="passport-photo" accept=".jpg,.png" hidden required>
+            </div>
+            <p id="passport-photo-file-name" class="text-muted mt-2"></p>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="submit-button mt-4">Submit Application</button>
+    </form>
+    <br>
 </div>
 
 <!-- Disclaimer Modal -->
@@ -164,18 +211,19 @@
                 <p>By submitting this application, I confirm that the information provided is accurate and truthful. Providing false information is a violation of The Gambia's legal code governing national documents.</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary" data-dismiss="modal">I Understand</button>
+                <button class="btn btn-primary" id="confirmDisclaimer">I Understand</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- JavaScript -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Function to handle file upload UI interactions
-        function setupFileUpload(uploadAreaId, fileInputId) {
+        function setupFileUpload(uploadAreaId, fileInputId, fileNameDisplayId) {
             const uploadArea = document.getElementById(uploadAreaId);
             const fileInput = document.getElementById(fileInputId);
+            const fileNameDisplay = document.getElementById(fileNameDisplayId);
 
             uploadArea.addEventListener('click', () => fileInput.click());
             uploadArea.addEventListener('dragover', (e) => {
@@ -187,34 +235,36 @@
                 e.preventDefault();
                 uploadArea.classList.remove('border-primary');
                 fileInput.files = e.dataTransfer.files;
-                uploadArea.querySelector('p').textContent = `Selected: ${e.dataTransfer.files[0].name}`;
+                fileNameDisplay.textContent = `Selected: ${e.dataTransfer.files[0].name}`;
             });
             fileInput.addEventListener('change', () => {
                 if (fileInput.files.length > 0) {
-                    uploadArea.querySelector('p').textContent = `Selected: ${fileInput.files[0].name}`;
+                    fileNameDisplay.textContent = `Selected: ${fileInput.files[0].name}`;
                 }
             });
         }
 
-        // Initialize file upload areas
-        setupFileUpload('birth-certificate-upload', 'birth-certificate');
-        setupFileUpload('passport-photo-upload', 'passport-photo');
+        // Initialize file upload handlers
+        setupFileUpload('birth-certificate-upload', 'birth-certificate', 'birth-certificate-file-name');
+        setupFileUpload('passport-photo-upload', 'passport-photo', 'passport-photo-file-name');
 
-        // Handle form submission and modal logic
+        // Handle form submission with disclaimer modal
         const form = document.getElementById('national-id-form');
         const disclaimerModal = document.getElementById('disclaimerModal');
+        const confirmButton = document.getElementById('confirmDisclaimer');
 
         form.addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent immediate submission
-            $('#disclaimerModal').modal('show'); // Show modal
+            event.preventDefault();
+            $('#disclaimerModal').modal('show');
         });
 
-        // Submit form when "I Understand" button is clicked in the modal
-        document.querySelector('#disclaimerModal .btn-primary').addEventListener('click', function () {
-            form.submit(); // Submit form after acknowledgment
+        confirmButton.addEventListener('click', function () {
+            $('#disclaimerModal').modal('hide');
+            form.submit();
         });
     });
 </script>
+
 
 
 {% endblock %}

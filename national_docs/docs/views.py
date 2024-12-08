@@ -284,7 +284,7 @@ def apply_national_id(request):
                 place_of_birth=place_of_birth,
                 gender=gender,
                 address=address,
-                phone=phone,
+                phone_number=phone,
                 email=email,
                 birth_certificate=birth_certificate,
                 passport_photo=passport_photo,
@@ -416,6 +416,7 @@ def apply_work_permit(request):
             date_of_birth = request.POST.get('date_of_birth')
             nationality = request.POST.get('nationality')
             address = request.POST.get('address')
+            phone = request.POST.get('phone')
             job_title = request.POST.get('job_title')
             work_contract = request.FILES.get('work_contract')
             passport_photo = request.FILES.get('passport_photo')
@@ -439,6 +440,7 @@ def apply_work_permit(request):
                 date_of_birth=date_of_birth,
                 nationality=nationality,
                 address=address,
+                phone_number=phone,
                 job_title=job_title,
                 work_contract=work_contract,
                 passport_photo=passport_photo,

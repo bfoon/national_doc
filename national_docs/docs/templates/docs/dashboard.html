@@ -98,17 +98,36 @@
         }
 
         .cta-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
+                transition: all 0.3s ease;
+                border-radius: 8px; /* Rounded corners */
+                font-weight: 600;   /* Bold text */
+                text-decoration: none; /* No underline */
+                display: inline-flex;
+                align-items: center;
+            }
 
         .cta-button:hover {
-            background-color: #0056b3;
-        }
+                transform: translateY(-2px); /* Slight lift effect on hover */
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Enhanced shadow */
+                text-decoration: none; /* Prevent underline on hover */
+            }
+
+        .print-button {
+                color: #495057;
+                border-color: #6c757d;
+            }
+
+        .print-button:hover {
+                background-color: #6c757d;
+                color: #fff;
+                text-decoration: none; /* Prevent underline on hover */
+            }
+
+        .cta-button i {
+                font-size: 1.2rem; /* Ensure icons are properly sized */
+                margin-right: 8px; /* Add spacing to the right of the icon */
+            }
+
 
         .status.text-muted {
             color: #6c757d;
@@ -319,27 +338,26 @@
                 <p id="appointment-info">National ID Card Interview on
                     {{ national_id_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
                 <p>Queue Number: <span id="queue-number">{{ national_id_application.application.interview_queue_number }}</span></p>
-                <div id="qrcode"></div>
-                <p style="font-size: smaller;">{{ national_id_application.application.token }}</p>
                 <a href="#" class="cta-button">Manage Appointments</a>
                 <a href="#" class="cta-button print-button" onclick="printAppointment('nationalId')">Print National ID Appointment</a>
                 {% elif resident_permit_application.application.status == 'interview' %}
                 <p id="appointment-info">National ID Card Interview on
                     {{ resident_permit_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
                 <p>Queue Number: <span id="queue-number">{{ resident_permit_application.application.interview_queue_number }}</span></p>
-               <div id="qrcode"></div>
-                <p style="font-size: smaller;">{{ resident_permit_application.application.token }}</p>
                 <a href="#" class="cta-button">Manage Appointments</a>
                 <a href="#" class="cta-button print-button" onclick="printAppointment('residentPermit')">Print Resident Permit Appointment</a>
                 {% elif work_permit_application.application.status == 'interview' %}
                 <p id="appointment-info">National ID Card Interview on
                     {{ work_permit_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
                 <p>Queue Number: <span id="queue-number">{{ work_permit_application.application.interview_queue_number }}</span></p>
-                <div id="qrcode"></div>
-                <p style="font-size: smaller;">{{ work_permit_application.application.token }}</p>
-                <a href="#" class="cta-button">Manage Appointments</a>
-                <a href="#" class="cta-button print-button" onclick="printAppointment('workPermit')">Print Work Permit Appointment</a>
-
+               <div class="d-flex flex-wrap gap-2 mt-4">
+                    <a href="#" class="btn btn-primary btn-lg shadow-sm cta-button">
+                        <i class="fas fa-calendar-check mr-2"></i> Manage Appointments
+                    </a>
+                    <a href="#" class="btn btn-outline-secondary btn-lg shadow-sm cta-button print-button" onclick="printAppointment('workPermit')">
+                        <i class="fas fa-print mr-2"></i> Print Work Permit Appointment
+                    </a>
+                </div>
 
                 {% endif %}
             </div>
@@ -429,21 +447,21 @@
                 <ul class="list-group">
                      {% if national_id_application.application.notes %}
                             <li class="list-group-item">
-                                <strong>{{ national_id_application.application.notes.first.user.get_full_name }}
-                                    ({{ national_id_application.application.notes.first.created_at|date:"Y-m-d H:i" }}):</strong>
-                                <p>{{ national_id_application.application.notes.first.message }}</p>
+                                <strong>{{ national_id_application.application.notes.last.user.get_full_name }}
+                                    ({{ national_id_application.application.notes.last.created_at|date:"Y-m-d H:i" }}):</strong>
+                                <p>{{ national_id_application.application.notes.last.message }}</p>
                             </li>
                     {% elif resident_permit_application.application.notes %}
                             <li class="list-group-item">
-                                <strong>{{ resident_permit_application.application.notes.first.user.get_full_name }}
-                                    ({{ resident_permit_application.application.notes.first.created_at|date:"Y-m-d H:i" }}):</strong>
-                                <p>{{ resident_permit_application.application.notes.first.message }}</p>
+                                <strong>{{ resident_permit_application.application.notes.last.user.get_full_name }}
+                                    ({{ resident_permit_application.application.notes.last.created_at|date:"Y-m-d H:i" }}):</strong>
+                                <p>{{ resident_permit_application.application.notes.last.message }}</p>
                             </li>
                      {% elif work_permit_application.application.notes %}
                             <li class="list-group-item">
-                                <strong>{{ work_permit_application.application.notes.first.user.get_full_name }}
-                                    ({{ work_permit_application.application.notes.first.created_at|date:"Y-m-d H:i" }}):</strong>
-                                <p>{{ work_permit_application.application.notes.first.message }}</p>
+                                <strong>{{ work_permit_application.application.notes.last.user.get_full_name }}
+                                    ({{ work_permit_application.application.notes.last.created_at|date:"Y-m-d H:i" }}):</strong>
+                                <p>{{ work_permit_application.application.notes.last.message }}</p>
                             </li>
                     {% else %}
                         <li class="list-group-item">No notes available.</li>
