@@ -2,61 +2,97 @@
 {% block content %}
 
 <style>
-    .signature {
-        font-family: 'Pacifico', cursive;
-        font-size: 0.9rem;
-        text-align: right;
-        margin-top: 10px;
-        color: #495057;
-    }
+/* Container for the passport photo */
+.passport-photo-container {
+    position: absolute;
+    top: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
 
-    .qr-code {
-        width: 100px;
-        height: 100px;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
+/* Circular Passport Photo */
+.passport-photo {
+    width: 75px;
+    height: 75px;
+    object-fit: cover;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-    .card-header {
-        background: linear-gradient(45deg, #007bff, #00d4ff);
-        color: white;
-        font-weight: bold;
-        border-radius: 0.5rem 0.5rem 0 0;
-    }
+/* Additional styling for the card to accommodate the photo */
+.card {
+    padding-top: 70px;
+    overflow: hidden;
+    border-radius: 0.5rem;
+}
 
-    .breadcrumb {
-        background-color: #f8f9fa;
-        border-radius: 0.5rem;
-    }
+/* Signature Style */
+.signature {
+    font-family: 'Pacifico', cursive;
+    font-size: 0.9rem;
+    text-align: right;
+    margin-top: 10px;
+    color: #495057;
+}
 
-    .breadcrumb a {
-        color: #007bff;
-    }
+/* QR Code Positioning */
+.qr-code {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
 
-    .modal-header {
-        background: #007bff;
-        color: white;
-    }
+/* Card Header with Gradient */
+.card-header {
+    background: linear-gradient(45deg, #007bff, #00d4ff);
+    color: white;
+    font-weight: bold;
+    border-radius: 0.5rem 0.5rem 0 0;
+}
 
-    .btn-primary, .btn-success, .btn-danger {
-        border-radius: 0.3rem;
-    }
+/* Breadcrumb Navigation */
+.breadcrumb {
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+}
 
-    .table thead th {
-        background-color: #007bff;
-        color: white;
-    }
+.breadcrumb a {
+    color: #007bff;
+}
 
-    .alert-danger {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
+/* Modal Header Styling */
+.modal-header {
+    background: #007bff;
+    color: white;
+}
 
-    .form-control:disabled, .form-control[readonly] {
-        background-color: #e9ecef;
-    }
+/* Button Styling */
+.btn-primary, .btn-success, .btn-danger {
+    border-radius: 0.3rem;
+}
+
+/* Table Header Styling */
+.table thead th {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Alert for Danger */
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Disabled Form Fields */
+.form-control:disabled, .form-control[readonly] {
+    background-color: #e9ecef;
+}
+
 </style>
 
 <!-- Link to Google Fonts for the signature font -->
@@ -73,50 +109,62 @@
             <li class="breadcrumb-item active" aria-current="page">ToDo Details</li>
         </ol>
     </nav>
-    <h2 class="mb-4">ToDo Details</h2>
+    <h2 class="mb-4 text-center">ToDo Details</h2>
 
-    <div class="card shadow mb-4">
-        <div class="card-header">
-            <h5 class="mb-0">Details for ToDo #{{ todo.id }}</h5>
+<div class="card shadow mb-4 position-relative">
+    <!-- Circular Passport Photo -->
+    <div class="passport-photo-container">
+        {% if todo.application.national_id_applications.first %}
+            <img src="{{ todo.application.national_id_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+        {% elif todo.application.resident_permit_applications.first %}
+            <img src="{{ todo.application.resident_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+        {% elif todo.application.work_permit_applications.first %}
+            <img src="{{ todo.application.work_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
+        {% endif %}
+    </div>
+
+    <div class="card-header text-center">
+        <h5 class="mb-0">Details for ToDo #{{ todo.id }}</h5>
+    </div>
+
+    <div class="card-body">
+        <p><strong>Application:</strong> {{ todo.application.get_service_type }}</p>
+        <p><strong>Interviewee:</strong> {{ todo.interview.application.user.get_full_name }}</p>
+        <p><strong>Interviewer:</strong> {{ todo.user.get_full_name }}</p>
+        <p><strong>Interview Duration:</strong> {{ todo.interview.duration }} Min</p>
+
+        <!-- Notes as a read-only textarea -->
+        <div class="form-group">
+            <label for="notes"><strong>Notes:</strong></label>
+            <textarea id="notes" class="form-control" rows="5" readonly>{{ todo.interview.notes }}</textarea>
+            <div class="signature">{{ todo.user.get_full_name }}</div>
         </div>
-        <div class="card-body">
-            <p><strong>Application:</strong> {{ todo.application.get_service_type }}</p>
-            <p><strong>Interviewee:</strong> {{ todo.interview.application.user.get_full_name }}</p>
-            <p><strong>Interviewer:</strong> {{ todo.user.get_full_name }}</p>
-            <p><strong>Interview Duration:</strong> {{ todo.interview.duration }} Min</p>
 
-            <!-- Notes as a read-only textarea -->
-            <div class="form-group">
-                <label for="notes"><strong>Notes:</strong></label>
-                <textarea id="notes" class="form-control" rows="5" readonly>{{ todo.interview.notes }}</textarea>
-                <div class="signature">{{ todo.user.get_full_name }}</div>
-            </div>
+        <p><strong>Approver:</strong>
+            {% if todo.approver %}
+                {{ todo.approver.get_full_name }}
+            {% else %}
+                N/A
+            {% endif %}
+        </p>
+        <p><strong>Status:</strong>
+            {% if todo.status == 1 %}
+                <span class="badge badge-success">Approved</span>
+            {% elif todo.status == 2 %}
+                <span class="badge badge-danger">Rejected</span>
+            {% else %}
+                <span class="badge badge-warning">Pending</span>
+            {% endif %}
+        </p>
 
-            <p><strong>Approver:</strong>
-                {% if todo.approver %}
-                    {{ todo.approver.get_full_name }}
-                {% else %}
-                    N/A
-                {% endif %}
-            </p>
-            <p><strong>Status:</strong>
-                {% if todo.status == 1 %}
-                    <span class="badge badge-success">Approved</span>
-                {% elif todo.status == 2 %}
-                    <span class="badge badge-danger">Rejected</span>
-                {% else %}
-                    <span class="badge badge-warning">Pending</span>
-                {% endif %}
-            </p>
-
-            {% if todo.status == 2 %}
+        {% if todo.status == 2 %}
             <div class="alert alert-danger mt-3">
                 <strong>Rejection Reason:</strong>
                 <p>{{ todo.rejection_reason }}</p>
             </div>
-            {% endif %}
+        {% endif %}
 
-            {% if todo.status == 0 %}
+        {% if todo.status == 0 %}
             <div class="d-flex mt-3">
                 <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#approveModal">
                     <i class="fas fa-check"></i> Approve
@@ -125,19 +173,19 @@
                     <i class="fas fa-times"></i> Reject
                 </button>
             </div>
-            {% endif %}
+        {% endif %}
 
-            {% if todo.status == 1 %}
+        {% if todo.status == 1 %}
             <!-- Print Receipt Button -->
             <a href="{% url 'todo_receipt_pdf' todo.id %}" class="btn btn-info float-right">
                 <i class="fas fa-print"></i> Print Receipt
             </a>
-            {% endif %}
-        </div>
+        {% endif %}
     </div>
-
-    <a href="{% url 'todo_list' %}" class="btn btn-secondary">Back to ToDo List</a>
 </div>
+
+<a href="{% url 'todo_list' %}" class="btn btn-secondary">Back to ToDo List</a>
+
 
 <!-- Approve Modal -->
 <div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel" aria-hidden="true">
