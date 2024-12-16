@@ -1,15 +1,19 @@
 {% extends 'docs/header.html' %}
 {% block content %}
+{% load static %}
 
 <style>
     /* Container Styling */
+/* Ensure form has padding-top to avoid overlap */
 .form-container {
+    padding-top: 80px; /* Space for the image to avoid overlap */
     background-color: #fff;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-    border: 1px solid #ccc;                  /* Subtle border for definition */
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 60px; /* Adds space so the form doesn't stick to the top */
 }
+
 
 /* Header Styling */
 h2, h4 {
@@ -101,6 +105,27 @@ h2, h4 {
     color: #ced4da;
 }
 
+/* Container for the profile picture */
+.profile-picture-container {
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+/* Circular Profile Picture */
+.profile-picture {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%; /* Makes it a perfect circle */
+    object-fit: cover;  /* Ensures the image covers the area without distortion */
+    border: 3px solid #fff; /* Adds a white border for better contrast */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
+}
+
+
+
 
 </style>
 
@@ -123,36 +148,50 @@ h2, h4 {
         </div>
     {% endif %}
 
-    <h2 class="mb-4">Edit Fulfiller Details</h2>
 
-        <div class="form-container position-relative">
-            <form method="POST">
-                {% csrf_token %}
 
-                <!-- First Row: Location and Action User -->
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="location">Location</label>
-                        <select class="form-control" id="location" name="location" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                            <option value="{{ application.post_location.id }}">{{ application.post_location }}</option>
-                            {% for location in post_locations %}
-                                {% if location != application.post_location %}
-                                    <option value="{{ location.id }}" {% if fulfiller.location.id == location.id %}selected{% endif %}>{{ location.name }}</option>
-                                {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
+    <h2 class="mb-4 text-center">Edit Fulfiller Details</h2>
+   <div class="position-relative">
+    <!-- Circular Passport Photo -->
+    <div class="profile-picture-container">
+        {% if application.national_id_applications.exists %}
+            <img src="{{ application.national_id_applications.first.passport_photo.url }}" alt="Profile Picture" class="profile-picture">
+        {% elif application.resident_permit_applications.exists %}
+            <img src="{{ application.resident_permit_applications.first.passport_photo.url }}" alt="Profile Picture" class="profile-picture">
+        {% elif application.work_permit_applications.exists %}
+            <img src="{{ application.work_permit_applications.first.passport_photo.url }}" alt="Profile Picture" class="profile-picture">
+        {% else %}
+            <img src="{% static 'img/default_profile.png' %}" alt="Default Profile Picture" class="profile-picture">
+        {% endif %}
+    </div>
+    <div class="form-container position-relative">
+        <form method="POST">
+            {% csrf_token %}
 
-                    <div class="form-group col-md-6">
-                        <label for="action">Action (User)</label>
-                        <select class="form-control" id="action" name="action" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                            <option value="">Select User</option>
-                            {% for user in users %}
-                                <option value="{{ user.id }}" {% if fulfiller.action.id == user.id %}selected{% endif %}>{{ user.get_full_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+            <!-- First Row: Location and Action User -->
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="location">Location</label>
+                    <select class="form-control" id="location" name="location" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                        <option value="{{ application.post_location.id }}">{{ application.post_location }}</option>
+                        {% for location in post_locations %}
+                            {% if location != application.post_location %}
+                                <option value="{{ location.id }}" {% if fulfiller.location.id == location.id %}selected{% endif %}>{{ location.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
                 </div>
+
+                <div class="form-group col-md-6">
+                    <label for="action">Action (User)</label>
+                    <select class="form-control" id="action" name="action" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                        <option value="">Select User</option>
+                        {% for user in users %}
+                            <option value="{{ user.id }}" {% if fulfiller.action.id == user.id %}selected{% endif %}>{{ user.get_full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
 
                 <!-- Second Row: Schedule and Priority -->
                 <div class="form-row">
@@ -215,13 +254,14 @@ h2, h4 {
                 </div>
 
                 <!-- Submit Button -->
-                <div class="form-group text-right">
-                    <button type="submit" class="btn btn-primary" {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                </div>
-            </form>
-        </div>
+                 <div class="form-group text-right">
+                <button type="submit" class="btn btn-primary" {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
             <h4 class="mb-3">Uploaded Documents</h4>
             <ul class="list-group mb-4">
