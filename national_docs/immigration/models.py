@@ -144,3 +144,30 @@ class Notification(models.Model):
 
     def __str__(self):
         return f'Notification for {self.user.username}: {self.message}'
+
+class FAQ(models.Model):
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "FAQ"
+        verbose_name_plural = "FAQs"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.question
+
+class CallNote(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='call_notes')
+    note = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Call Note"
+        verbose_name_plural = "Call Notes"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Call Note by {self.user.get_full_name()} on {self.created_at.strftime('%Y-%m-%d %H:%M')}"

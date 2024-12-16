@@ -18,6 +18,8 @@ from django.db import IntegrityError
 from immigration.models import OfficerProfile
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.db.models import Q
+
 
 
 def landing_page(request):
@@ -568,13 +570,12 @@ def chat_with_support(request):
             return JsonResponse({'status': 'success'})
         return JsonResponse({'status': 'error', 'message': 'Failed to send message.'})
 
-    # Fetch chat history
+    # Fetch only unread chat history
     messages = ChatMessage.objects.filter(
-        sender=request.user, recipient=support_user
-    ) | ChatMessage.objects.filter(
-        sender=support_user, recipient=request.user
-    )
-    messages = messages.order_by('timestamp')
+        (Q(sender=request.user, recipient=support_user) |
+         Q(sender=support_user, recipient=request.user)),
+        is_read=False  # Exclude read messages
+    ).order_by('timestamp')
 
     chat_data = [
         {

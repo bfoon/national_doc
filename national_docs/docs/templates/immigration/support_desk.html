@@ -1,0 +1,246 @@
+<!-- templates/immigration/support_desk.html -->
+{% extends 'docs/header.html' %}
+{% block content %}
+
+<div class="container my-5">
+    <!-- Display Messages -->
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
+            <li class="breadcrumb-item">
+                <a href="{% url 'immigration_dashboard' %}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Support</li>
+        </ol>
+    </nav>
+
+    <h2 class="mb-4 text-center">Support Desk</h2>
+
+    <!-- FAQ Section -->
+    <div class="card mb-5 shadow">
+        <div class="card-header d-flex justify-content-between align-items-center bg-info text-white">
+            <h5 class="mb-0">Frequently Asked Questions</h5>
+            <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#addFaqModal">
+                <i class="fas fa-plus-circle"></i> Add FAQ
+            </button>
+        </div>
+        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+            <ul class="list-group">
+                {% for faq in faqs|dictsortreversed:"id" %}
+                    <li class="list-group-item">
+                        <strong>{{ faq.question }}</strong><br>
+                        {{ faq.answer }}
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">No FAQs available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Chat Messages Section -->
+    <div class="card mb-5 shadow">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Chat Messages</h5>
+        </div>
+        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+            <ul class="list-group">
+                {% for chat in chats %}
+                    {% if not chat.parent %}
+                        <li class="list-group-item chat-item" id="chat-{{ chat.id }}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>{{ chat.sender.get_full_name }}</strong>: {{ chat.message }}<br>
+                                    <small class="text-muted">{{ chat.timestamp|date:"Y-m-d H:i" }}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-primary btn-sm respond-btn" data-toggle="modal" data-target="#respondChatModal" data-chat-id="{{ chat.id }}" data-sender-name="{{ chat.sender.get_full_name }}">
+                                        <i class="fas fa-reply"></i> Respond
+                                    </button>
+                                    <button class="btn btn-danger btn-sm close-btn" data-chat-id="{{ chat.id }}">
+                                        <i class="fas fa-times"></i> Close
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Display Replies Indented Below -->
+                            {% for reply in chat.replies.all %}
+                                <div class="ml-4 mt-2 p-2 bg-light border rounded">
+                                    <strong>{{ reply.sender.get_full_name }}</strong>: {{ reply.message }}<br>
+                                    <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
+                                </div>
+                            {% endfor %}
+                        </li>
+                    {% endif %}
+                {% empty %}
+                    <li class="list-group-item text-muted">No chat messages available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Call Notes Section -->
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center bg-warning text-white">
+            <h5 class="mb-0">Previous Call Notes</h5>
+            <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#addCallNoteModal">
+                <i class="fas fa-plus-circle"></i> Add Call Note
+            </button>
+        </div>
+        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+            <ul class="list-group">
+                {% for note in call_notes|dictsortreversed:"id" %}
+                    <li class="list-group-item">
+                        <strong>{{ note.user.get_full_name }}</strong> ({{ note.created_at|date:"Y-m-d H:i" }}):<br>
+                        {{ note.note }}
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">No call notes available.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Modals for Adding FAQ and Call Notes -->
+<div class="modal fade" id="addFaqModal" tabindex="-1" role="dialog" aria-labelledby="addFaqModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="addFaqModalLabel">Add New FAQ</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'add_faq' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="faq-question">Question</label>
+                        <input type="text" class="form-control" id="faq-question" name="question" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="faq-answer">Answer</label>
+                        <textarea class="form-control" id="faq-answer" name="answer" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-info">Add FAQ</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addCallNoteModal" tabindex="-1" role="dialog" aria-labelledby="addCallNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="addCallNoteModalLabel">Add Call Note</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'add_call_note' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="call-note">Note</label>
+                        <textarea class="form-control" id="call-note" name="note" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning">Add Call Note</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Respond to Chat Modal -->
+<div class="modal fade" id="respondChatModal" tabindex="-1" role="dialog" aria-labelledby="respondChatModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="respondChatModalLabel">Respond to <span id="senderName"></span></h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="POST" action="{% url 'respond_chat' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="chatId" name="chat_id">
+                    <div class="form-group">
+                        <label for="responseMessage">Your Response</label>
+                        <textarea class="form-control" id="responseMessage" name="response" rows="3" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Send Response</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Handle Respond button click
+    document.addEventListener('DOMContentLoaded', function () {
+        const respondButtons = document.querySelectorAll('.respond-btn');
+        const chatIdInput = document.getElementById('chatId');
+        const senderNameSpan = document.getElementById('senderName');
+
+        respondButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const chatId = button.getAttribute('data-chat-id');
+                const senderName = button.getAttribute('data-sender-name');
+
+                chatIdInput.value = chatId;
+                senderNameSpan.textContent = senderName;
+            });
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const closeButtons = document.querySelectorAll('.close-btn');
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const chatId = button.getAttribute('data-chat-id');
+                fetch("{% url 'close_chat' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `chat_id=${chatId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Remove the chat item from the list
+                        const chatItem = document.getElementById(`chat-${chatId}`);
+                        if (chatItem) {
+                            chatItem.remove();
+                        }
+                    } else {
+                        console.error('Error:', data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+</script>
+
+{% endblock %}

@@ -58,4 +58,13 @@ urlpatterns = [
 
     # Notifications
     path('notifications/mark-as-read/<int:notification_id>/', views.mark_notification_as_read, name='mark_notification_as_read'),
+
+    path('support_desk/', views.support_desk, name='support_desk'),
+    path('add_faq/', views.add_faq, name='add_faq'),
+    path('add_call_note/', views.add_call_note, name='add_call_note'),
+    path('respond_chat/', views.respond_chat, name='respond_chat'),
+    path('close_chat/', views.close_chat, name='close_chat'),
+
+    path('birth_certificate_request/', views.birth_certificate_request, name='birth_certificate_request'),
+
 ]

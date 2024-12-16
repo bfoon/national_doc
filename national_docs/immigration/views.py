@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from docs.models import Application, UploadedDocument
+from docs.models import Application, UploadedDocument, ChatMessage
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
-                     Interview, ToDo, Boot, OfficerProfile, Notification)
+                     Interview, ToDo, Boot, OfficerProfile, Notification,
+                     FAQ, CallNote)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_date
@@ -175,6 +176,7 @@ def filler_search(request):
     # Render the filtered results as HTML
     return render(request, 'immigration/filler_search.html', {'fulfillers': fulfillers})
 
+@login_required
 def update_fulfiller_details(fulfiller, request):
     """Updates the fulfiller details from the POST request."""
     fulfiller.location_id = request.POST.get('location')
@@ -185,6 +187,7 @@ def update_fulfiller_details(fulfiller, request):
     fulfiller.progress = request.POST.get('progress')
     fulfiller.save()
 
+@login_required
 def assign_interview_slot(application, request, questionnaire, notes_text):
     """Assigns an available interview slot to the application."""
     interview_slot = InterviewSlot.objects.filter(
@@ -215,6 +218,7 @@ def assign_interview_slot(application, request, questionnaire, notes_text):
         messages.warning(request, 'No available interview slots.')
         return False
 
+@login_required
 def send_requester_note(application, user, message):
     """Creates a note for the requester if a message is provided."""
     if message:
@@ -357,6 +361,7 @@ def add_post_location(request):
         return redirect('post_locations')
 
     return render(request, 'immigration/add_post_location.html')
+
 @login_required
 def edit_post_location(request, id):
     location = get_object_or_404(PostLocation, id=id)
@@ -419,7 +424,6 @@ def list_officer_users(request):
     }
 
     return render(request, 'immigration/list_officer_users.html', context)
-
 
 @login_required
 def create_user(request):
@@ -1152,3 +1156,88 @@ def export_webpage(request):
     else:
         fulfillers = Fulfiller.objects.filter(action=request.user)
     return render(request, 'immigration/export_webpage.html', {'fulfillers': fulfillers})
+
+def support_desk(request):
+    faqs = FAQ.objects.all()
+
+    # Fetch top-level unread chats (main chats) and prefetch replies for efficiency
+    chats = ChatMessage.objects.filter(parent__isnull=True, is_read=False).order_by('-timestamp').prefetch_related(
+        'replies')
+
+    call_notes = CallNote.objects.filter(user=request.user)
+
+    context = {
+        'faqs': faqs,
+        'chats': chats,
+        'call_notes': call_notes,
+    }
+    return render(request, 'immigration/support_desk.html', context)
+
+@login_required
+def add_faq(request):
+    if request.method == 'POST':
+        question = request.POST.get('question')
+        answer = request.POST.get('answer')
+
+        if question and answer:
+            FAQ.objects.create(question=question, answer=answer)
+            messages.success(request, "FAQ added successfully!")
+        else:
+            messages.error(request, "Please fill in all fields.")
+
+    return redirect('support_desk')
+
+@login_required
+def add_call_note(request):
+    if request.method == 'POST':
+        note = request.POST.get('note')
+
+        if note:
+            CallNote.objects.create(user=request.user, note=note)
+            messages.success(request, "Call note added successfully!")
+        else:
+            messages.error(request, "Please provide a call note.")
+
+    return redirect('support_desk')
+
+
+@login_required
+def respond_chat(request):
+    if request.method == 'POST':
+        chat_id = request.POST.get('chat_id')
+        response_text = request.POST.get('response')
+        original_chat = get_object_or_404(ChatMessage, id=chat_id)
+
+        # Create the response message
+        ChatMessage.objects.create(
+            sender=request.user,
+            recipient=original_chat.sender,
+            message=response_text,
+            parent=original_chat
+        )
+
+        messages.success(request, 'Response sent successfully.')
+        return redirect('support_desk')
+
+@login_required
+@csrf_exempt
+def close_chat(request):
+    if request.method == 'POST':
+        chat_id = request.POST.get('chat_id')
+        try:
+            # Get the main chat message
+            chat = ChatMessage.objects.get(id=chat_id)
+            chat.is_read = True
+            chat.save()
+
+            # Mark all replies to this chat as read
+            ChatMessage.objects.filter(parent=chat).update(is_read=True)
+
+            return JsonResponse({'success': True})
+        except ChatMessage.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Chat message not found'})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+def birth_certificate_request(request):
+    return render(request, 'immigration/birth_certificate_request.html')

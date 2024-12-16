@@ -29,6 +29,21 @@
     .shadow {
         border-radius: 10px;
     }
+    /* Chatbox Button Styling */
+#openSupportChat .card {
+    background-color: #f8f9fa;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#openSupportChat .card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+#openSupportChat i {
+    color: #007bff;
+}
+
 </style>
 
 <div class="container my-5">
@@ -185,6 +200,34 @@
                 </div>
             </a>
         </div>
+
+           <!-- Birth Certificate Request -->
+        <div class="col-md-3 mt-3">
+            <a href="{% url 'birth_certificate_request' %}" class="text-decoration-none">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <i class="fas fa-file-alt fa-2x text-secondary mb-3"></i>
+                        <h5 class="card-title">Birth Certificate Request</h5>
+                        <p class="card-text">Submit and manage birth certificate requests.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+       <!-- Support Desk -->
+        <div class="col-md-3 mt-3">
+            <a href="{% url 'support_desk' %}" class="text-decoration-none">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <i class="fas fa-life-ring fa-2x text-primary mb-3"></i>
+                        <h5 class="card-title">Support Desk</h5>
+                        <p class="card-text">Give help and assistance.</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+
     </div>
 </div>
 
