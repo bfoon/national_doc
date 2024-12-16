@@ -40,6 +40,34 @@
     border: 1px solid #dee2e6;   /* Soft border for definition */
     border-radius: 4px;          /* Rounded corners for a polished look */
 }
+.modal-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+}
+
+.modal-title i {
+    margin-right: 8px;
+}
+
+.modal-body h5 {
+    color: #007bff;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.list-unstyled li {
+    margin-bottom: 10px;
+}
+
+.btn-link {
+    color: #007bff;
+    font-weight: 600;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}
 
 </style>
 
@@ -259,72 +287,79 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="applicantDetailModalLabel"><i class="fas fa-user"></i> Applicant Details</h5>
+                <h5 class="modal-title" id="applicantDetailModalLabel">
+                    <i class="fas fa-user-circle mr-2"></i> Applicant Details
+                </h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-           <div class="modal-body">
-                <!-- Applicant Information -->
-                <h5>Applicant Information</h5>
-                 {% if application.national_id_applications.first %}
-                <p><strong>Full Name:</strong> {{application.national_id_applications.first.full_name }}</p>
-                <p><strong>Email:</strong> {{ application.national_id_applications.first.email }}</p>
-                <p><strong>Phone Number:</strong> {{ application.national_id_applications.first.phone_number }}</p>
-                {% elif application.resident_permit_applications.first %}
-                <p><strong>Full Name:</strong> {{application.resident_permit_applications.first.full_name }}</p>
-                <p><strong>Email:</strong> {{ application.resident_permit_applications.first.email }}</p>
-                <p><strong>Phone Number:</strong> {{ application.resident_permit_applications.first.phone_number }}</p>
-                {% elif application.work_permit_applications.first %}
-                <p><strong>Full Name:</strong> {{application.work_permit_applications.first.full_name }}</p>
-                <p><strong>Email:</strong> {{ application.work_permit_applications.first.email }}</p>
-                <p><strong>Phone Number:</strong> {{ application.work_permit_applications.first.phone_number }}</p>
-                {% endif %}
 
-                <!-- Application Information -->
-                <h5>Application Information</h5>
-                <p><strong>Application Type:</strong> {{ application.application_type|capfirst }}</p>
+            <div class="modal-body">
+                <!-- Applicant Information Section -->
+                <section class="mb-4">
+                    <h5 class="border-bottom pb-2"><i class="fas fa-id-card mr-2"></i> Applicant Information</h5>
+                    {% if application.national_id_applications.first %}
+                        <p><strong>Full Name:</strong> {{ application.national_id_applications.first.full_name }}</p>
+                        <p><strong>Email:</strong> {{ application.national_id_applications.first.email }}</p>
+                        <p><strong>Phone Number:</strong> {{ application.national_id_applications.first.phone_number }}</p>
+                    {% elif application.resident_permit_applications.first %}
+                        <p><strong>Full Name:</strong> {{ application.resident_permit_applications.first.full_name }}</p>
+                        <p><strong>Email:</strong> {{ application.resident_permit_applications.first.email }}</p>
+                        <p><strong>Phone Number:</strong> {{ application.resident_permit_applications.first.phone_number }}</p>
+                    {% elif application.work_permit_applications.first %}
+                        <p><strong>Full Name:</strong> {{ application.work_permit_applications.first.full_name }}</p>
+                        <p><strong>Email:</strong> {{ application.work_permit_applications.first.email }}</p>
+                        <p><strong>Phone Number:</strong> {{ application.work_permit_applications.first.phone_number }}</p>
+                    {% else %}
+                        <p class="text-muted">No applicant information available.</p>
+                    {% endif %}
+                </section>
 
-                <!-- Conditional Information based on Service Type -->
+                <!-- Application Information Section -->
+                <section class="mb-4">
+                    <h5 class="border-bottom pb-2"><i class="fas fa-file-alt mr-2"></i> Application Information</h5>
+                    <p><strong>Application Type:</strong> {{ application.application_type|capfirst }}</p>
+                </section>
+
+                <!-- Service-Specific Details -->
                 {% if application.national_id_applications.first %}
-                    <h5>National ID Application Details</h5>
-                    <ul>
-                        <li><strong>Birth Certificate:</strong>
-                            <a href="{{ application.national_id_applications.first.birth_certificate.url }}" target="_blank">View Document</a>
-                        </li>
-                        <li><strong>Passport Photo:</strong>
-                            <a href="{{ application.national_id_applications.first.passport_photo.url }}" target="_blank">View Document</a>
-                        </li>
-                    </ul>
+                    <section class="mb-4">
+                        <h5 class="border-bottom pb-2"><i class="fas fa-id-card-alt mr-2"></i> National ID Application Details</h5>
+                        <ul class="list-unstyled">
+                            <li><strong>Birth Certificate:</strong> <a href="{{ application.national_id_applications.first.birth_certificate.url }}" target="_blank" class="btn btn-link p-0">View Document</a></li>
+                            <li><strong>Passport Photo:</strong> <a href="{{ application.national_id_applications.first.passport_photo.url }}" target="_blank" class="btn btn-link p-0">View Document</a></li>
+                        </ul>
+                    </section>
                 {% elif application.resident_permit_applications.first %}
-                    <h5>Resident Permit Application Details</h5>
-                    <ul>
-                        <li><strong>Purpose of Stay:</strong> {{ application.resident_permit_applications.first.purpose_of_stay }}</li>
-                        <li><strong>Passport Number:</strong> {{ application.resident_permit_applications.first.passport_number }}</li>
-                        <li><strong>Date of Entry:</strong> {{ application.resident_permit_applications.first.date_of_entry }}</li>
-                        <li><strong>Resident Permit Document:</strong>
-                            <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">View Document</a>
-                        </li>
-                        <li><strong>Passport Photo:</strong>
-                            <a href="{{ application.resident_permit_applications.first.passport_photo.url }}" target="_blank">View Document</a>
-                        </li>
-                    </ul>
+                    <section class="mb-4">
+                        <h5 class="border-bottom pb-2"><i class="fas fa-passport mr-2"></i> Resident Permit Application Details</h5>
+                        <ul class="list-unstyled">
+                            <li><strong>Purpose of Stay:</strong> {{ application.resident_permit_applications.first.purpose_of_stay }}</li>
+                            <li><strong>Passport Number:</strong> {{ application.resident_permit_applications.first.passport_number }}</li>
+                            <li><strong>Date of Entry:</strong> {{ application.resident_permit_applications.first.date_of_entry }}</li>
+                            <li><strong>Resident Permit Document:</strong> <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank" class="btn btn-link p-0">View Document</a></li>
+                            <li><strong>Passport Photo:</strong> <a href="{{ application.resident_permit_applications.first.passport_photo.url }}" target="_blank" class="btn btn-link p-0">View Document</a></li>
+                        </ul>
+                    </section>
                 {% elif application.work_permit_applications.first %}
-                    <h5>Work Permit Application Details</h5>
-                    <ul>
-                        <li><strong>Job Title:</strong> {{ application.work_permit_applications.first.job_title }}</li>
-                        <li><strong>Work Contract:</strong>
-                            <a href="{{ application.work_permit_applications.first.work_contract.url }}" target="_blank">View Document</a>
-                        </li>
-                        <li><strong>Passport Photo:</strong>
-                            <a href="{{ application.work_permit_applications.first.passport_photo.url }}" target="_blank">View Document</a>
-                        </li>
-                    </ul>
-               {% else %}
-                    <p class="text-muted">No applicant information available.</p>
+                    <section class="mb-4">
+                        <h5 class="border-bottom pb-2"><i class="fas fa-briefcase mr-2"></i> Work Permit Application Details</h5>
+                        <ul class="list-unstyled">
+                            <li><strong>Job Title:</strong> {{ application.work_permit_applications.first.job_title }}</li>
+                            <li><strong>Work Contract:</strong> <a href="{{ application.work_permit_applications.first.work_contract.url }}" target="_blank" class="btn btn-link p-0">View Document</a></li>
+                            <li><strong>Passport Photo:</strong> <a href="{{ application.work_permit_applications.first.passport_photo.url }}" target="_blank" class="btn btn-link p-0">View Document</a></li>
+                        </ul>
+                    </section>
                 {% endif %}
-                <p><strong>Interviewer:</strong> {{ interview.interviewer.get_full_name }}</p>
+
+                <!-- Interviewer Information -->
+                <section>
+                    <h5 class="border-bottom pb-2"><i class="fas fa-user-tie mr-2"></i> Interviewer</h5>
+                    <p><strong>Name:</strong> {{ interview.interviewer.get_full_name }}</p>
+                </section>
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
                     <i class="fas fa-times"></i> Close
