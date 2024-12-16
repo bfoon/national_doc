@@ -157,43 +157,105 @@
             border: none;
         }
       /* Style for floating support button */
-    .support-icon {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background-color: #007bff;
-        color: white;
-        border-radius: 50%;
-        width: 60px;
-        height: 60px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        z-index: 1000;
-    }
+   /* Support Icon */
+.support-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    z-index: 1000;
+}
 
-    .support-icon:hover {
-        background-color: #0056b3;
-    }
+.support-icon:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+}
 
-    .support-icon i {
-        font-size: 1.5rem;
-    }
+.support-icon i {
+    font-size: 1.5rem;
+}
 
-    /* Modal customization */
-    .support-modal .modal-content {
-        border-radius: 10px;
-    }
+/* Chatbox Container */
+.support-chatbox {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 350px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1050;
+    display: none; /* Hidden by default */
+    overflow: hidden;
+}
 
-    .support-modal-header {
-        background-color: #007bff;
-        color: white;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
+/* Chatbox Header */
+.chatbox-header {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 10px 10px 0 0;
+    font-weight: bold;
+}
+
+/* Close Button */
+.close-chatbox-btn {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+/* Chatbox Body */
+.chatbox-body {
+    padding: 15px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Textarea */
+.chatbox-body textarea {
+    resize: none;
+}
+
+/* Send Button */
+.chatbox-body .btn-primary {
+    border-radius: 5px;
+}
+
+/* Animation for Showing Chatbox */
+.support-chatbox.show {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
     </style>
 
 </head>
@@ -471,44 +533,132 @@
             </div>
             </div>
             </div>
-        <!-- Floating Support Icon -->
-        <div class="support-icon" data-toggle="modal" data-target="#supportModal">
-            <i class="fas fa-life-ring"></i>
-        </div>
+       <!-- Floating Support Icon -->
+<div class="support-icon" data-toggle="modal" data-target="#supportModal">
+    <i class="fas fa-life-ring"></i>
+</div>
 
-        <!-- Support Modal -->
-        <div class="modal fade support-modal" id="supportModal" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header support-modal-header">
-                        <h5 class="modal-title" id="supportModalLabel">Support</h5>
-                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <p>How can we assist you? Please select one of the following options:</p>
-                        <ul class="list-unstyled">
-                            <li>
-                                <a href="#" class="btn btn-link">
-                                    <i class="fas fa-envelope"></i> Contact Support
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="btn btn-link">
-                                    <i class="fas fa-question-circle"></i> Frequently Asked Questions (FAQs)
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            <i class="fas fa-times"></i> Close
-                        </button>
-                    </div>
-                </div>
+<!-- Support Modal -->
+<div class="modal fade support-modal" id="supportModal" tabindex="-1" role="dialog" aria-labelledby="supportModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header support-modal-header">
+                <h5 class="modal-title" id="supportModalLabel"><i class="fas fa-headset"></i> Support</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>How can we assist you? Please select one of the following options:</p>
+                <ul class="list-unstyled">
+                    <li>
+                        <a href="#" id="contactSupportBtn" class="btn btn-link">
+                            <i class="fas fa-envelope"></i> Contact Support
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="btn btn-link">
+                            <i class="fas fa-question-circle"></i> Frequently Asked Questions (FAQs)
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Close
+                </button>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Support Chatbox -->
+<div id="supportChatbox" class="support-chatbox">
+    <div class="chatbox-header">
+        <h5 class="mb-0"><i class="fas fa-comments mr-2"></i> Support Chat</h5>
+        <button type="button" id="closeChatboxBtn" class="close-chatbox-btn">&times;</button>
+    </div>
+    <div class="chatbox-body">
+        <div id="chatMessages" class="mb-2" style="max-height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px;">
+            <!-- Messages will be loaded here dynamically -->
+        </div>
+        <textarea class="form-control mb-2" id="chatMessage" rows="3" placeholder="Type your message here..."></textarea>
+        <button class="btn btn-primary btn-block" id="sendChatMessageBtn">
+            <i class="fas fa-paper-plane"></i> Send
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const contactSupportBtn = document.getElementById('contactSupportBtn');
+    const supportChatbox = document.getElementById('supportChatbox');
+    const closeChatboxBtn = document.getElementById('closeChatboxBtn');
+    const sendChatMessageBtn = document.getElementById('sendChatMessageBtn');
+    const chatMessage = document.getElementById('chatMessage');
+    const chatMessages = document.getElementById('chatMessages');
+
+    // Show the chatbox when "Contact Support" is clicked
+    contactSupportBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        $('#supportModal').modal('hide'); // Close the modal if open
+        supportChatbox.classList.add('show');
+        fetchMessages(); // Load existing messages when the chatbox is opened
+    });
+
+    // Close the chatbox and redirect to the dashboard
+    closeChatboxBtn.addEventListener('click', function () {
+        supportChatbox.classList.remove('show');
+        window.location.href = "/dashboard/";  // Replace with your actual dashboard URL
+    });
+
+    // Function to fetch messages from the server
+    function fetchMessages() {
+        fetch("{% url 'chat_with_support' %}")  // Ensure this URL is correct
+            .then(response => response.json())
+            .then(data => {
+                chatMessages.innerHTML = '';
+                data.messages.forEach(msg => {
+                    chatMessages.innerHTML += `
+                        <div class="${msg.sender === '{{ user.username }}' ? 'text-right' : 'text-left'} mb-2">
+                            <p><strong>${msg.sender}:</strong> ${msg.message}</p>
+                            <small class="text-muted">${msg.timestamp}</small>
+                        </div>
+                    `;
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+    }
+
+    // Handle sending the chat message
+    sendChatMessageBtn.addEventListener('click', function () {
+        const messageText = chatMessage.value.trim();
+        if (messageText !== "") {
+            fetch("{% url 'chat_with_support' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ message: messageText })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    chatMessage.value = "";
+                    fetchMessages(); // Refresh messages after sending
+                } else {
+                    alert("Failed to send message.");
+                }
+            });
+        }
+    });
+
+    // Refresh messages every 5 seconds
+    setInterval(fetchMessages, 5000);
+});
+</script>
+
 
   <!-- JavaScript for handling the modal and AJAX request -->
  {% load static %}
@@ -558,7 +708,9 @@
     } else {
         console.error("No valid token found for National ID, Resident Permit, or Work Permit.");
     }
+
 </script>
+
 
 <footer class="fixed-footer">
     <p>Developed by Akaine Consulting</p>

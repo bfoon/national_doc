@@ -175,3 +175,13 @@ class UploadedDocument(models.Model):
 
     def __str__(self):
         return f"Document {self.document_type} for {self.application.user.username}"
+
+class ChatMessage(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_chats')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_chats')
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Message from {self.sender.username} to {self.recipient.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"

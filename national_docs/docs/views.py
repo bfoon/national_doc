@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import (NationalIDApplication,
                      UploadedDocument, Application,
-                     ResidentPermitApplication, WorkPermitApplication, Profile)
+                     ResidentPermitApplication, WorkPermitApplication, Profile, ChatMessage)
 from django.core.files.storage import FileSystemStorage
 from immigration.models import PostLocation, Fulfiller
 from django.db import transaction
@@ -16,6 +16,8 @@ from django.contrib.auth.models import User
 from .models import Profile
 from django.db import IntegrityError
 from immigration.models import OfficerProfile
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 
 def landing_page(request):
@@ -552,3 +554,35 @@ def upload_document(request, id):
 
     except NationalIDApplication.DoesNotExist:
         return render(request, 'docs/error.html', {'message': 'Application not found.'})
+
+@login_required
+@csrf_exempt
+def chat_with_support(request):
+    support_user = User.objects.filter(is_staff=True).first()  # Assuming the first staff user is support
+
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        message_text = data.get('message')
+        if message_text and support_user:
+            ChatMessage.objects.create(sender=request.user, recipient=support_user, message=message_text)
+            return JsonResponse({'status': 'success'})
+        return JsonResponse({'status': 'error', 'message': 'Failed to send message.'})
+
+    # Fetch chat history
+    messages = ChatMessage.objects.filter(
+        sender=request.user, recipient=support_user
+    ) | ChatMessage.objects.filter(
+        sender=support_user, recipient=request.user
+    )
+    messages = messages.order_by('timestamp')
+
+    chat_data = [
+        {
+            'sender': msg.sender.username,
+            'message': msg.message,
+            'timestamp': msg.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        for msg in messages
+    ]
+
+    return JsonResponse({'messages': chat_data})

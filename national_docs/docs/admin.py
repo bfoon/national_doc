@@ -9,3 +9,8 @@ admin.site.register(WorkPermitApplication)
 admin.site.register(DriversLicenseApplication)
 admin.site.register(TINApplication)
 admin.site.register(Profile)
+@admin.register(ChatMessage)
+class ChatMessageAdmin(admin.ModelAdmin):
+    list_display = ('sender', 'recipient', 'message', 'timestamp', 'is_read')
+    list_filter = ('is_read', 'timestamp')
+    search_fields = ('sender__username', 'recipient__username', 'message')
