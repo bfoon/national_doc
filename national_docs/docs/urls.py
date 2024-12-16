@@ -27,4 +27,5 @@ urlpatterns = [
     path('upload-document/<int:id>/', views.upload_document, name='upload_document'),
 
     path('chat/', views.chat_with_support, name='chat_with_support'),
+    path('faqs/', views.faq_list, name='faq_list'),
 ]

@@ -6,7 +6,7 @@ from .models import (NationalIDApplication,
                      UploadedDocument, Application,
                      ResidentPermitApplication, WorkPermitApplication, Profile, ChatMessage)
 from django.core.files.storage import FileSystemStorage
-from immigration.models import PostLocation, Fulfiller
+from immigration.models import PostLocation, Fulfiller, FAQ, OfficerProfile
 from django.db import transaction
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
@@ -15,10 +15,10 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from .models import Profile
 from django.db import IntegrityError
-from immigration.models import OfficerProfile
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.db.models import Q
+from django.core.paginator import Paginator
 
 
 
@@ -587,3 +587,19 @@ def chat_with_support(request):
     ]
 
     return JsonResponse({'messages': chat_data})
+
+@login_required
+def faq_list(request):
+    query = request.GET.get('q', '')
+    faqs = FAQ.objects.filter(question__icontains=query) if query else FAQ.objects.all()
+
+    # Paginate the FAQ list
+    paginator = Paginator(faqs, 5)  # Show 5 FAQs per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {
+        'faqs': page_obj,
+        'query': query,
+    }
+    return render(request, 'docs/faq_list.html', context)
