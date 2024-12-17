@@ -456,7 +456,7 @@ footer {
                 <p id="appointment-info">National ID Card Interview on
                     {{ national_id_application.application.interview_slot.date_time|date:"Y-m-d H:i"}}</p>
                 <p>Queue Number: <span id="queue-number">{{ national_id_application.application.interview_queue_number }}</span></p>
-                <a href="#" class="cta-button">Manage Appointments</a>
+                <a href="/manage_appointments" class="cta-button">Manage Appointments</a>
                 <a href="#" class="cta-button print-button" onclick="printAppointment('nationalId')">Print National ID Appointment</a>
                 {% elif resident_permit_application.application.status == 'interview' %}
                 <p id="appointment-info">National ID Card Interview on

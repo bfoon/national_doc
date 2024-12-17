@@ -28,6 +28,23 @@ from weasyprint import HTML
 from django.templatetags.static import static
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
+from threading import Thread
+from django.core.mail import send_mail
+from django.conf import settings
+
+def send_email_in_thread(subject, message, recipient_email):
+    def send():
+        send_mail(
+            subject,
+            message,
+            settings.EMAIL_HOST_USER,
+            [recipient_email],
+            fail_silently=False,
+        )
+
+    # Start the email sending in a new thread
+    email_thread = Thread(target=send)
+    email_thread.start()
 
 @login_required
 def send_notification(user, message):
@@ -176,9 +193,8 @@ def filler_search(request):
     # Render the filtered results as HTML
     return render(request, 'immigration/filler_search.html', {'fulfillers': fulfillers})
 
-@login_required
 def update_fulfiller_details(fulfiller, request):
-    """Updates the fulfiller details from the POST request."""
+    """Updates the fulfiller details from the POST request and notifies the requester."""
     fulfiller.location_id = request.POST.get('location')
     fulfiller.action_id = request.user.id
     fulfiller.schedule = request.POST.get('schedule')
@@ -187,7 +203,27 @@ def update_fulfiller_details(fulfiller, request):
     fulfiller.progress = request.POST.get('progress')
     fulfiller.save()
 
-@login_required
+    # Notify the requester about the state update
+    application = fulfiller.application
+    requester = application.user
+
+    state = request.POST.get('state')
+
+    subject = 'Your Application State Has Been Updated'
+    message = f"""
+    Dear {requester.get_full_name()},
+
+    The state of your application (ID: {application.id}) has been updated to: {state}.
+
+    Please log in to your portal to view more details.
+
+    Best regards,  
+    The Gambia Immigration Office
+    """
+
+    send_email_in_thread(subject, message, requester.email)
+
+
 def assign_interview_slot(application, request, questionnaire, notes_text):
     """Assigns an available interview slot to the application."""
     interview_slot = InterviewSlot.objects.filter(
@@ -217,16 +253,6 @@ def assign_interview_slot(application, request, questionnaire, notes_text):
     else:
         messages.warning(request, 'No available interview slots.')
         return False
-
-@login_required
-def send_requester_note(application, user, message):
-    """Creates a note for the requester if a message is provided."""
-    if message:
-        Note.objects.create(
-            application=application,
-            user=user,
-            message=message
-        )
 
 @login_required
 def fulfiller_detail(request, id):
@@ -262,15 +288,6 @@ def fulfiller_detail(request, id):
             application.status = application_status
             application.save()
 
-            # Send note to requester if applicable
-            message_to_requester = request.POST.get('message')
-            if message_to_requester:
-                send_requester_note(application, user, message_to_requester)
-
-            # # Send notification to the applicant
-            # applicant = application.user  # Assuming `application` has a `user` field for the applicant
-            # send_notification(applicant, f"Your application status has changed to {application.status}.")
-
             messages.success(request, 'Fulfiller details and message updated successfully.')
 
         except ValidationError as e:
@@ -295,17 +312,39 @@ def fulfiller_detail(request, id):
 
 @login_required
 def send_note_to_requester(request, fulfiller_id):
+    """Sends a note to the requester and notifies them via email."""
     if request.method == 'POST':
         fulfiller = get_object_or_404(Fulfiller, id=fulfiller_id)
+        application = fulfiller.application
+        requester = application.user
         message_text = request.POST.get('message')
 
         if message_text:
+            # Create a new note for the requester
             Note.objects.create(
-                application=fulfiller.application,
+                application=application,
                 user=request.user,
                 message=message_text
             )
-            messages.success(request, 'Message sent successfully to the requester.')
+
+            # Send email notification to the requester
+            subject = 'You Have Received a New Message Regarding Your Application'
+            email_message = f"""
+            Dear {requester.get_full_name()},
+
+            You have received a new message regarding your application (ID: {application.id}):
+
+            "{message_text}"
+
+            Please log in to your portal to view more details.
+
+            Best regards,  
+            The Gambia Immigration Office
+            """
+
+            send_email_in_thread(subject, email_message, requester.email)
+
+            messages.success(request, 'Message sent successfully to the requester and email notification sent.')
         else:
             messages.warning(request, 'Please enter a message before sending.')
 
@@ -822,12 +861,11 @@ def approve_todo(request, todo_id):
     application = todo.application
     interview = todo.interview
 
-    # Update application and interview status to 'completed'
     application.status = 'completed'
     interview.status = 'completed'
 
     # Set the fulfiller status to 'closed' and progress to 100
-    fulfiller = application.fulfiller  # Accessing the related fulfiller
+    fulfiller = application.fulfiller
     if fulfiller:
         fulfiller.status = 'closed'
         fulfiller.progress = 100
@@ -835,8 +873,25 @@ def approve_todo(request, todo_id):
 
     application.save()
     interview.save()
-    user = request.user  # Assuming the current user is the one to notify
-    send_notification(user, f"Interview for {application.user.get_full_name} is approved ")
+
+    # Notify the requester via in-app notification
+    requester = application.user
+    send_notification(requester, f"Your interview for application ID {application.id} has been approved.")
+
+    # Send email notification to the requester
+    subject = 'Your Application For National Document Has Been Approved'
+    email_message = f"""
+    Dear {requester.get_full_name()},
+
+    Your interview for application ID {application.id} has been approved and marked as completed.
+
+    Please log in to your portal to view more details.
+
+    Best regards,  
+    The Gambia Immigration Office
+    """
+
+    send_email_in_thread(subject, email_message, requester.email)
 
     messages.success(request, "ToDo item has been approved successfully. Application and Interview are marked as completed.")
     return redirect('todo_list')
@@ -870,11 +925,10 @@ def reject_todo(request, todo_id):
         application = todo.application
         interview = todo.interview
 
-        # Update application and interview status to 'canceled'
         application.status = 'canceled'
         interview.status = 'canceled'
 
-        fulfiller = application.fulfiller  # Accessing the related fulfiller
+        fulfiller = application.fulfiller
         if fulfiller:
             fulfiller.status = 'closed'
             fulfiller.progress = 100
@@ -883,9 +937,28 @@ def reject_todo(request, todo_id):
         application.save()
         interview.save()
 
-        user = request.user  # Assuming the current user is the one to notify
-        send_notification(user, f"Interview for {application.user.get_full_name} is rejected ")
-        messages.success(request, "ToDo item has been rejected successfully.")
+        # Notify the requester via in-app notification
+        requester = application.user
+        send_notification(requester, f"Your ToDo item for application ID {application.id} has been rejected.")
+
+        # Send email notification to the requester
+        subject = 'Your Application For National Document Has Been Rejected'
+        email_message = f"""
+        Dear {requester.get_full_name()},
+
+        Your application item for application ID {application.id} has been rejected.
+
+        Rejection Reason: {rejection_reason}
+
+        Please log in to your portal to view more details.
+
+        Best regards,  
+        The Gambia Immigration Office
+        """
+
+        send_email_in_thread(subject, email_message, requester.email)
+
+        messages.success(request, "ToDo item has been rejected successfully and the requester has been notified.")
         return redirect('todo_list')
 
     return render(request, 'immigration/reject_todo.html', {
@@ -1200,7 +1273,6 @@ def add_call_note(request):
 
     return redirect('support_desk')
 
-
 @login_required
 def respond_chat(request):
     if request.method == 'POST':
@@ -1216,8 +1288,17 @@ def respond_chat(request):
             parent=original_chat
         )
 
+        # Send email notification in a thread
+        subject = 'New Response to Your Support Request'
+        message = f'Hello {original_chat.sender.get_full_name()},\n\nYou have received a new response to your support request:\n\n"{response_text}"\n\nPlease check your support chat for more details.'
+        recipient_email = original_chat.sender.email
+
+        send_email_in_thread(subject, message, recipient_email)
+
         messages.success(request, 'Response sent successfully.')
         return redirect('support_desk')
+
+
 
 @login_required
 @csrf_exempt
@@ -1232,6 +1313,19 @@ def close_chat(request):
 
             # Mark all replies to this chat as read
             ChatMessage.objects.filter(parent=chat).update(is_read=True)
+
+            # Send email notification to the requester
+            subject = 'Your Support Request Has Been Closed'
+            message = f'Hello {chat.sender.get_full_name()},\n\nYour support request has been closed. If you need further assistance, please contact us again.\n\nThank you!'
+            recipient_email = chat.sender.email
+
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                [recipient_email],
+                fail_silently=False,
+            )
 
             return JsonResponse({'success': True})
         except ChatMessage.DoesNotExist:

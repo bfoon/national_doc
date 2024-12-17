@@ -603,3 +603,7 @@ def faq_list(request):
         'query': query,
     }
     return render(request, 'docs/faq_list.html', context)
+
+@login_required
+def manage_appointments(request):
+    return render(request, 'docs/manage_appointments.html')

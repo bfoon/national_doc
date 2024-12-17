@@ -1,0 +1,279 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+
+<style>
+/* General Page Styles */
+.container {
+    margin-top: 50px;
+    margin-bottom: 50px;
+    max-width: 900px;
+}
+
+/* Breadcrumb Styles */
+.breadcrumb {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+/* Appointment List Styles */
+.appointment-list {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.appointment-item {
+    border-bottom: 1px solid #ecf0f1;
+    padding: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.appointment-item:last-child {
+    border-bottom: none;
+}
+
+.appointment-item:hover {
+    background-color: #f9f9f9;
+}
+
+.appointment-details {
+    flex-grow: 1;
+}
+
+.appointment-type {
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.appointment-date,
+.appointment-time,
+.appointment-queue {
+    color: #7f8c8d;
+    margin-right: 10px;
+    font-size: 0.9rem;
+}
+
+/* Appointment Actions Buttons */
+.appointment-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    font-weight: 500;
+}
+
+.btn-reschedule {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.btn-reschedule:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+.btn-cancel {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.btn-cancel:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+}
+
+.btn-print {
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+.btn-print:hover {
+    background-color: #27ae60;
+    transform: translateY(-2px);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1050;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding-top: 50px;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+/* Header Styles */
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #34495e;
+    margin-bottom: 20px;
+    text-align: center;
+}
+</style>
+
+<div class="container">
+
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb p-2">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Manage Appointments</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4">Manage Appointments</h1>
+
+    <!-- Appointment List Section -->
+    <div class="appointment-list">
+        <h2>Your Appointments</h2>
+        <div id="appointments-container">
+            <!-- Appointments will be dynamically inserted here -->
+        </div>
+    </div>
+
+</div>
+
+<!-- Reschedule Modal -->
+<div id="rescheduleModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Reschedule Appointment</h2>
+        <p>Select a new date and time for your appointment:</p>
+        <input type="date" id="newDate" class="form-control mb-2">
+        <input type="time" id="newTime" class="form-control mb-3">
+        <button id="confirmReschedule" class="btn btn-reschedule">Confirm</button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Sample appointment data
+    const appointments = [
+        { id: 1, type: 'National ID Card Interview', date: '2024-06-15', time: '10:00', queue: 'A123' },
+        { id: 2, type: 'Resident Permit Interview', date: '2024-07-02', time: '14:30', queue: 'B45' },
+        { id: 3, type: 'Work Permit Document Submission', date: '2024-07-10', time: '09:15', queue: 'C78' }
+    ];
+
+    // DOM Elements
+    const appointmentsContainer = document.getElementById('appointments-container');
+    const rescheduleModal = document.getElementById('rescheduleModal');
+    const closeModalBtn = document.querySelector('.close');
+    const confirmRescheduleBtn = document.getElementById('confirmReschedule');
+    let selectedAppointmentId = null;
+
+    // Function to render appointments
+    function renderAppointments() {
+        appointmentsContainer.innerHTML = '';
+        appointments.forEach(app => {
+            const div = document.createElement('div');
+            div.className = 'appointment-item';
+            div.innerHTML = `
+                <div class="appointment-details">
+                    <span class="appointment-type">${app.type}</span><br>
+                    <span class="appointment-date">${app.date}</span> |
+                    <span class="appointment-time">${app.time}</span> |
+                    <span class="appointment-queue">Queue: ${app.queue}</span>
+                </div>
+                <div class="appointment-actions">
+                    <button class="btn btn-reschedule" onclick="openRescheduleModal(${app.id})">Reschedule</button>
+                    <button class="btn btn-cancel" onclick="cancelAppointment(${app.id})">Cancel</button>
+                    <button class="btn btn-print" onclick="printAppointment(${app.id})">Print</button>
+                </div>
+            `;
+            appointmentsContainer.appendChild(div);
+        });
+    }
+
+    // Open reschedule modal
+    window.openRescheduleModal = function (id) {
+        selectedAppointmentId = id;
+        rescheduleModal.style.display = 'block';
+    };
+
+    // Close reschedule modal
+    closeModalBtn.addEventListener('click', () => rescheduleModal.style.display = 'none');
+
+    // Confirm reschedule
+    confirmRescheduleBtn.addEventListener('click', () => {
+        const newDate = document.getElementById('newDate').value;
+        const newTime = document.getElementById('newTime').value;
+        const appointment = appointments.find(app => app.id === selectedAppointmentId);
+        if (appointment) {
+            appointment.date = newDate;
+            appointment.time = newTime;
+            renderAppointments();
+            rescheduleModal.style.display = 'none';
+        }
+    });
+
+    // Cancel appointment
+    window.cancelAppointment = function (id) {
+        if (confirm('Are you sure you want to cancel this appointment?')) {
+            const index = appointments.findIndex(app => app.id === id);
+            if (index > -1) {
+                appointments.splice(index, 1);
+                renderAppointments();
+            }
+        }
+    };
+
+    // Print appointment
+    window.printAppointment = function (id) {
+        const appointment = appointments.find(app => app.id === id);
+        if (appointment) {
+            window.open(`data:text/html,<h1>${appointment.type}</h1><p>Date: ${appointment.date}</p><p>Time: ${appointment.time}</p>`);
+        }
+    };
+
+    // Initial render
+    renderAppointments();
+});
+</script>
+
+{% endblock %}
