@@ -67,24 +67,22 @@
     <div class="container">
         <!-- Gambia Government Logo -->
         <a href="{% url 'landing_page' %}">
-        <img src="/media/Coat_of_arms_of_The_Gambia.svg"
-         alt="Gambia Government Logo" class="logo">
+            <img src="/media/Coat_of_arms_of_The_Gambia.svg" alt="Gambia Government Logo" class="logo">
         </a>
-
 
         <h1>National Document Portal</h1>
 
-         {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
 
-        <form method="post" action="{% url 'login' %}">
+        <form method="post" id="loginForm" action="{% url 'login' %}">
             {% csrf_token %}
 
             <div class="form-group">
@@ -97,7 +95,7 @@
                 <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            <button type="button" class="btn btn-primary btn-block" id="showDisclaimerModal">Login</button>
         </form>
 
         <div class="links d-flex justify-content-between mt-3">
@@ -106,10 +104,58 @@
         </div>
     </div>
 
+    <!-- Disclaimer Modal -->
+    <div class="modal fade" id="disclaimerModal" tabindex="-1" role="dialog" aria-labelledby="disclaimerModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title" id="disclaimerModalLabel">Disclaimer</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <strong>Warning:</strong> Any illegal activity conducted on this system is punishable by the court of law.
+                    </p>
+                    <p>
+                        According to the Constitution of The Gambia, engaging in the creation of fake national documents or digital fraud is a serious offense.
+                    </p>
+                    <p>
+                        By clicking "Accept", you agree to comply with these laws and understand the consequences of any fraudulent activities.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Decline</button>
+                    <button type="button" class="btn btn-success" id="acceptDisclaimer">Accept</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const showDisclaimerModalBtn = document.getElementById('showDisclaimerModal');
+            const acceptDisclaimerBtn = document.getElementById('acceptDisclaimer');
+            const loginForm = document.getElementById('loginForm');
+
+            // Show the disclaimer modal when the login button is clicked
+            showDisclaimerModalBtn.addEventListener('click', function () {
+                $('#disclaimerModal').modal('show');
+            });
+
+            // Submit the login form when the disclaimer is accepted
+            acceptDisclaimerBtn.addEventListener('click', function () {
+                $('#disclaimerModal').modal('hide');
+                loginForm.submit();
+            });
+        });
+    </script>
 
 </body>
 </html>

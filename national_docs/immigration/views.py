@@ -814,7 +814,6 @@ def todo_list(request):
         'todos': todos,
     })
 
-
 @login_required
 def todo_detail(request, todo_id):
     todo = get_object_or_404(ToDo, id=todo_id)
