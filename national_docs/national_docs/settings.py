@@ -62,7 +62,7 @@ ROOT_URLCONF = 'national_docs.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -101,6 +101,11 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')  # Your Gmail address from .env
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')  # Your Gmail app password from .env
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+TWILIO_ACCOUNT_SID = 'ACa0ca58dacb6f9255c9efb3eeaa17026c'
+TWILIO_AUTH_TOKEN = '5106264d473ae30e893d039250be41e3'
+TWILIO_PHONE_NUMBER = '+2203930160'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

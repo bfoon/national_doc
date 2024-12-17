@@ -8,6 +8,8 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),  # Add this line
     path('profile/', views.profile_view, name='profile_view'),
 
+    path('send-edit-profile-otp/', views.send_edit_profile_otp, name='send_edit_profile_otp'),
+    path('verify-edit-profile-otp/', views.verify_edit_profile_otp, name='verify_edit_profile_otp'),
     path('edit-profile/', views.edit_profile, name='edit_profile'),
 
     path('dashboard/', views.dashboard, name='dashboard'),

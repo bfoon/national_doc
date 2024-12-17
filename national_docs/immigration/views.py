@@ -5,7 +5,7 @@ from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile, Notification,
                      FAQ, CallNote)
 from django.contrib.auth.models import User, Group
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.dateparse import parse_date
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib import messages
@@ -1229,6 +1229,11 @@ def export_webpage(request):
         fulfillers = Fulfiller.objects.filter(action=request.user)
     return render(request, 'immigration/export_webpage.html', {'fulfillers': fulfillers})
 
+def is_staff_or_superuser(user):
+    return user.is_staff or user.is_superuser
+
+
+@login_required
 def support_desk(request):
     faqs = FAQ.objects.all()
 
@@ -1245,7 +1250,9 @@ def support_desk(request):
     }
     return render(request, 'immigration/support_desk.html', context)
 
+
 @login_required
+@user_passes_test(is_staff_or_superuser)
 def add_faq(request):
     if request.method == 'POST':
         question = request.POST.get('question')
@@ -1259,7 +1266,9 @@ def add_faq(request):
 
     return redirect('support_desk')
 
+
 @login_required
+@user_passes_test(is_staff_or_superuser)
 def add_call_note(request):
     if request.method == 'POST':
         note = request.POST.get('note')
@@ -1272,7 +1281,9 @@ def add_call_note(request):
 
     return redirect('support_desk')
 
+
 @login_required
+@user_passes_test(is_staff_or_superuser)
 def respond_chat(request):
     if request.method == 'POST':
         chat_id = request.POST.get('chat_id')
@@ -1298,8 +1309,8 @@ def respond_chat(request):
         return redirect('support_desk')
 
 
-
 @login_required
+@user_passes_test(is_staff_or_superuser)
 @csrf_exempt
 def close_chat(request):
     if request.method == 'POST':

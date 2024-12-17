@@ -1,4 +1,6 @@
 {% extends 'docs/header.html' %}
+{% load custom_filters %}
+
 {% block content %}
 
 <style>
@@ -74,8 +76,8 @@
 
         <div class="card-body">
             <p><strong>Username:</strong> {{ request.user.username }}</p>
-            <p><strong>Email:</strong> {{ request.user.email }}</p>
-            <p><strong>Phone Number:</strong> {{ profile.phone }}</p>
+            <p><strong>Email:</strong> {{ request.user.email|masked_email }}</p>
+            <p><strong>Phone Number:</strong> {{ profile.phone|masked_phone }}</p>
             <p><strong>Date of Birth:</strong> {{ profile.date_of_birth|date:"F d, Y" }}</p>
             <p><strong>Nationality:</strong> {{ profile.nationality|capfirst }}</p>
         </div>
@@ -83,9 +85,10 @@
 
     <!-- Action buttons -->
     <div class="text-center action-buttons">
-        <a href="{% url 'edit_profile' %}" class="btn btn-primary">
+        <a href="{% url 'send_edit_profile_otp' %}" class="btn btn-primary">
             <i class="fas fa-edit"></i> Edit Profile
         </a>
+
         {% if request.user.is_superuser %}
             <a href="{% url 'dashboard' %}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Back to Dashboard

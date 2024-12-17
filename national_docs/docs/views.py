@@ -19,7 +19,12 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.db.models import Q
 from django.core.paginator import Paginator
-
+import random
+from twilio.rest import Client
+from django.conf import settings
+from django.core.mail import send_mail
+from datetime import timedelta
+import datetime
 
 
 def landing_page(request):
@@ -238,6 +243,138 @@ def edit_profile(request):
             'user': request.user,
             'profile': profile,
         })
+
+
+@login_required
+def send_edit_profile_otp(request):
+    """Generates and sends an OTP via SMS or falls back to email if SMS fails."""
+    user = request.user
+
+    # Phone number and email setup
+    phone_number = f"+220{user.profile.phone}" if user.profile.phone else None
+    email = user.email
+
+    if not phone_number and not email:
+        messages.error(request, "No phone number or email associated with your profile.")
+        return redirect('profile')
+
+    # Generate a random 6-digit OTP
+    otp = str(random.randint(100000, 999999))
+
+    # Save OTP in session for verification
+    request.session['otp'] = otp
+    request.session['otp_phone_number'] = phone_number
+    request.session['otp_email'] = email
+    request.session['otp_attempts'] = 0
+    request.session['otp_timestamp'] = timezone.now().strftime("%Y-%m-%d %H:%M:%S.%f%z")
+
+    # Twilio credentials
+    account_sid = settings.TWILIO_ACCOUNT_SID
+    auth_token = settings.TWILIO_AUTH_TOKEN
+    twilio_number = settings.TWILIO_PHONE_NUMBER  # Normal SMS number, not WhatsApp
+
+    client = Client(account_sid, auth_token)
+
+    # Try sending OTP via SMS
+    try:
+        if phone_number:
+            client.messages.create(
+                from_=twilio_number,
+                to=phone_number,
+                body=f'Your OTP code to edit your profile is: {otp}. This code will expire in 5 minutes.'
+            )
+            messages.success(request, 'OTP sent successfully via SMS.')
+            return redirect('verify_edit_profile_otp')
+    except Exception as sms_error:
+        # Fallback to email if SMS fails
+        if email:
+            try:
+                subject = "Your OTP for Profile Edit"
+                message = f"Your OTP code to edit your profile is: {otp}. This code will expire in 5 minutes."
+                send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email])
+                messages.warning(request, 'SMS failed. OTP sent via email.')
+                return redirect('verify_edit_profile_otp')
+            except Exception as email_error:
+                messages.warning(request, f"Failed to send OTP via email: {email_error}")
+                return redirect('profile')
+
+        # If both SMS and email fail
+        messages.error(request, f"Failed to send OTP via SMS: {sms_error}")
+        return redirect('/profile')
+
+@login_required
+def verify_edit_profile_otp(request):
+    """Verifies the OTP before allowing profile editing with a 3-attempt limit and 3-minute expiry."""
+    max_attempts = 3  # Maximum number of attempts allowed
+    otp_expiry_time = 3  # OTP expiry time in minutes
+
+    # Initialize or fetch the attempt count and timestamp from session
+    if 'otp_attempts' not in request.session:
+        request.session['otp_attempts'] = 0
+
+    if request.method == 'POST':
+        entered_otp = request.POST.get('otp')
+        saved_otp = request.session.get('otp')
+        otp_timestamp_str = request.session.get('otp_timestamp')  # OTP generation time as string
+
+        # Check if OTP or timestamp is missing
+        if not saved_otp or not otp_timestamp_str:
+            messages.warning(request, "OTP has expired. Please request a new one.")
+            return redirect('/profile')
+
+        # Convert the stored timestamp string back to a timezone-aware datetime object
+        otp_timestamp = datetime.datetime.strptime(otp_timestamp_str, "%Y-%m-%d %H:%M:%S.%f%z")
+
+        # Check if the OTP has expired
+        if timezone.now() > otp_timestamp + timedelta(minutes=otp_expiry_time):
+            messages.warning(request, "OTP has expired. Please request a new one.")
+            # Clear expired OTP and session attempts
+            request.session.pop('otp', None)
+            request.session.pop('otp_attempts', None)
+            request.session.pop('otp_timestamp', None)
+            return redirect('/profile')
+
+        # Check if the user has exceeded the maximum attempts
+        if request.session['otp_attempts'] >= max_attempts:
+            messages.warning(request, "You've exceeded the maximum number of OTP attempts.")
+
+            # Send security email to user
+            subject = "Suspicious Activity on Your Profile"
+            message = f"""
+            Dear {request.user.get_full_name()},
+
+            We noticed multiple failed attempts to edit your profile information. If this was not you, 
+            please take immediate action to secure your account.
+
+            Contact our support team if you suspect any unauthorized activity.
+
+            Regards,  
+            The Gambia Immigration Office  
+            """
+            recipient_email = request.user.email
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient_email])
+
+            # Clear OTP and attempt count from session
+            request.session.pop('otp', None)
+            request.session.pop('otp_attempts', None)
+            request.session.pop('otp_timestamp', None)
+            return redirect('/profile')
+
+        # Verify the entered OTP
+        if entered_otp == saved_otp:
+            # OTP verified successfully
+            request.session.pop('otp', None)
+            request.session.pop('otp_attempts', None)
+            request.session.pop('otp_timestamp', None)
+            messages.success(request, "OTP verified successfully.")
+            return redirect('edit_profile')
+        else:
+            # Increment attempt count and display error
+            request.session['otp_attempts'] += 1
+            remaining_attempts = max_attempts - request.session['otp_attempts']
+            messages.warning(request, f"Invalid OTP. {remaining_attempts} attempt(s) remaining.")
+
+    return render(request, 'docs/verify_edit_profile_otp.html')
 
 @login_required
 @transaction.atomic
