@@ -201,7 +201,7 @@
             </a>
         </div>
 
-           <!-- Birth Certificate Request -->
+        <!-- Birth Certificate Request -->
         <div class="col-md-3 mt-3">
             <a href="{% url 'birth_certificate_request' %}" class="text-decoration-none">
                 <div class="card shadow">
@@ -214,7 +214,7 @@
             </a>
         </div>
 
-    <!-- Support Desk (Restricted to Superuser or Staff) -->
+        <!-- Support Desk (Restricted to Superuser or Staff) -->
         {% if request.user.is_staff or request.user.is_superuser %}
             <div class="col-md-3 mt-3">
                 <a href="{% url 'support_desk' %}" class="text-decoration-none">
