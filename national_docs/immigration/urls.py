@@ -61,10 +61,17 @@ urlpatterns = [
 
     path('support_desk/', views.support_desk, name='support_desk'),
     path('add_faq/', views.add_faq, name='add_faq'),
+    path('update_faq/<int:faq_id>/', views.update_faq, name='update_faq'),
+    path('delete_faq/<int:faq_id>/', views.delete_faq, name='delete_faq'),
     path('add_call_note/', views.add_call_note, name='add_call_note'),
     path('respond_chat/', views.respond_chat, name='respond_chat'),
     path('close_chat/', views.close_chat, name='close_chat'),
 
     path('birth_certificate_request/', views.birth_certificate_request, name='birth_certificate_request'),
+    path('get_user_application/<int:user_id>/', views.get_user_application, name='get_user_application'),
+    path('save_note/', views.save_note, name='save_note'),
+    path('get_user_notes/<int:user_id>/', views.get_user_notes, name='get_user_notes'),
+    path('close_call_note/<int:note_id>/', views.close_call_note, name='close_call_note'),
+    path('search_call_notes/', views.search_call_notes, name='search_call_notes'),
 
 ]

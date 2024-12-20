@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from docs.models import Application, UploadedDocument, ChatMessage
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile, Notification,
-                     FAQ, CallNote)
+                     FAQ, CallNote, MessageNote)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.dateparse import parse_date
@@ -1266,6 +1266,31 @@ def add_faq(request):
 
     return redirect('support_desk')
 
+@login_required
+def update_faq(request, faq_id):
+    faq = get_object_or_404(FAQ, id=faq_id)
+
+    if request.method == 'POST':
+        question = request.POST.get('question')
+        answer = request.POST.get('answer')
+
+        if question and answer:
+            faq.question = question
+            faq.answer = answer
+            faq.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'success': False, 'error': 'Please fill in all fields.'})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+
+@login_required
+def delete_faq(request, faq_id):
+    faq = get_object_or_404(FAQ, id=faq_id)
+    faq.delete()
+    messages.success(request, 'FAQ deleted successfully!')
+    return redirect('support_desk')
+
 
 @login_required
 @user_passes_test(is_staff_or_superuser)
@@ -1308,7 +1333,6 @@ def respond_chat(request):
         messages.success(request, 'Response sent successfully.')
         return redirect('support_desk')
 
-
 @login_required
 @user_passes_test(is_staff_or_superuser)
 @csrf_exempt
@@ -1345,3 +1369,93 @@ def close_chat(request):
 @login_required
 def birth_certificate_request(request):
     return render(request, 'immigration/birth_certificate_request.html')
+
+@login_required
+def get_user_application(request, user_id):
+    try:
+        application = Application.objects.filter(user_id=user_id).latest('application_date')
+        return JsonResponse({
+            'success': True,
+            'application_id': application.get_service_type(),
+            'application_date': application.application_date.strftime('%Y-%m-%d'),
+            'application_location': application.post_location.name if application.post_location else 'N/A',
+        })
+    except Application.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'No application found for this user'})
+
+# Take not for chat
+@login_required
+def save_note(request):
+    if request.method == 'POST':
+        sender_id = request.POST.get('sender_id')
+        chat_id = request.POST.get('chat_id')
+        note_text = request.POST.get('note')
+
+        try:
+            sender = User.objects.get(id=sender_id)
+            chat = ChatMessage.objects.get(id=chat_id)
+
+            MessageNote.objects.create(
+                user=sender,
+                chat=chat,  # Ensure the note is tied to the chat
+                note=note_text,
+                created_by=request.user
+            )
+
+            return JsonResponse({
+                'success': True,
+                'created_by': request.user.get_full_name(),
+                'note': note_text,
+                'created_at': timezone.now().strftime('%Y-%m-%d %H:%M')
+            })
+        except User.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'User not found'})
+        except ChatMessage.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Chat not found'})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+def get_user_notes(request, user_id):
+    """Fetches notes for a specific user where the chat is not closed."""
+    notes = MessageNote.objects.filter(user_id=user_id, chat__is_read=False).order_by('-created_at')
+    notes_data = [
+        {
+            'created_by': note.created_by.get_full_name(),
+            'note': note.note,
+            'created_at': note.created_at.strftime('%Y-%m-%d %H:%M')
+        } for note in notes
+    ]
+    return JsonResponse({'notes': notes_data})
+
+@login_required
+@csrf_exempt
+def close_call_note(request, note_id):
+    """Marks a call note as completed."""
+    if request.method == 'POST':
+        try:
+            note = CallNote.objects.get(id=note_id)
+            note.completed = True
+            note.save()
+            return JsonResponse({'success': True})
+        except CallNote.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Note not found'})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+def search_call_notes(request):
+    query = request.GET.get('q', '')
+    notes = CallNote.objects.filter(
+        Q(note__icontains=query) | Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query)
+    ).order_by('-created_at')
+
+    notes_data = [
+        {
+            'user': note.user.get_full_name(),
+            'note': note.note,
+            'created_at': note.created_at.strftime('%Y-%m-%d %H:%M'),
+            'completed': note.completed
+        } for note in notes
+    ]
+
+    return JsonResponse({'notes': notes_data})

@@ -1,6 +1,37 @@
 <!-- templates/immigration/support_desk.html -->
 {% extends 'docs/header.html' %}
 {% block content %}
+<style>
+    /* Scrollable Notes Container */
+    .notes-container {
+        max-height: 150px; /* Adjust based on your desired height (about two notes) */
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    /* Individual Note Styling */
+    .notes-container .note {
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 5px;
+        padding: 8px;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+    }
+
+    /* Save Button Styling */
+    #saveNoteBtn {
+        padding: 8px 20px;
+        font-size: 1rem;
+    }
+    .completed {
+        text-decoration: line-through;
+        color: #6c757d;
+    }
+</style>
 
 <div class="container my-5">
     <!-- Display Messages -->
@@ -27,26 +58,41 @@
     <h2 class="mb-4 text-center">Support Desk</h2>
 
     <!-- FAQ Section -->
-    <div class="card mb-5 shadow">
-        <div class="card-header d-flex justify-content-between align-items-center bg-info text-white">
+    <div class="card mb-4 shadow">
+         <div class="card-header d-flex justify-content-between align-items-center bg-info text-white">
             <h5 class="mb-0">Frequently Asked Questions</h5>
-            <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#addFaqModal">
-                <i class="fas fa-plus-circle"></i> Add FAQ
-            </button>
+                <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#addFAQModal">
+                    <i class="fas fa-plus-circle"></i> Add FAQ
+                </button>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for faq in faqs %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ faq.question }}</strong><br>
+                                <p class="mb-0">{{ faq.answer }}</p>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-warning btn-sm edit-faq-btn"
+                                        data-toggle="modal"
+                                        data-target="#updateFAQModal"
+                                        data-faq-id="{{ faq.id }}"
+                                        data-question="{{ faq.question }}"
+                                        data-answer="{{ faq.answer }}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <a href="{% url 'delete_faq' faq.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this FAQ?');">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </a>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted text-center">No FAQs available.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-            <ul class="list-group">
-                {% for faq in faqs|dictsortreversed:"id" %}
-                    <li class="list-group-item">
-                        <strong>{{ faq.question }}</strong><br>
-                        {{ faq.answer }}
-                    </li>
-                {% empty %}
-                    <li class="list-group-item text-muted">No FAQs available.</li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
 
     <!-- Chat Messages Section -->
     <div class="card mb-5 shadow">
@@ -58,16 +104,34 @@
                 {% for chat in chats %}
                     {% if not chat.parent %}
                         <li class="list-group-item chat-item" id="chat-{{ chat.id }}">
-                            <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex justify-content-between align-items-start">
                                 <div>
-                                    <strong>{{ chat.sender.get_full_name }}</strong>: {{ chat.message }}<br>
+                                    <strong>
+                                        <a href="#" class="text-primary sender-details-link"
+                                           data-toggle="modal"
+                                           data-target="#senderDetailsModal"
+                                           data-sender-id="{{ chat.sender.id }}"
+                                           data-chat-id="{{ chat.id }}"
+                                           data-sender-name="{{ chat.sender.get_full_name }}"
+                                           aria-label="View details for {{ chat.sender.get_full_name }}">
+                                            {{ chat.sender.get_full_name }}
+                                        </a>
+                                    </strong>: {{ chat.message }}<br>
                                     <small class="text-muted">{{ chat.timestamp|date:"Y-m-d H:i" }}</small>
                                 </div>
-                                <div>
-                                    <button class="btn btn-primary btn-sm respond-btn" data-toggle="modal" data-target="#respondChatModal" data-chat-id="{{ chat.id }}" data-sender-name="{{ chat.sender.get_full_name }}">
+                                <div class="btn-group">
+                                    <button class="btn btn-primary btn-sm respond-btn"
+                                            data-toggle="modal"
+                                            data-target="#respondChatModal"
+                                            data-chat-id="{{ chat.id }}"
+                                            data-sender-name="{{ chat.sender.get_full_name }}"
+                                            aria-label="Respond to {{ chat.sender.get_full_name }}">
                                         <i class="fas fa-reply"></i> Respond
                                     </button>
-                                    <button class="btn btn-danger btn-sm close-btn" data-chat-id="{{ chat.id }}">
+                                    <button class="btn btn-danger btn-sm close-btn"
+                                            onclick="if (confirm('Are you sure you want to close this chat? This action cannot be undone.')) closeChat(this.dataset.chatId)"
+                                            data-chat-id="{{ chat.id }}"
+                                            aria-label="Close chat with {{ chat.sender.get_full_name }}">
                                         <i class="fas fa-times"></i> Close
                                     </button>
                                 </div>
@@ -83,7 +147,7 @@
                         </li>
                     {% endif %}
                 {% empty %}
-                    <li class="list-group-item text-muted">No chat messages available.</li>
+                    <li class="list-group-item text-muted text-center">No chat messages available.</li>
                 {% endfor %}
             </ul>
         </div>
@@ -97,49 +161,67 @@
                 <i class="fas fa-plus-circle"></i> Add Call Note
             </button>
         </div>
-        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
-            <ul class="list-group">
-                {% for note in call_notes|dictsortreversed:"id" %}
-                    <li class="list-group-item">
-                        <strong>{{ note.user.get_full_name }}</strong> ({{ note.created_at|date:"Y-m-d H:i" }}):<br>
-                        {{ note.note }}
-                    </li>
-                {% empty %}
-                    <li class="list-group-item text-muted">No call notes available.</li>
-                {% endfor %}
-            </ul>
+        <div class="card-body">
+            <!-- Search Bar -->
+            <div class="form-group mb-3">
+                <input type="text" id="searchCallNotes" class="form-control" placeholder="Search call notes...">
+            </div>
+
+            <!-- Call Notes List -->
+            <div id="callNotesContainer" style="max-height: 300px; overflow-y: auto;">
+                <ul class="list-group" id="callNotesList">
+                    {% for note in call_notes %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div class="note-content">
+                                <strong>{{ note.user.get_full_name }}</strong>
+                                <small class="text-muted">({{ note.created_at|date:"Y-m-d H:i" }})</small>:<br>
+                                <p class="mb-0 note-text {% if note.completed %}completed{% endif %}">{{ note.note }}</p>
+                            </div>
+                            <button class="btn btn-sm {% if note.completed %}btn-success disabled{% else %}btn-danger{% endif %} close-note-btn" data-note-id="{{ note.id }}">
+                                <i class="fas {% if note.completed %}fa-check-circle{% else %}fa-times-circle{% endif %}"></i>
+                            </button>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-muted text-center">No call notes available.</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Modals for Adding FAQ and Call Notes -->
-<div class="modal fade" id="addFaqModal" tabindex="-1" role="dialog" aria-labelledby="addFaqModalLabel" aria-hidden="true">
+<!-- Add FAQ Modal -->
+<div class="modal fade" id="addFAQModal" tabindex="-1" role="dialog" aria-labelledby="addFAQModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="addFaqModalLabel">Add New FAQ</h5>
+                <h5 class="modal-title" id="addFAQModalLabel">Add New FAQ</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body">
-                <form method="POST" action="{% url 'add_faq' %}">
-                    {% csrf_token %}
+            <form id="addFAQForm" method="post" action="{% url 'add_faq' %}">
+                {% csrf_token %}
+                <div class="modal-body">
                     <div class="form-group">
-                        <label for="faq-question">Question</label>
-                        <input type="text" class="form-control" id="faq-question" name="question" required>
+                        <label for="newQuestion">Question</label>
+                        <input type="text" class="form-control" id="newQuestion" name="question" required>
                     </div>
                     <div class="form-group">
-                        <label for="faq-answer">Answer</label>
-                        <textarea class="form-control" id="faq-answer" name="answer" rows="3" required></textarea>
+                        <label for="newAnswer">Answer</label>
+                        <textarea class="form-control" id="newAnswer" name="answer" rows="4" required></textarea>
                     </div>
-                    <button type="submit" class="btn btn-info">Add FAQ</button>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Add FAQ</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
+
+<!-- Take note Modal -->
 <div class="modal fade" id="addCallNoteModal" tabindex="-1" role="dialog" aria-labelledby="addCallNoteModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -185,6 +267,75 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Send Response</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Sender Details Modal -->
+<div class="modal fade" id="senderDetailsModal" tabindex="-1" role="dialog" aria-labelledby="senderDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="senderDetailsModalLabel">Sender Details</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Name:</strong> <span id="modalSenderName"></span></p>
+                <p><strong>Application ID:</strong> <span id="modalApplicationID"></span></p>
+                <p><strong>Date of Application:</strong> <span id="modalApplicationDate"></span></p>
+                <p><strong>Location of Application:</strong> <span id="modalApplicationLocation"></span></p>
+
+                <!-- Notes Section -->
+                <h5 class="mt-4">Notes</h5>
+                <div id="notesContainer" class="mt-2 notes-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                    <p class="text-muted">No notes available.</p>
+                </div>
+
+                <!-- Note-taking Form -->
+                <div class="form-group mt-4">
+                    <label for="noteText">Add Note</label>
+                    <textarea id="noteText" class="form-control" rows="3" placeholder="Enter your note here..."></textarea>
+                </div>
+                <div class="text-right">
+                    <button id="saveNoteBtn" class="btn btn-success">
+                        <i class="fas fa-save"></i> Save Note
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update FAQ Modal -->
+<div class="modal fade" id="updateFAQModal" tabindex="-1" role="dialog" aria-labelledby="updateFAQModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="updateFAQModalLabel">Edit FAQ</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="updateFAQForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="editQuestion">Question</label>
+                        <input type="text" class="form-control" id="editQuestion" name="question" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editAnswer">Answer</label>
+                        <textarea class="form-control" id="editAnswer" name="answer" rows="4" required></textarea>
+                    </div>
+                    <input type="hidden" id="faqId" name="faq_id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Update FAQ</button>
                 </div>
             </form>
         </div>
@@ -242,5 +393,302 @@
         });
     });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let senderId = null;
+    let chatId = null;
+
+    $('.sender-details-link').on('click', function () {
+        senderId = $(this).data('sender-id');
+        chatId = $(this).data('chat-id');
+        const senderName = $(this).data('sender-name');
+
+        // Set sender name in the modal
+        $('#modalSenderName').text(senderName);
+
+        // Clear previous data
+        $('#modalApplicationID').text('Loading...');
+        $('#modalApplicationDate').text('Loading...');
+        $('#modalApplicationLocation').text('Loading...');
+        $('#noteText').val('');
+        $('#notesContainer').html('<p class="text-muted">Loading notes...</p>');
+
+        // Fetch application details via AJAX
+        $.ajax({
+            url: `/immigration/get_user_application/${senderId}/`,
+            method: 'GET',
+            success: function (data) {
+                if (data.success) {
+                    $('#modalApplicationID').text(data.application_id);
+                    $('#modalApplicationDate').text(data.application_date);
+                    $('#modalApplicationLocation').text(data.application_location);
+                } else {
+                    $('#modalApplicationID').text('No application found');
+                    $('#modalApplicationDate').text('-');
+                    $('#modalApplicationLocation').text('-');
+                }
+            },
+            error: function () {
+                $('#modalApplicationID').text('Error fetching data');
+                $('#modalApplicationDate').text('-');
+                $('#modalApplicationLocation').text('-');
+            }
+        });
+
+        // Fetch user notes via AJAX
+        $.ajax({
+            url: `/immigration/get_user_notes/${senderId}/`,
+            method: 'GET',
+            success: function (data) {
+                if (data.notes.length > 0) {
+                    let notesHtml = '';
+                    data.notes.forEach(note => {
+                        notesHtml += `
+                            <div class="note">
+                                <p><strong>${note.created_by}</strong>: ${note.note}</p>
+                                <small class="text-muted">${note.created_at}</small>
+                            </div>
+                        `;
+                    });
+                    $('#notesContainer').html(notesHtml);
+                } else {
+                    $('#notesContainer').html('<p class="text-muted">No notes available.</p>');
+                }
+            },
+            error: function () {
+                $('#notesContainer').html('<p class="text-danger">Error fetching notes.</p>');
+            }
+        });
+    });
+
+    // Save Note via AJAX and Display Immediately
+    $('#saveNoteBtn').on('click', function () {
+        const noteText = $('#noteText').val().trim();
+
+        if (!noteText) {
+            alert('Please enter a note before saving.');
+            return;
+        }
+
+        $.ajax({
+            url: '/immigration/save_note/',
+            method: 'POST',
+            data: {
+                'sender_id': senderId,
+                'chat_id': chatId,
+                'note': noteText,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if (data.success) {
+                    const newNoteHtml = `
+                        <div class="note">
+                            <p><strong>{{ request.user.get_full_name }}</strong>: ${noteText}</p>
+                            <small class="text-muted">${new Date().toLocaleString()}</small>
+                        </div>
+                    `;
+                    $('#notesContainer').prepend(newNoteHtml);
+                    $('#noteText').val('');
+                    alert('Note saved successfully.');
+                } else {
+                    alert('Failed to save note: ' + data.error);
+                }
+            },
+            error: function () {
+                alert('An error occurred while saving the note.');
+            }
+        });
+    });
+});
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const closeNoteButtons = document.querySelectorAll('.close-note-btn');
+
+        closeNoteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const noteId = this.dataset.noteId;
+                const noteItem = this.closest('.list-group-item');
+                const noteText = noteItem.querySelector('.note-text');
+                const buttonIcon = this.querySelector('i');
+
+                // Confirm before marking as completed
+                if (!confirm('Are you sure you want to close this note?')) {
+                    return;
+                }
+
+                // Send AJAX request to mark note as completed
+                fetch(`/immigration/close_call_note/${noteId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json'
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update UI to reflect completed note
+                        noteText.classList.add('completed');
+                        this.classList.remove('btn-danger');
+                        this.classList.add('btn-success');
+                        buttonIcon.classList.remove('fa-times-circle');
+                        buttonIcon.classList.add('fa-check-circle');
+                        this.disabled = true;
+                    } else {
+                        alert('Failed to close the note: ' + data.error);
+                    }
+                })
+                .catch(() => {
+                    alert('An error occurred while closing the note.');
+                });
+            });
+        });
+    });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchCallNotes');
+    const callNotesContainer = document.getElementById('callNotesContainer');
+
+    // Function to handle marking a note as completed
+    function attachCloseNoteHandlers() {
+        document.querySelectorAll('.close-note-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const noteId = this.dataset.noteId;
+
+                if (!noteId) {
+                    alert('Invalid note ID.');
+                    return;
+                }
+
+                if (confirm('Are you sure you want to close this note?')) {
+                    fetch(`/immigration/close_call_note/${noteId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json'
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Strike out the note and disable the button
+                            const noteText = this.closest('.list-group-item').querySelector('.note-text');
+                            noteText.classList.add('completed');
+                            this.classList.replace('btn-danger', 'btn-success');
+                            this.innerHTML = '<i class="fas fa-check-circle"></i>';
+                            this.disabled = true;
+                        } else {
+                            alert('Failed to close note: ' + data.error);
+                        }
+                    })
+                    .catch(() => {
+                        alert('An error occurred while closing the note.');
+                    });
+                }
+            });
+        });
+    }
+
+    // Search functionality
+    searchInput.addEventListener('keyup', function () {
+        const query = searchInput.value.trim();
+
+        fetch(`/immigration/search_call_notes/?q=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.notes.length > 0) {
+                    let notesHtml = '';
+                    data.notes.forEach(note => {
+                        notesHtml += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div class="note-content">
+                                    <strong>${note.user}</strong>
+                                    <small class="text-muted">(${note.created_at})</small>:<br>
+                                    <p class="mb-0 note-text ${note.completed ? 'completed' : ''}">${note.note}</p>
+                                </div>
+                                <button class="btn btn-sm ${note.completed ? 'btn-success disabled' : 'btn-danger'} close-note-btn" data-note-id="${note.id}">
+                                    <i class="fas ${note.completed ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                                </button>
+                            </li>
+                        `;
+                    });
+                    callNotesContainer.innerHTML = `<ul class="list-group">${notesHtml}</ul>`;
+                    attachCloseNoteHandlers(); // Reattach event handlers after updating the list
+                } else {
+                    callNotesContainer.innerHTML = '<p class="text-muted text-center">No call notes found.</p>';
+                }
+            })
+            .catch(() => {
+                callNotesContainer.innerHTML = '<p class="text-danger text-center">Error fetching call notes.</p>';
+            });
+    });
+
+    // Attach close note handlers on initial load
+    attachCloseNoteHandlers();
+});
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Populate the update modal with FAQ data
+        document.querySelectorAll('.edit-faq-btn').forEach(button => {
+            button.addEventListener('click', function () {
+                const faqId = this.getAttribute('data-faq-id');
+                const question = this.getAttribute('data-question');
+                const answer = this.getAttribute('data-answer');
+
+                document.getElementById('faqId').value = faqId;
+                document.getElementById('editQuestion').value = question;
+                document.getElementById('editAnswer').value = answer;
+            });
+        });
+
+        // Handle the form submission via AJAX
+        document.getElementById('updateFAQForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const faqId = formData.get('faq_id');
+
+            fetch(`/immigration/update_faq/${faqId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('FAQ updated successfully!');
+                    location.reload();
+                } else {
+                    alert('Failed to update FAQ: ' + data.error);
+                }
+            })
+            .catch(() => {
+                alert('An error occurred while updating the FAQ.');
+            });
+        });
+    });
+</script>
+
+
+<script>
+    document.querySelectorAll('.btn-danger').forEach(button => {
+        button.addEventListener('click', function (e) {
+            if (!confirm('Are you sure you want to delete this FAQ?')) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>
+
 
 {% endblock %}

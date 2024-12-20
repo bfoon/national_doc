@@ -1,7 +1,7 @@
 # immigration/models.py
 from django.db import models
 from django.contrib.auth.models import User, Group
-from docs.models import Application
+from docs.models import Application, ChatMessage
 
 
 class PostLocation(models.Model):
@@ -162,6 +162,7 @@ class FAQ(models.Model):
 class CallNote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='call_notes')
     note = models.TextField()
+    completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -171,3 +172,18 @@ class CallNote(models.Model):
 
     def __str__(self):
         return f"Call Note by {self.user.get_full_name()} on {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
+class MessageNote(models.Model):
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_notes')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_notes')
+    chat = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, null=True ,related_name='notes')  # Link to ChatMessage
+    note = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Message Note"
+        verbose_name_plural = "Message Notes"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Note by {self.created_by.get_full_name()} on {self.created_at.strftime('%Y-%m-%d %H:%M')}"
