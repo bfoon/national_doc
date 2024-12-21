@@ -802,33 +802,49 @@ footer {
 
 <script src="{% static 'js/dashboard.js' %}"></script>
 <!-- Modal for Viewing Application Details -->
-<div class="modal fade" id="applicationModal" tabindex="-1" role="dialog" aria-labelledby="applicationModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
+            <!-- Modal Header -->
             <div class="modal-header">
                 <h5 class="modal-title" id="applicationModalLabel">Application Details</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <span aria-hidden="true">&times;</span>
+</button>
+
             </div>
+
+            <!-- Modal Body -->
             <div class="modal-body">
-                <div id="immigrationNote" class="alert alert-warning" style="display:none;">
-                    <strong>Immigration Note:</strong> <span id="immigrationMessage"></span>
+                <!-- Immigration Notice -->
+                <div id="immigrationNote" class="alert alert-warning d-flex align-items-start mb-4 rounded shadow-sm border-0" style="display: none;">
+                    <div class="me-3">
+                        <svg class="icon icon-warning" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h6 class="mb-1 text-warning fw-bold">Immigration Notice</h6>
+                        <p class="mb-0 small" id="immigrationMessage"></p>
+                    </div>
                 </div>
-                <div id="applicationDetails">
+
+                <!-- Application Details -->
+                <div id="applicationDetails" class="card shadow-sm border-0">
                     <!-- Dynamic content will be loaded here -->
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="cancelApplicationBtn" style="display:none;">Cancel Application</button>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-danger" id="cancelApplicationBtn" style="display: none;">Cancel Application</button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
 
-
- <!-- Modal for Notes -->
+<!-- Modal for Notes -->
 <div class="modal fade" id="notesModal" tabindex="-1" role="dialog" aria-labelledby="notesModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -840,32 +856,39 @@ footer {
             </div>
             <div class="modal-body">
                 <ul class="list-group">
-                     {% if national_id_application.application.notes %}
+                    {% with national_id_application.application.notes.last as national_notes %}
+                    {% with resident_permit_application.application.notes.last as resident_notes %}
+                    {% with work_permit_application.application.notes.last as work_notes %}
+                        {% if national_notes %}
                             <li class="list-group-item">
-                                <strong>{{ national_id_application.application.notes.last.user.get_full_name }}
-                                    ({{ national_id_application.application.notes.last.created_at|date:"Y-m-d H:i" }}):</strong>
-                                <p>{{ national_id_application.application.notes.last.message }}</p>
+                                <strong>{{ national_notes.user.get_full_name }}
+                                    ({{ national_notes.created_at|date:"Y-m-d H:i" }}):</strong>
+                                <p>{{ national_notes.message }}</p>
                             </li>
-                    {% elif resident_permit_application.application.notes %}
+                        {% elif resident_notes %}
                             <li class="list-group-item">
-                                <strong>{{ resident_permit_application.application.notes.last.user.get_full_name }}
-                                    ({{ resident_permit_application.application.notes.last.created_at|date:"Y-m-d H:i" }}):</strong>
-                                <p>{{ resident_permit_application.application.notes.last.message }}</p>
+                                <strong>{{ resident_notes.user.get_full_name }}
+                                    ({{ resident_notes.created_at|date:"Y-m-d H:i" }}):</strong>
+                                <p>{{ resident_notes.message }}</p>
                             </li>
-                     {% elif work_permit_application.application.notes %}
+                        {% elif work_notes %}
                             <li class="list-group-item">
-                                <strong>{{ work_permit_application.application.notes.last.user.get_full_name }}
-                                    ({{ work_permit_application.application.notes.last.created_at|date:"Y-m-d H:i" }}):</strong>
-                                <p>{{ work_permit_application.application.notes.last.message }}</p>
+                                <strong>{{ work_notes.user.get_full_name }}
+                                    ({{ work_notes.created_at|date:"Y-m-d H:i" }}):</strong>
+                                <p>{{ work_notes.message }}</p>
                             </li>
-                    {% else %}
-                        <li class="list-group-item">No notes available.</li>
-                    {% endif %}
+                        {% else %}
+                            <li class="list-group-item">No notes available.</li>
+                        {% endif %}
+                    {% endwith %}
+                    {% endwith %}
+                    {% endwith %}
                 </ul>
             </div>
-            </div>
-            </div>
-            </div>
+        </div>
+    </div>
+</div>
+
        <!-- Floating Support Icon -->
 <div class="support-icon" data-toggle="modal" data-target="#supportModal">
     <i class="fas fa-life-ring"></i>

@@ -34,6 +34,7 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.utils.text import slugify
 import logging
+from django.http import HttpResponseForbidden
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -50,7 +51,7 @@ def send_email_in_thread(subject, message, recipient_email):
     email_thread = Thread(target=send)
     email_thread.start()
 
-@login_required
+
 def send_notification(user, message):
     notification = Notification.objects.create(user=user, message=message)
     notification.save()
@@ -360,16 +361,28 @@ def send_note_to_requester(request, fulfiller_id):
 @login_required
 def post_locations(request):
     user = request.user
+
+    # Fetch locations based on user type
     if user.is_superuser:
         locations_list = PostLocation.objects.all()
     else:
-        locations_list = PostLocation.objects.filter(id=user.officerprofile.post_location.id)
+        # Check if the user has an OfficerProfile
+        officer_profile = getattr(user, 'officerprofile', None)
+        if officer_profile and officer_profile.post_location:
+            locations_list = PostLocation.objects.filter(id=officer_profile.post_location.id)
+        else:
+            # If no OfficerProfile or post_location is found, deny access or handle gracefully
+            messages.warning(request, "You do not have permission to view post locations.")
+            return  redirect('immigration_dashboard')
 
-    paginator = Paginator(locations_list, 10)  # Show 10 locations per page
-    page_number = request.GET.get('page')
+    # Paginate locations (10 per page)
+    paginator = Paginator(locations_list, 10)
+    page_number = request.GET.get('page', 1)  # Default to the first page
     locations = paginator.get_page(page_number)
 
-    return render(request, 'immigration/post_locations.html', {'locations': locations})
+    # Render template with paginated locations
+    context = {'locations': locations}
+    return render(request, 'immigration/post_locations.html', context)
 
 @login_required
 def add_post_location(request):
