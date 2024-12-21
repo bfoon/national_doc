@@ -31,6 +31,17 @@
         text-decoration: line-through;
         color: #6c757d;
     }
+    .card-dash div {
+        border-right: 1px solid #ddd;
+        padding-right: 10px;
+    }
+    .card-dash div:last-child {
+        border-right: none;
+    }
+    .text-primary { color: #007bff; }
+    .text-success { color: #28a745; }
+    .text-danger { color: #dc3545; }
+    .text-secondary { color: #6c757d; }
 </style>
 
 <div class="container my-5">
@@ -57,42 +68,71 @@
 
     <h2 class="mb-4 text-center">Support Desk</h2>
 
-    <!-- FAQ Section -->
-    <div class="card mb-4 shadow">
-         <div class="card-header d-flex justify-content-between align-items-center bg-info text-white">
-            <h5 class="mb-0">Frequently Asked Questions</h5>
-                <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#addFAQModal">
-                    <i class="fas fa-plus-circle"></i> Add FAQ
-                </button>
-            </div>
-            <div class="card-body">
-                <ul class="list-group">
-                    {% for faq in faqs %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{{ faq.question }}</strong><br>
-                                <p class="mb-0">{{ faq.answer }}</p>
-                            </div>
-                            <div class="btn-group">
-                                <button class="btn btn-warning btn-sm edit-faq-btn"
-                                        data-toggle="modal"
-                                        data-target="#updateFAQModal"
-                                        data-faq-id="{{ faq.id }}"
-                                        data-question="{{ faq.question }}"
-                                        data-answer="{{ faq.answer }}">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
-                                <a href="{% url 'delete_faq' faq.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this FAQ?');">
-                                    <i class="fas fa-trash-alt"></i> Delete
-                                </a>
-                            </div>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item text-muted text-center">No FAQs available.</li>
-                    {% endfor %}
-                </ul>
-            </div>
+<!-- Statistics Card -->
+<div class="card mb-4 shadow-sm">
+    <div class="card-body card-dash d-flex justify-content-around text-center">
+        <div>
+            <h5 id="open-applications" class="text-primary mb-0">0</h5>
+            <small>Open Applications</small>
         </div>
+        <div>
+            <h5 id="closed-applications" class="text-success mb-0">0</h5>
+            <small>Closed Applications</small>
+        </div>
+        <div>
+            <h5 id="open-chats" class="text-danger mb-0">0</h5>
+            <small>Open Chat Messages</small>
+        </div>
+        <div>
+            <h5 id="closed-chats" class="text-secondary mb-0">0</h5>
+            <small>Closed Chat Messages</small>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="card mb-4 shadow">
+    <div class="card-header d-flex justify-content-between align-items-center bg-info text-white">
+        <h5 class="mb-0">Frequently Asked Questions</h5>
+        <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#addFAQModal">
+            <i class="fas fa-plus-circle"></i> Add FAQ
+        </button>
+    </div>
+    <div class="card-body">
+        <!-- Search FAQ -->
+        <div class="mb-3">
+            <input type="text" class="form-control" id="searchFAQ" placeholder="Search FAQs...">
+        </div>
+
+        <ul class="list-group">
+            {% for faq in faqs %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ faq.question }}</strong><br>
+                        <p class="mb-0">{{ faq.answer }}</p>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-warning btn-sm edit-faq-btn"
+                                data-toggle="modal"
+                                data-target="#updateFAQModal"
+                                data-faq-id="{{ faq.id }}"
+                                data-question="{{ faq.question }}"
+                                data-answer="{{ faq.answer }}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <a href="{% url 'delete_faq' faq.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this FAQ?');">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="list-group-item text-muted text-center">No FAQs available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+
 
     <!-- Chat Messages Section -->
     <div class="card mb-5 shadow">
@@ -636,6 +676,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('searchFAQ');
+        const faqContainer = document.getElementById('faqContainer');
+
+        searchInput.addEventListener('keyup', function () {
+            const query = searchInput.value.trim();
+
+            fetch(`/immigration/search_faqs/?q=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.faqs.length > 0) {
+                        let faqHtml = '<ul class="list-group">';
+                        data.faqs.forEach(faq => {
+                            faqHtml += `
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>${faq.question}</strong><br>
+                                        <p class="mb-0">${faq.answer}</p>
+                                    </div>
+                                    <div class="btn-group">
+                                        <button class="btn btn-warning btn-sm edit-faq-btn"
+                                                data-toggle="modal"
+                                                data-target="#updateFAQModal"
+                                                data-faq-id="${faq.id}"
+                                                data-question="${faq.question}"
+                                                data-answer="${faq.answer}">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <a href="/immigration/delete_faq/${faq.id}/" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this FAQ?');">
+                                            <i class="fas fa-trash-alt"></i> Delete
+                                        </a>
+                                    </div>
+                                </li>
+                            `;
+                        });
+                        faqHtml += '</ul>';
+                        faqContainer.innerHTML = faqHtml;
+                    } else {
+                        faqContainer.innerHTML = '<p class="text-muted text-center">No FAQs found.</p>';
+                    }
+                })
+                .catch(() => {
+                    faqContainer.innerHTML = '<p class="text-danger text-center">Error fetching FAQs.</p>';
+                });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
         // Populate the update modal with FAQ data
         document.querySelectorAll('.edit-faq-btn').forEach(button => {
             button.addEventListener('click', function () {
@@ -677,6 +766,30 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+</script>
+<script>
+    // Function to animate numbers
+    function animateCountUp(targetElement, start, end, duration) {
+        const increment = Math.ceil((end - start) / (duration / 10)); // Define step increment
+        let current = start;
+
+        const counter = setInterval(() => {
+            current += increment;
+            if (current >= end) {
+                current = end;
+                clearInterval(counter);
+            }
+            targetElement.textContent = current; // Update the number in the element
+        }, 10); // Refresh every 10ms for smooth animation
+    }
+
+    // On window load, start animation for each counter
+    window.onload = function () {
+        animateCountUp(document.getElementById("open-applications"), 0, {{ open_applications }}, 1000); // 1 sec duration
+        animateCountUp(document.getElementById("closed-applications"), 0, {{ closed_applications }}, 1000);
+        animateCountUp(document.getElementById("open-chats"), 0, {{ open_chats }}, 1000);
+        animateCountUp(document.getElementById("closed-chats"), 0, {{ closed_chats }}, 1000);
+    };
 </script>
 
 

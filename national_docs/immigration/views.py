@@ -875,7 +875,7 @@ def approve_todo(request, todo_id):
 
     # Notify the requester via in-app notification
     requester = application.user
-    send_notification(requester, f"Your interview for application ID {application.id} has been approved.")
+    # send_notification(requester, f"Your interview for application ID {application.id} has been approved.")
 
     # Send email notification to the requester
     subject = 'Your Application For National Document Has Been Approved'
@@ -1235,21 +1235,38 @@ def is_staff_or_superuser(user):
 
 @login_required
 def support_desk(request):
+    # Fetch FAQs
     faqs = FAQ.objects.all()
 
     # Fetch top-level unread chats (main chats) and prefetch replies for efficiency
-    chats = ChatMessage.objects.filter(parent__isnull=True, is_read=False).order_by('-timestamp').prefetch_related(
-        'replies')
+    chats = ChatMessage.objects.filter(parent__isnull=True, is_read=False).order_by('-timestamp').prefetch_related('replies')
 
+    # Fetch call notes for the logged-in user
     call_notes = CallNote.objects.filter(user=request.user)
 
+    # Define open and closed application statuses
+    open_statuses = ['pending', 'processing', 'waiting', 'interview']
+    closed_statuses = ['completed', 'canceled']
+
+    # Fetch counts for open/closed applications
+    open_applications = Application.objects.filter(status__in=open_statuses).count()
+    closed_applications = Application.objects.filter(status__in=closed_statuses).count()
+
+    # Fetch counts for open/closed chats
+    open_chats = ChatMessage.objects.filter(is_read=False, parent__isnull=True).count()
+    closed_chats = ChatMessage.objects.filter(is_read=True, parent__isnull=True).count()
+
+    # Context data for the template
     context = {
         'faqs': faqs,
         'chats': chats,
         'call_notes': call_notes,
+        'open_applications': open_applications,
+        'closed_applications': closed_applications,
+        'open_chats': open_chats,
+        'closed_chats': closed_chats,
     }
     return render(request, 'immigration/support_desk.html', context)
-
 
 @login_required
 @user_passes_test(is_staff_or_superuser)
@@ -1291,6 +1308,24 @@ def delete_faq(request, faq_id):
     messages.success(request, 'FAQ deleted successfully!')
     return redirect('support_desk')
 
+@login_required
+def search_faqs(request):
+    query = request.GET.get('q', '')
+    if query:
+        faqs = FAQ.objects.filter(Q(question__icontains=query) | Q(answer__icontains=query))
+    else:
+        faqs = FAQ.objects.all()
+
+    # Convert FAQs to JSON
+    faq_list = [
+        {
+            'id': faq.id,
+            'question': faq.question,
+            'answer': faq.answer
+        }
+        for faq in faqs
+    ]
+    return JsonResponse({'faqs': faq_list})
 
 @login_required
 @user_passes_test(is_staff_or_superuser)
