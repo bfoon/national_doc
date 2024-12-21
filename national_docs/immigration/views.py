@@ -31,6 +31,8 @@ from django.views.decorators.csrf import csrf_exempt
 from threading import Thread
 from django.core.mail import send_mail
 from django.conf import settings
+from django.views.decorators.http import require_http_methods
+
 
 def send_email_in_thread(subject, message, recipient_email):
     def send():
@@ -1269,37 +1271,68 @@ def support_desk(request):
     return render(request, 'immigration/support_desk.html', context)
 
 @login_required
-@user_passes_test(is_staff_or_superuser)
+@require_http_methods(["POST"])
 def add_faq(request):
-    if request.method == 'POST':
-        question = request.POST.get('question')
-        answer = request.POST.get('answer')
+    try:
+        # Get form data
+        question = request.POST.get('question', '').strip()
+        answer = request.POST.get('answer', '').strip()
 
-        if question and answer:
-            FAQ.objects.create(question=question, answer=answer)
-            messages.success(request, "FAQ added successfully!")
-        else:
-            messages.error(request, "Please fill in all fields.")
+        # Validate input
+        if len(question) < 10:
+            return JsonResponse({
+                'success': False,
+                'error': 'Question must be at least 10 characters long'
+            })
 
-    return redirect('support_desk')
+        if len(answer) < 20:
+            return JsonResponse({
+                'success': False,
+                'error': 'Answer must be at least 20 characters long'
+            })
 
-@login_required
+        # Create new FAQ
+        FAQ.objects.create(
+            question=question,
+            answer=answer
+        )
+
+        return JsonResponse({
+            'success': True,
+            'message': 'FAQ added successfully'
+        })
+
+    except Exception as e:
+        print(f"Error adding FAQ: {str(e)}")  # For debugging
+        return JsonResponse({
+            'success': False,
+            'error': 'An unexpected error occurred'
+        })
+
+
+@require_http_methods(["POST"])
 def update_faq(request, faq_id):
-    faq = get_object_or_404(FAQ, id=faq_id)
-
-    if request.method == 'POST':
+    try:
+        faq = FAQ.objects.get(id=faq_id)
         question = request.POST.get('question')
         answer = request.POST.get('answer')
 
-        if question and answer:
-            faq.question = question
-            faq.answer = answer
-            faq.save()
-            return JsonResponse({'success': True})
-        else:
-            return JsonResponse({'success': False, 'error': 'Please fill in all fields.'})
+        if len(question) < 10:
+            raise ValidationError('Question must be at least 10 characters long')
+        if len(answer) < 20:
+            raise ValidationError('Answer must be at least 20 characters long')
 
-    return JsonResponse({'success': False, 'error': 'Invalid request method.'})
+        faq.question = question
+        faq.answer = answer
+        faq.save()
+
+        return JsonResponse({'success': True})
+    except FAQ.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'FAQ not found'})
+    except ValidationError as e:
+        return JsonResponse({'success': False, 'error': str(e)})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': 'An unexpected error occurred'})
 
 @login_required
 def delete_faq(request, faq_id):
@@ -1308,24 +1341,29 @@ def delete_faq(request, faq_id):
     messages.success(request, 'FAQ deleted successfully!')
     return redirect('support_desk')
 
-@login_required
 def search_faqs(request):
-    query = request.GET.get('q', '')
-    if query:
-        faqs = FAQ.objects.filter(Q(question__icontains=query) | Q(answer__icontains=query))
-    else:
-        faqs = FAQ.objects.all()
+    try:
+        query = request.GET.get('q', '').strip()
 
-    # Convert FAQs to JSON
-    faq_list = [
-        {
-            'id': faq.id,
-            'question': faq.question,
-            'answer': faq.answer
-        }
-        for faq in faqs
-    ]
-    return JsonResponse({'faqs': faq_list})
+        if query:
+            # Search in both question and answer fields
+            faqs = FAQ.objects.filter(
+                Q(question__icontains=query) |
+                Q(answer__icontains=query)
+            ).values('id', 'question', 'answer')
+        else:
+            # If no query, return all FAQs
+            faqs = FAQ.objects.all().values('id', 'question', 'answer')
+
+        return JsonResponse({
+            'success': True,
+            'faqs': list(faqs)
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
 
 @login_required
 @user_passes_test(is_staff_or_superuser)

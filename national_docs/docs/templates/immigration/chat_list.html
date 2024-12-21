@@ -1,0 +1,58 @@
+<!-- chat_list.html -->
+<div class="card mb-5 shadow">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Chat Messages</h5>
+    </div>
+    <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+        <ul class="list-group">
+            {% for chat in chats %}
+                {% if not chat.parent %}
+                    <li class="list-group-item chat-item" id="chat-{{ chat.id }}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>
+                                    <a href="#" class="text-primary sender-details-link"
+                                       data-toggle="modal"
+                                       data-target="#senderDetailsModal"
+                                       data-sender-id="{{ chat.sender.id }}"
+                                       data-chat-id="{{ chat.id }}"
+                                       data-sender-name="{{ chat.sender.get_full_name }}"
+                                       aria-label="View details for {{ chat.sender.get_full_name }}">
+                                        {{ chat.sender.get_full_name }}
+                                    </a>
+                                </strong>: {{ chat.message }}<br>
+                                <small class="text-muted">{{ chat.timestamp|date:"Y-m-d H:i" }}</small>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary btn-sm respond-btn"
+                                        data-toggle="modal"
+                                        data-target="#respondChatModal"
+                                        data-chat-id="{{ chat.id }}"
+                                        data-sender-name="{{ chat.sender.get_full_name }}"
+                                        aria-label="Respond to {{ chat.sender.get_full_name }}">
+                                    <i class="fas fa-reply"></i> Respond
+                                </button>
+                                <button class="btn btn-danger btn-sm close-btn"
+                                        onclick="if (confirm('Are you sure you want to close this chat? This action cannot be undone.')) closeChat(this.dataset.chatId)"
+                                        data-chat-id="{{ chat.id }}"
+                                        aria-label="Close chat with {{ chat.sender.get_full_name }}">
+                                    <i class="fas fa-times"></i> Close
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Display Replies Indented Below -->
+                        {% for reply in chat.replies.all %}
+                            <div class="ml-4 mt-2 p-2 bg-light border rounded">
+                                <strong>{{ reply.sender.get_full_name }}</strong>: {{ reply.message }}<br>
+                                <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
+                            </div>
+                        {% endfor %}
+                    </li>
+                {% endif %}
+            {% empty %}
+                <li class="list-group-item text-muted text-center">No chat messages available.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

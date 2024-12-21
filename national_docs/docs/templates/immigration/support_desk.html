@@ -42,218 +42,1273 @@
     .text-success { color: #28a745; }
     .text-danger { color: #dc3545; }
     .text-secondary { color: #6c757d; }
+    /* FAQ Section Styles */
+    .faq-content {
+        flex: 1;
+        min-width: 0; /* Prevents text overflow */
+    }
+
+    .faq-question {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #2c3e50;
+    }
+
+    .faq-answer {
+        color: #34495e;
+        white-space: pre-line; /* Preserves line breaks */
+    }
+
+    /* Search Container Styles */
+    .search-container {
+        position: relative;
+    }
+
+    .search-container .input-group-text {
+        background-color: #f8f9fa;
+        border-right: none;
+    }
+
+    .search-container input {
+        border-left: none;
+    }
+
+    .search-container input:focus {
+        box-shadow: none;
+        border-color: #ced4da;
+    }
+
+    /* Button Group Styles */
+    .btn-group {
+        margin-left: 1rem;
+        flex-shrink: 0;
+    }
+
+    .btn-group .btn {
+        padding: 0.375rem 0.75rem;
+    }
+
+    /* List Item Styles */
+    .list-group-item {
+        transition: background-color 0.2s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    /* Loading Indicator Styles */
+    #faqLoadingIndicator .spinner-border {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+        .list-group-item {
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+
+        .btn-group {
+            margin-left: 0;
+            margin-top: 1rem;
+            justify-content: flex-end;
+        }
+    }
+    /* Modal Styles */
+#updateFAQModal .modal-dialog {
+    max-width: 700px;
+}
+
+#updateFAQModal .modal-header {
+    border-bottom: 2px solid #e9ecef;
+}
+
+#updateFAQModal .modal-footer {
+    border-top: 2px solid #e9ecef;
+}
+
+/* Form Control Styles */
+#updateFAQModal .form-control:focus {
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
+#updateFAQModal .form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Label Styles */
+#updateFAQModal label {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+#updateFAQModal label i {
+    margin-right: 0.5rem;
+    color: #ffc107;
+}
+
+/* Help Text Styles */
+#updateFAQModal .form-text {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Loading Indicator Styles */
+#updateFAQModal .loading-indicator {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Validation Styles */
+#updateFAQModal .form-control.is-invalid {
+    border-color: #dc3545;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23dc3545' viewBox='0 0 12 12'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Error Alert Styles */
+#updateFAQError {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1.25rem;
+}
+
+/* Button Hover Effects */
+#updateFAQModal .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+#updateFAQModal .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    #updateFAQModal .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    #updateFAQModal .modal-footer {
+        flex-direction: column;
+    }
+
+    #updateFAQModal .btn-group {
+        display: flex;
+        width: 100%;
+    }
+
+    #updateFAQModal .btn-group .btn {
+        flex: 1;
+    }
+}
+    /* Modal Styles */
+#addFAQModal .modal-dialog {
+    max-width: 700px;
+}
+
+#addFAQModal .modal-header {
+    border-bottom: 2px solid #e9ecef;
+}
+
+#addFAQModal .modal-footer {
+    border-top: 2px solid #e9ecef;
+}
+
+/* Form Control Styles */
+#addFAQModal .form-control:focus {
+    border-color: #17a2b8;
+    box-shadow: 0 0 0 0.2rem rgba(23, 162, 184, 0.25);
+}
+
+#addFAQModal .form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Label Styles */
+#addFAQModal label {
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+#addFAQModal label i {
+    margin-right: 0.5rem;
+    color: #17a2b8;
+}
+
+/* Help Text Styles */
+#addFAQModal .form-text {
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Loading Indicator Styles */
+#addFAQModal .loading-indicator {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Error Alert Styles */
+#addFAQError {
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 1.25rem;
+}
+
+/* Button Hover Effects */
+#addFAQModal .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+#addFAQModal .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    #addFAQModal .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    #addFAQModal .modal-footer {
+        flex-direction: column;
+    }
+
+    #addFAQModal .btn-group {
+        display: flex;
+        width: 100%;
+    }
+
+    #addFAQModal .btn-group .btn {
+        flex: 1;
+    }
+}
+    /* Accordion Styles */
+    .accordion-button:not(.collapsed) {
+        background-color: #f8f9fa;
+        color: #0dcaf0;
+        box-shadow: none;
+    }
+
+    .accordion-button:focus {
+        box-shadow: none;
+        border-color: rgba(13, 202, 240, 0.2);
+    }
+
+    /* Search Input Styles */
+    .input-group .form-control:focus {
+        border-color: #0dcaf0;
+        box-shadow: none;
+    }
+
+    .input-group .form-control:focus + .input-group-text {
+        border-color: #0dcaf0;
+    }
+
+    /* Button Hover Effects */
+    .btn-outline-warning:hover {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #dc3545;
+        color: #fff;
+    }
+
+    /* Custom Badge Positioning */
+    .accordion-button .badge {
+        min-width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+     /* Chat Container Styles */
+    .chat-container {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    }
+
+    .chat-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-container::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    /* Message Styles */
+    .chat-thread:hover {
+        background-color: #f8f9fa;
+    }
+
+    .message-content {
+        line-height: 1.5;
+    }
+
+    /* Button Hover Effects */
+    .btn-outline-primary:hover {
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.15);
+    }
+
+    .btn-outline-danger:hover {
+        box-shadow: 0 2px 4px rgba(220, 53, 69, 0.15);
+    }
+
+    /* Avatar Circle */
+    .avatar-circle {
+        transition: transform 0.2s;
+    }
+
+    .avatar-circle:hover {
+        transform: scale(1.05);
+    }
+
+    /* Custom Utilities */
+    .fs-xs {
+        font-size: 0.75rem;
+    }
+
+    .fs-sm {
+        font-size: 0.875rem;
+    }
+     /* Timeline Styles */
+    .timeline-container {
+        position: relative;
+        padding: 1rem;
+    }
+
+    .timeline-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 2rem;
+        height: 100%;
+        width: 2px;
+        background: #dee2e6;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-left: 3rem;
+    }
+
+    .timeline-badge {
+        position: absolute;
+        left: 1.35rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 2.5rem;
+        color: white;
+        z-index: 1;
+    }
+
+    .timeline-content {
+        margin-left: 1rem;
+    }
+
+    .timeline-item.completed .timeline-content {
+        opacity: 0.75;
+    }
+
+    /* Scrollbar Styles */
+    .timeline-container {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    }
+
+    .timeline-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .timeline-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .timeline-container::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    /* Animation */
+    .timeline-item {
+        opacity: 0;
+        transform: translateX(-20px);
+        animation: slideIn 0.3s ease forwards;
+    }
+
+    @keyframes slideIn {
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    /* Button Hover Effects */
+    .btn-outline-success:hover {
+        box-shadow: 0 2px 4px rgba(40, 167, 69, 0.15);
+    }
+
+    .btn-outline-primary:hover {
+        box-shadow: 0 2px 4px rgba(0, 123, 255, 0.15);
+    }
+    /* Modal Animation */
+    .modal.fade .modal-dialog {
+        transform: scale(0.8);
+        transition: transform 0.3s ease-out;
+    }
+
+    .modal.show .modal-dialog {
+        transform: scale(1);
+    }
+
+    /* Form Controls */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0dcaf0;
+        box-shadow: 0 0 0 0.2rem rgba(13, 202, 240, 0.25);
+    }
+
+    .input-group-text {
+        border-left: none;
+    }
+
+    .form-control:focus + .input-group-text {
+        border-color: #0dcaf0;
+    }
+
+    /* Button Styles */
+    .btn-check:checked + .btn-outline-secondary {
+        background-color: #0dcaf0;
+        border-color: #0dcaf0;
+        color: white;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #0dcaf0;
+        border-color: #0dcaf0;
+    }
+
+    /* Validation Styles */
+    .was-validated .form-control:invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    .was-validated .form-control:valid:focus {
+        border-color: #198754;
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+    }
+    /* Modal Animation */
+    .modal.fade .modal-dialog {
+        transform: translateY(-10px);
+        transition: transform 0.3s ease-out;
+    }
+
+    .modal.show .modal-dialog {
+        transform: translateY(0);
+    }
+
+    /* Form Styles */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+
+    .input-group-text {
+        border-left: none;
+    }
+
+    .form-control:focus + .input-group-text {
+        border-color: #ffc107;
+    }
+
+    /* Button Styles */
+    .btn-check:checked + .btn-outline-secondary {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    /* Switch Style */
+    .form-switch .form-check-input:checked {
+        background-color: #ffc107;
+        border-color: #ffc107;
+    }
+
+    .form-switch .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+    /* Modal Animation */
+    .modal.fade .modal-dialog {
+        transform: scale(0.95);
+        transition: transform 0.3s ease-out;
+    }
+
+    .modal.show .modal-dialog {
+        transform: scale(1);
+    }
+
+    /* Original Message Styles */
+    .original-message {
+        position: relative;
+        background-color: #f8f9fa;
+    }
+
+    .original-message::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 20px;
+        border: 8px solid transparent;
+        border-top-color: #f8f9fa;
+    }
+
+    /* Form Styles */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .input-group-text {
+        border-left: none;
+    }
+
+    .form-control:focus + .input-group-text {
+        border-color: #0d6efd;
+    }
+
+    /* Button Styles */
+    .btn-outline-secondary:hover {
+        background-color: #f8f9fa;
+        color: #0d6efd;
+        border-color: #0d6efd;
+    }
+
+    /* Template Highlight */
+    .template-highlight {
+        background-color: #e9ecef;
+        padding: 0.5rem;
+        border-radius: 0.25rem;
+        margin-bottom: 0.5rem;
+    }
+     /* Modal Animation */
+    .modal.fade .modal-dialog {
+        transform: scale(0.95);
+        transition: transform 0.3s ease-out;
+    }
+
+    .modal.show .modal-dialog {
+        transform: scale(1);
+    }
+
+    /* Customer Details Styles */
+    .avatar-circle {
+        border-radius: 50%;
+        transition: transform 0.2s;
+    }
+
+    .avatar-circle:hover {
+        transform: scale(1.05);
+    }
+
+    .customer-details .detail-item label {
+        font-size: 0.875rem;
+    }
+
+    /* Notes Container Styles */
+    .notes-container {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+    }
+
+    .notes-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .notes-container::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .notes-container::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+
+    /* Note Item Styles */
+    .note-item {
+        border-left: 3px solid #0d6efd;
+        background-color: #f8f9fa;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: 0.25rem;
+        transition: transform 0.2s;
+    }
+
+    .note-item:hover {
+        transform: translateX(5px);
+    }
+
+    .note-item.important {
+        border-left-color: #dc3545;
+    }
+
+    /* Button Group Styles */
+    .btn-group .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .btn-group .btn-outline-primary.active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    /* Modal Animation */
+    .modal.fade .modal-dialog {
+        transform: scale(0.95);
+        transition: transform 0.3s ease-out;
+    }
+
+    .modal.show .modal-dialog {
+        transform: scale(1);
+    }
+
+    /* Form Styles */
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
+
+    .input-group-text {
+        border-left: none;
+    }
+
+    .form-control:focus + .input-group-text {
+        border-color: #ffc107;
+    }
+
+    /* Button Toolbar Styles */
+    .btn-toolbar .btn-outline-secondary {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .btn-toolbar .btn-outline-secondary:hover {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: #000;
+    }
+
+    /* Answer Editor Styles */
+    .answer-editor textarea {
+        font-family: monospace;
+        resize: vertical;
+    }
+
+    /* Sidebar Styles */
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+
+    /* Preview Button Hover */
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+    }
 </style>
 
 <div class="container my-5">
     <!-- Display Messages -->
     {% if messages %}
-        <div class="messages">
+        <div class="messages mb-4">
             {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
-                    {{ message }}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm border-0" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <div>{{ message }}</div>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <!-- Breadcrumb Navigation -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
-            <li class="breadcrumb-item">
-                <a href="{% url 'immigration_dashboard' %}">Dashboard</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Support</li>
-        </ol>
-    </nav>
-
-    <h2 class="mb-4 text-center">Support Desk</h2>
-
-<!-- Statistics Card -->
-<div class="card mb-4 shadow-sm">
-    <div class="card-body card-dash d-flex justify-content-around text-center">
-        <div>
-            <h5 id="open-applications" class="text-primary mb-0">0</h5>
-            <small>Open Applications</small>
-        </div>
-        <div>
-            <h5 id="closed-applications" class="text-success mb-0">0</h5>
-            <small>Closed Applications</small>
-        </div>
-        <div>
-            <h5 id="open-chats" class="text-danger mb-0">0</h5>
-            <small>Open Chat Messages</small>
-        </div>
-        <div>
-            <h5 id="closed-chats" class="text-secondary mb-0">0</h5>
-            <small>Closed Chat Messages</small>
-        </div>
-    </div>
-</div>
-
-<!-- FAQ Section -->
-<div class="card mb-4 shadow">
-    <div class="card-header d-flex justify-content-between align-items-center bg-info text-white">
-        <h5 class="mb-0">Frequently Asked Questions</h5>
-        <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#addFAQModal">
-            <i class="fas fa-plus-circle"></i> Add FAQ
-        </button>
-    </div>
-    <div class="card-body">
-        <!-- Search FAQ -->
-        <div class="mb-3">
-            <input type="text" class="form-control" id="searchFAQ" placeholder="Search FAQs...">
-        </div>
-
-        <ul class="list-group">
-            {% for faq in faqs %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>{{ faq.question }}</strong><br>
-                        <p class="mb-0">{{ faq.answer }}</p>
-                    </div>
-                    <div class="btn-group">
-                        <button class="btn btn-warning btn-sm edit-faq-btn"
-                                data-toggle="modal"
-                                data-target="#updateFAQModal"
-                                data-faq-id="{{ faq.id }}"
-                                data-question="{{ faq.question }}"
-                                data-answer="{{ faq.answer }}">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <a href="{% url 'delete_faq' faq.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this FAQ?');">
-                            <i class="fas fa-trash-alt"></i> Delete
+    <!-- Modern Header Section -->
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0 bg-transparent">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">
+                            <i class="fas fa-home"></i> Dashboard
                         </a>
-                    </div>
-                </li>
-            {% empty %}
-                <li class="list-group-item text-muted text-center">No FAQs available.</li>
-            {% endfor %}
-        </ul>
-    </div>
-</div>
-
-
-
-    <!-- Chat Messages Section -->
-    <div class="card mb-5 shadow">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Chat Messages</h5>
+                    </li>
+                    <li class="breadcrumb-item active">Support Desk</li>
+                </ol>
+            </nav>
         </div>
-        <div class="card-body" style="max-height: 400px; overflow-y: auto;">
-            <ul class="list-group">
-                {% for chat in chats %}
-                    {% if not chat.parent %}
-                        <li class="list-group-item chat-item" id="chat-{{ chat.id }}">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <strong>
-                                        <a href="#" class="text-primary sender-details-link"
-                                           data-toggle="modal"
-                                           data-target="#senderDetailsModal"
-                                           data-sender-id="{{ chat.sender.id }}"
-                                           data-chat-id="{{ chat.id }}"
-                                           data-sender-name="{{ chat.sender.get_full_name }}"
-                                           aria-label="View details for {{ chat.sender.get_full_name }}">
-                                            {{ chat.sender.get_full_name }}
-                                        </a>
-                                    </strong>: {{ chat.message }}<br>
-                                    <small class="text-muted">{{ chat.timestamp|date:"Y-m-d H:i" }}</small>
-                                </div>
-                                <div class="btn-group">
-                                    <button class="btn btn-primary btn-sm respond-btn"
-                                            data-toggle="modal"
-                                            data-target="#respondChatModal"
-                                            data-chat-id="{{ chat.id }}"
-                                            data-sender-name="{{ chat.sender.get_full_name }}"
-                                            aria-label="Respond to {{ chat.sender.get_full_name }}">
-                                        <i class="fas fa-reply"></i> Respond
-                                    </button>
-                                    <button class="btn btn-danger btn-sm close-btn"
-                                            onclick="if (confirm('Are you sure you want to close this chat? This action cannot be undone.')) closeChat(this.dataset.chatId)"
-                                            data-chat-id="{{ chat.id }}"
-                                            aria-label="Close chat with {{ chat.sender.get_full_name }}">
-                                        <i class="fas fa-times"></i> Close
-                                    </button>
-                                </div>
-                            </div>
 
-                            <!-- Display Replies Indented Below -->
-                            {% for reply in chat.replies.all %}
-                                <div class="ml-4 mt-2 p-2 bg-light border rounded">
-                                    <strong>{{ reply.sender.get_full_name }}</strong>: {{ reply.message }}<br>
-                                    <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
-                                </div>
-                            {% endfor %}
-                        </li>
-                    {% endif %}
-                {% empty %}
-                    <li class="list-group-item text-muted text-center">No chat messages available.</li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-    <!-- Call Notes Section -->
-    <div class="card shadow">
-        <div class="card-header d-flex justify-content-between align-items-center bg-warning text-white">
-            <h5 class="mb-0">Previous Call Notes</h5>
-            <button class="btn btn-light btn-sm" data-toggle="modal" data-target="#addCallNoteModal">
-                <i class="fas fa-plus-circle"></i> Add Call Note
-            </button>
-        </div>
-        <div class="card-body">
-            <!-- Search Bar -->
-            <div class="form-group mb-3">
-                <input type="text" id="searchCallNotes" class="form-control" placeholder="Search call notes...">
-            </div>
-
-            <!-- Call Notes List -->
-            <div id="callNotesContainer" style="max-height: 300px; overflow-y: auto;">
-                <ul class="list-group" id="callNotesList">
-                    {% for note in call_notes %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div class="note-content">
-                                <strong>{{ note.user.get_full_name }}</strong>
-                                <small class="text-muted">({{ note.created_at|date:"Y-m-d H:i" }})</small>:<br>
-                                <p class="mb-0 note-text {% if note.completed %}completed{% endif %}">{{ note.note }}</p>
-                            </div>
-                            <button class="btn btn-sm {% if note.completed %}btn-success disabled{% else %}btn-danger{% endif %} close-note-btn" data-note-id="{{ note.id }}">
-                                <i class="fas {% if note.completed %}fa-check-circle{% else %}fa-times-circle{% endif %}"></i>
-                            </button>
-                        </li>
-                    {% empty %}
-                        <li class="list-group-item text-muted text-center">No call notes available.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </div>
-    </div>
-
-<!-- Add FAQ Modal -->
-<div class="modal fade" id="addFAQModal" tabindex="-1" role="dialog" aria-labelledby="addFAQModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title" id="addFAQModalLabel">Add New FAQ</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <form id="addFAQForm" method="post" action="{% url 'add_faq' %}">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="newQuestion">Question</label>
-                        <input type="text" class="form-control" id="newQuestion" name="question" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="newAnswer">Answer</label>
-                        <textarea class="form-control" id="newAnswer" name="answer" rows="4" required></textarea>
+    <!-- Enhanced Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Open Applications Card -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100 bg-gradient">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 bg-primary bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-folder-open text-primary fa-2x"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0 fw-bold text-primary" id="open-applications">0</h3>
+                            <p class="text-muted mb-0">Open Applications</p>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Add FAQ</button>
+            </div>
+        </div>
+
+        <!-- Closed Applications Card -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100 bg-gradient">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 bg-success bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-check-circle text-success fa-2x"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0 fw-bold text-success" id="closed-applications">0</h3>
+                            <p class="text-muted mb-0">Closed Applications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Open Chats Card -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100 bg-gradient">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 bg-danger bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-comments text-danger fa-2x"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0 fw-bold text-danger" id="open-chats">0</h3>
+                            <p class="text-muted mb-0">Open Chats</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Closed Chats Card -->
+        <div class="col-md-3 col-sm-6">
+            <div class="card border-0 shadow-sm h-100 bg-gradient">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0 bg-secondary bg-opacity-10 p-3 rounded-circle">
+                            <i class="fas fa-check-double text-secondary fa-2x"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h3 class="mb-0 fw-bold text-secondary" id="closed-chats">0</h3>
+                            <p class="text-muted mb-0">Closed Chats</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- FAQ Section -->
+<div class="card mb-4 border-0 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center bg-gradient bg-info text-white py-3">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-question-circle fa-lg me-2"></i>
+            <h5 class="mb-0">Frequently Asked Questions</h5>
+        </div>
+        <button class="btn btn-light btn-sm d-flex align-items-center gap-2 shadow-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#addFAQModal">
+            <i class="fas fa-plus-circle"></i>
+            <span>Add FAQ</span>
+        </button>
+    </div>
+
+    <div class="card-body">
+        <!-- Enhanced Search FAQ with icon -->
+        <div class="mb-4">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text"
+                       class="form-control border-start-0 ps-0"
+                       id="searchFAQ"
+                       placeholder="Search FAQs..."
+                       aria-label="Search FAQs">
+            </div>
+        </div>
+
+        <!-- FAQ Accordion List -->
+        <div class="accordion accordion-flush" id="faqAccordion">
+            {% for faq in faqs %}
+                <div class="accordion-item border mb-3 rounded-3 shadow-sm">
+                    <h2 class="accordion-header" id="heading-{{ faq.id }}">
+                        <button class="accordion-button collapsed rounded-3 bg-light"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#collapse-{{ faq.id }}"
+                                aria-expanded="false"
+                                aria-controls="collapse-{{ faq.id }}">
+                            <div class="d-flex align-items-center w-100">
+                                <span class="badge bg-info text-white me-3">Q</span>
+                                <span class="fw-semibold">{{ faq.question }}</span>
+                            </div>
+                        </button>
+                    </h2>
+                    <div id="collapse-{{ faq.id }}"
+                         class="accordion-collapse collapse"
+                         aria-labelledby="heading-{{ faq.id }}"
+                         data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="bg-light p-3 rounded-3 position-relative">
+                                        <span class="badge bg-success position-absolute top-0 start-0 mt-2 ms-2">A</span>
+                                        <div class="ms-4">{{ faq.answer }}</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-end mt-3 gap-2">
+                                <button class="btn btn-outline-warning btn-sm d-flex align-items-center gap-2 edit-faq-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#updateFAQModal"
+                                        data-faq-id="{{ faq.id }}"
+                                        data-question="{{ faq.question }}"
+                                        data-answer="{{ faq.answer }}">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Edit</span>
+                                </button>
+                                <a href="{% url 'delete_faq' faq.id %}"
+                                   class="btn btn-outline-danger btn-sm d-flex align-items-center gap-2"
+                                   onclick="return confirm('Are you sure you want to delete this FAQ?');">
+                                    <i class="fas fa-trash-alt"></i>
+                                    <span>Delete</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">No FAQs available.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Chat Messages Section -->
+<div class="card border-0 shadow-sm mb-5">
+    <div class="card-header bg-gradient bg-success text-white py-3 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-comments fa-lg me-2"></i>
+            <h5 class="mb-0">Chat Messages</h5>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0 ps-0" placeholder="Search messages...">
+            </div>
+            <select class="form-select form-select-sm" style="width: auto;">
+                <option value="all">All Messages</option>
+                <option value="unread">Unread</option>
+                <option value="urgent">Urgent</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="chat-container" style="max-height: 600px; overflow-y: auto;">
+            {% for chat in chats %}
+                {% if not chat.parent %}
+                    <div class="chat-thread p-4 border-bottom" id="chat-{{ chat.id }}">
+                        <!-- Main Message -->
+                        <div class="d-flex gap-3">
+                            <!-- User Avatar -->
+                            <div class="flex-shrink-0">
+                                <div class="avatar-circle bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                    <i class="fas fa-user text-primary"></i>
+                                </div>
+                            </div>
+
+                            <!-- Message Content -->
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h6 class="mb-1">
+                                            <a href="#" class="text-decoration-none sender-details-link fw-bold"
+                                               data-bs-toggle="modal"
+                                               data-bs-target="#senderDetailsModal"
+                                               data-sender-id="{{ chat.sender.id }}"
+                                               data-chat-id="{{ chat.id }}"
+                                               data-sender-name="{{ chat.sender.get_full_name }}">
+                                                {{ chat.sender.get_full_name }}
+                                            </a>
+                                            <span class="badge bg-info ms-2 fs-xs">New User</span>
+                                        </h6>
+                                        <div class="text-muted fs-sm">
+                                            <i class="fas fa-clock me-1"></i>
+                                            {{ chat.timestamp|date:"Y-m-d H:i" }}
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 respond-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#respondChatModal"
+                                                data-chat-id="{{ chat.id }}"
+                                                data-sender-name="{{ chat.sender.get_full_name }}">
+                                            <i class="fas fa-reply"></i>
+                                            <span>Reply</span>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 close-btn"
+                                                data-chat-id="{{ chat.id }}">
+                                            <i class="fas fa-times"></i>
+                                            <span>Close</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="message-content p-3 bg-light rounded-3">
+                                    {{ chat.message }}
+                                </div>
+
+                                <!-- Replies Section -->
+                                {% if chat.replies.all %}
+                                    <div class="replies-section mt-3 ms-4 border-start border-success border-3">
+                                        {% for reply in chat.replies.all %}
+                                            <div class="reply-item ms-3 mb-3">
+                                                <div class="d-flex gap-2">
+                                                    <!-- Reply Avatar -->
+                                                    <div class="flex-shrink-0">
+                                                        <div class="avatar-circle bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                            <i class="fas fa-headset text-success"></i>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Reply Content -->
+                                                    <div class="flex-grow-1">
+                                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                                            <h6 class="mb-0 fw-semibold">{{ reply.sender.get_full_name }}</h6>
+                                                            <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
+                                                        </div>
+                                                        <div class="message-content p-2 bg-white rounded-3 border">
+                                                            {{ reply.message }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            {% empty %}
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-comments fa-3x text-muted"></i>
+                    </div>
+                    <h6 class="text-muted">No chat messages available</h6>
+                    <p class="text-muted small mb-0">New messages will appear here</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+    <!-- Call Notes Section -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-gradient bg-warning text-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-phone-alt fa-lg me-2"></i>
+                <h5 class="mb-0">Call Notes</h5>
+                <span class="badge bg-light text-warning ms-2">{{ call_notes|length }} Notes</span>
+            </div>
+            <div class="d-flex gap-2">
+                <div class="btn-group">
+                    <button class="btn btn-light btn-sm active">All</button>
+                    <button class="btn btn-light btn-sm">Active</button>
+                    <button class="btn btn-light btn-sm">Completed</button>
+                </div>
+                <button class="btn btn-light btn-sm d-flex align-items-center gap-2"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addCallNoteModal">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Note</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Enhanced Search Bar -->
+        <div class="mb-4">
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text"
+                       id="searchCallNotes"
+                       class="form-control border-start-0 ps-0"
+                       placeholder="Search call notes..."
+                       aria-label="Search call notes">
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Call Notes Timeline -->
+        <div id="callNotesContainer" class="timeline-container" style="max-height: 600px; overflow-y: auto;">
+            {% for note in call_notes %}
+                <div class="timeline-item mb-4 {% if note.completed %}completed{% endif %}" id="note-{{ note.id }}">
+                    <div class="timeline-badge {% if note.completed %}bg-success{% else %}bg-warning{% endif %}">
+                        <i class="fas {% if note.completed %}fa-check{% else %}fa-phone{% endif %}"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-body">
+                                <!-- Note Header -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle bg-light rounded-circle d-flex align-items-center justify-content-center me-2"
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-user text-warning"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ note.user.get_full_name }}</h6>
+                                            <small class="text-muted">
+                                                <i class="fas fa-clock me-1"></i>
+                                                {{ note.created_at|date:"Y-m-d H:i" }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm {% if note.completed %}btn-success disabled{% else %}btn-outline-success{% endif %} close-note-btn"
+                                                data-note-id="{{ note.id }}"
+                                                {% if not note.completed %}
+                                                title="Mark as completed"
+                                                {% endif %}>
+                                            <i class="fas {% if note.completed %}fa-check-circle{% else %}fa-check{% endif %}"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Note Content -->
+                                <div class="note-content {% if note.completed %}text-muted{% endif %}">
+                                    <div class="p-3 bg-light rounded-3 {% if note.completed %}bg-opacity-50{% endif %}">
+                                        {{ note.note }}
+                                    </div>
+                                    {% if note.tags %}
+                                    <div class="mt-2">
+                                        {% for tag in note.tags %}
+                                            <span class="badge bg-info bg-opacity-10 text-info me-1">{{ tag }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-sticky-note fa-3x text-muted"></i>
+                    </div>
+                    <h6 class="text-muted">No call notes available</h6>
+                    <p class="text-muted small mb-0">Click 'Add Note' to create your first note</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- Add FAQ Modal -->
+<div class="modal fade" id="addFAQModal" tabindex="-1" role="dialog" aria-labelledby="addFAQModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-gradient bg-info text-white align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-question-circle fa-lg me-2"></i>
+                    <h5 class="modal-title mb-0" id="addFAQModalLabel">Add New FAQ</h5>
+                </div>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+            </div>
+
+            <form id="addFAQForm" method="post" action="{% url 'add_faq' %}" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <!-- Category Selection -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-folder text-info me-2"></i>
+                            Category
+                        </label>
+                        <select class="form-select" name="category" required>
+                            <option value="">Select a category</option>
+                            <option value="general">General</option>
+                            <option value="account">Account & Security</option>
+                            <option value="billing">Billing</option>
+                            <option value="technical">Technical</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a category.
+                        </div>
+                    </div>
+
+                    <!-- Question Input -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center" for="newQuestion">
+                            <i class="fas fa-question text-info me-2"></i>
+                            Question
+                        </label>
+                        <div class="input-group">
+                            <input type="text"
+                                   class="form-control"
+                                   id="newQuestion"
+                                   name="question"
+                                   placeholder="Enter your question here"
+                                   required>
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-pen"></i>
+                            </span>
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter a question.
+                        </div>
+                        <small class="text-muted mt-1">
+                            Write a clear, concise question that users might ask.
+                        </small>
+                    </div>
+
+                    <!-- Answer Input -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center" for="newAnswer">
+                            <i class="fas fa-comment-dots text-info me-2"></i>
+                            Answer
+                        </label>
+                        <div class="input-group">
+                            <textarea class="form-control"
+                                      id="newAnswer"
+                                      name="answer"
+                                      rows="6"
+                                      placeholder="Enter the answer here"
+                                      required></textarea>
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-paragraph"></i>
+                            </span>
+                        </div>
+                        <div class="invalid-feedback">
+                            Please provide an answer.
+                        </div>
+                        <small class="text-muted mt-1">
+                            Provide a detailed, helpful answer. You can use markdown for formatting.
+                        </small>
+                    </div>
+
+                    <!-- Tags Input -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-tags text-info me-2"></i>
+                            Tags
+                        </label>
+                        <input type="text"
+                               class="form-control"
+                               name="tags"
+                               placeholder="Enter tags separated by commas">
+                        <small class="text-muted mt-1">
+                            Optional: Add relevant tags to help with categorization
+                        </small>
+                    </div>
+
+                    <!-- Priority Selection -->
+                    <div class="form-group">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-flag text-info me-2"></i>
+                            Priority
+                        </label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="priority" id="priority1" value="low" checked>
+                            <label class="btn btn-outline-secondary" for="priority1">Low</label>
+
+                            <input type="radio" class="btn-check" name="priority" id="priority2" value="medium">
+                            <label class="btn btn-outline-secondary" for="priority2">Medium</label>
+
+                            <input type="radio" class="btn-check" name="priority" id="priority3" value="high">
+                            <label class="btn btn-outline-secondary" for="priority3">High</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <div class="d-flex justify-content-between w-100">
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>
+                            Cancel
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button"
+                                    class="btn btn-outline-primary"
+                                    id="previewBtn">
+                                <i class="fas fa-eye me-2"></i>
+                                Preview
+                            </button>
+                            <button type="submit"
+                                    class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>
+                                Add FAQ
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -263,50 +1318,278 @@
 
 <!-- Take note Modal -->
 <div class="modal fade" id="addCallNoteModal" tabindex="-1" role="dialog" aria-labelledby="addCallNoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title" id="addCallNoteModalLabel">Add Call Note</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-gradient bg-warning text-white align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-phone-alt fa-lg me-2"></i>
+                    <h5 class="modal-title mb-0" id="addCallNoteModalLabel">Add Call Note</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <form method="POST" action="{% url 'add_call_note' %}">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="call-note">Note</label>
-                        <textarea class="form-control" id="call-note" name="note" rows="3" required></textarea>
+
+            <form method="POST" action="{% url 'add_call_note' %}" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="modal-body p-4">
+                    <!-- Call Details -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-user text-warning me-2"></i>
+                            Customer Name
+                        </label>
+                        <input type="text" class="form-control" name="customer_name" placeholder="Enter customer name" required>
+                        <div class="invalid-feedback">
+                            Please enter the customer's name.
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-warning">Add Call Note</button>
-                </form>
-            </div>
+
+                    <!-- Call Type -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-tag text-warning me-2"></i>
+                            Call Type
+                        </label>
+                        <select class="form-select" name="call_type" required>
+                            <option value="">Select call type</option>
+                            <option value="inquiry">General Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="complaint">Complaint</option>
+                            <option value="follow_up">Follow-up</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a call type.
+                        </div>
+                    </div>
+
+                    <!-- Priority -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-flag text-warning me-2"></i>
+                            Priority
+                        </label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="priority" id="priority-low" value="low" checked>
+                            <label class="btn btn-outline-secondary" for="priority-low">
+                                <i class="fas fa-arrow-down text-success me-1"></i>Low
+                            </label>
+
+                            <input type="radio" class="btn-check" name="priority" id="priority-medium" value="medium">
+                            <label class="btn btn-outline-secondary" for="priority-medium">
+                                <i class="fas fa-minus text-warning me-1"></i>Medium
+                            </label>
+
+                            <input type="radio" class="btn-check" name="priority" id="priority-high" value="high">
+                            <label class="btn btn-outline-secondary" for="priority-high">
+                                <i class="fas fa-arrow-up text-danger me-1"></i>High
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Note Content -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center" for="call-note">
+                            <i class="fas fa-comment-alt text-warning me-2"></i>
+                            Note Details
+                        </label>
+                        <div class="input-group">
+                            <textarea class="form-control"
+                                      id="call-note"
+                                      name="note"
+                                      rows="5"
+                                      placeholder="Enter detailed notes about the call..."
+                                      required></textarea>
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-paragraph"></i>
+                            </span>
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter call notes.
+                        </div>
+                        <small class="text-muted mt-1">
+                            Include key points discussed, actions taken, and any follow-up required.
+                        </small>
+                    </div>
+
+                    <!-- Follow-up Section -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-clock text-warning me-2"></i>
+                            Follow-up Required
+                        </label>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="followupRequired" name="needs_followup">
+                            <label class="form-check-label" for="followupRequired">Schedule follow-up</label>
+                        </div>
+                    </div>
+
+                    <!-- Follow-up Date (Initially Hidden) -->
+                    <div class="form-group mb-4 d-none" id="followupDateGroup">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-calendar text-warning me-2"></i>
+                            Follow-up Date
+                        </label>
+                        <input type="datetime-local" class="form-control" name="followup_date">
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <div class="d-flex justify-content-between w-100">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary" id="previewNoteBtn">
+                                <i class="fas fa-eye me-2"></i>Preview
+                            </button>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save me-2"></i>Save Note
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <!-- Respond to Chat Modal -->
 <div class="modal fade" id="respondChatModal" tabindex="-1" role="dialog" aria-labelledby="respondChatModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="respondChatModalLabel">Respond to <span id="senderName"></span></h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content border-0 shadow">
+            <!-- Modal Header -->
+            <div class="modal-header bg-gradient bg-primary text-white align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-reply fa-lg me-2"></i>
+                    <h5 class="modal-title mb-0" id="respondChatModalLabel">
+                        Respond to <span id="senderName" class="fw-bold"></span>
+                    </h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{% url 'respond_chat' %}">
+
+            <form method="POST" action="{% url 'respond_chat' %}" class="needs-validation" novalidate>
                 {% csrf_token %}
-                <div class="modal-body">
-                    <input type="hidden" id="chatId" name="chat_id">
-                    <div class="form-group">
-                        <label for="responseMessage">Your Response</label>
-                        <textarea class="form-control" id="responseMessage" name="response" rows="3" required></textarea>
+                <input type="hidden" id="chatId" name="chat_id">
+
+                <!-- Original Message Preview -->
+                <div class="original-message bg-light p-3 border-bottom">
+                    <small class="text-muted d-block mb-1">Original Message:</small>
+                    <div class="original-content" id="originalMessage">
+                        <!-- Original message will be inserted here via JavaScript -->
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Send Response</button>
+
+                <div class="modal-body p-4">
+                    <!-- Response Type Selection -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-tag text-primary me-2"></i>
+                            Response Type
+                        </label>
+                        <select class="form-select" name="response_type" required>
+                            <option value="">Select response type</option>
+                            <option value="general">General Response</option>
+                            <option value="technical">Technical Support</option>
+                            <option value="inquiry">Information Inquiry</option>
+                            <option value="urgent">Urgent Matter</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Please select a response type.
+                        </div>
+                    </div>
+
+                    <!-- Template Selection -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center">
+                            <i class="fas fa-file-alt text-primary me-2"></i>
+                            Response Template
+                        </label>
+                        <select class="form-select" id="templateSelect">
+                            <option value="">Choose a template (optional)</option>
+                            <option value="greeting">General Greeting</option>
+                            <option value="technical">Technical Support</option>
+                            <option value="followup">Follow-up Required</option>
+                            <option value="urgent">Urgent Response</option>
+                        </select>
+                    </div>
+
+                    <!-- Response Message -->
+                    <div class="form-group mb-4">
+                        <label class="form-label d-flex align-items-center" for="responseMessage">
+                            <i class="fas fa-comment text-primary me-2"></i>
+                            Your Response
+                        </label>
+                        <div class="input-group">
+                            <textarea class="form-control"
+                                      id="responseMessage"
+                                      name="response"
+                                      rows="5"
+                                      placeholder="Type your response here..."
+                                      required></textarea>
+                            <span class="input-group-text bg-light">
+                                <i class="fas fa-pen"></i>
+                            </span>
+                        </div>
+                        <div class="invalid-feedback">
+                            Please enter your response.
+                        </div>
+                        <div class="mt-2">
+                            <div class="d-flex align-items-center mb-1">
+                                <small class="text-muted me-2">Formatting:</small>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('bold')">
+                                        <i class="fas fa-bold"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('italic')">
+                                        <i class="fas fa-italic"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" onclick="formatText('list')">
+                                        <i class="fas fa-list"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Options -->
+                    <div class="form-group">
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="sendCopy" name="send_copy">
+                                <label class="form-check-label" for="sendCopy">
+                                    Send me a copy
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="markUrgent" name="mark_urgent">
+                                <label class="form-check-label" for="markUrgent">
+                                    Mark as urgent
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="requireFollowup" name="require_followup">
+                                <label class="form-check-label" for="requireFollowup">
+                                    Requires follow-up
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light">
+                    <div class="d-flex justify-content-between w-100">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-outline-primary" id="previewResponseBtn">
+                                <i class="fas fa-eye me-2"></i>Preview
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Send Response
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>
@@ -315,35 +1598,120 @@
 
 <!-- Sender Details Modal -->
 <div class="modal fade" id="senderDetailsModal" tabindex="-1" role="dialog" aria-labelledby="senderDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="senderDetailsModalLabel">Sender Details</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-gradient bg-primary text-white">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-circle fa-lg me-2"></i>
+                    <h5 class="modal-title mb-0" id="senderDetailsModalLabel">Customer Profile</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <p><strong>Name:</strong> <span id="modalSenderName"></span></p>
-                <p><strong>Application ID:</strong> <span id="modalApplicationID"></span></p>
-                <p><strong>Date of Application:</strong> <span id="modalApplicationDate"></span></p>
-                <p><strong>Location of Application:</strong> <span id="modalApplicationLocation"></span></p>
 
-                <!-- Notes Section -->
-                <h5 class="mt-4">Notes</h5>
-                <div id="notesContainer" class="mt-2 notes-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
-                    <p class="text-muted">No notes available.</p>
-                </div>
+            <div class="modal-body p-0">
+                <div class="row g-0">
+                    <!-- Left Column: Customer Details -->
+                    <div class="col-md-4 border-end bg-light">
+                        <div class="p-4">
+                            <!-- Profile Avatar -->
+                            <div class="text-center mb-4">
+                                <div class="avatar-circle mx-auto mb-3 bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+                                     style="width: 100px; height: 100px;">
+                                    <i class="fas fa-user fa-3x text-primary"></i>
+                                </div>
+                                <h5 class="mb-0" id="modalSenderName">Loading...</h5>
+                                <span class="badge bg-success mt-2">Active Customer</span>
+                            </div>
 
-                <!-- Note-taking Form -->
-                <div class="form-group mt-4">
-                    <label for="noteText">Add Note</label>
-                    <textarea id="noteText" class="form-control" rows="3" placeholder="Enter your note here..."></textarea>
-                </div>
-                <div class="text-right">
-                    <button id="saveNoteBtn" class="btn btn-success">
-                        <i class="fas fa-save"></i> Save Note
-                    </button>
+                            <!-- Key Details -->
+                            <div class="customer-details">
+                                <div class="detail-item mb-3">
+                                    <label class="text-muted mb-1">
+                                        <i class="fas fa-fingerprint text-primary me-2"></i>Application ID
+                                    </label>
+                                    <p class="mb-0 fw-bold" id="modalApplicationID">Loading...</p>
+                                </div>
+
+                                <div class="detail-item mb-3">
+                                    <label class="text-muted mb-1">
+                                        <i class="fas fa-calendar text-primary me-2"></i>Application Date
+                                    </label>
+                                    <p class="mb-0 fw-bold" id="modalApplicationDate">Loading...</p>
+                                </div>
+
+                                <div class="detail-item mb-3">
+                                    <label class="text-muted mb-1">
+                                        <i class="fas fa-map-marker-alt text-primary me-2"></i>Location
+                                    </label>
+                                    <p class="mb-0 fw-bold" id="modalApplicationLocation">Loading...</p>
+                                </div>
+
+                                <div class="detail-item">
+                                    <label class="text-muted mb-1">
+                                        <i class="fas fa-clock text-primary me-2"></i>Status
+                                    </label>
+                                    <div class="progress" style="height: 10px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
+                                    </div>
+                                    <small class="text-muted">Application Progress: 75%</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Notes & Activity -->
+                    <div class="col-md-8">
+                        <div class="p-4">
+                            <!-- Notes Header -->
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-sticky-note text-primary me-2"></i>Notes & Activity
+                                </h5>
+                                <div class="btn-group">
+                                    <button class="btn btn-outline-primary btn-sm active">All Notes</button>
+                                    <button class="btn btn-outline-primary btn-sm">Important</button>
+                                    <button class="btn btn-outline-primary btn-sm">Follow-ups</button>
+                                </div>
+                            </div>
+
+                            <!-- Notes Container -->
+                            <div id="notesContainer" class="notes-container mb-4" style="max-height: 300px; overflow-y: auto;">
+                                <div class="placeholder-content text-center py-4">
+                                    <i class="fas fa-notebook fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted mb-0">No notes available</p>
+                                </div>
+                            </div>
+
+                            <!-- Add Note Form -->
+                            <div class="add-note-form bg-light p-3 rounded-3">
+                                <h6 class="mb-3">
+                                    <i class="fas fa-plus-circle text-primary me-2"></i>Add New Note
+                                </h6>
+                                <div class="mb-3">
+                                    <select class="form-select form-select-sm mb-3">
+                                        <option value="general">General Note</option>
+                                        <option value="important">Important</option>
+                                        <option value="followup">Follow-up Required</option>
+                                    </select>
+                                    <textarea id="noteText"
+                                              class="form-control"
+                                              rows="3"
+                                              placeholder="Enter your note here..."></textarea>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="markImportant">
+                                        <label class="form-check-label" for="markImportant">
+                                            Mark as important
+                                        </label>
+                                    </div>
+                                    <button id="saveNoteBtn" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Save Note
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -352,32 +1720,180 @@
 
 <!-- Update FAQ Modal -->
 <div class="modal fade" id="updateFAQModal" tabindex="-1" role="dialog" aria-labelledby="updateFAQModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-white">
-                <h5 class="modal-title" id="updateFAQModalLabel">Edit FAQ</h5>
-                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-gradient bg-warning text-white align-items-center">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-edit fa-lg me-2"></i>
+                    <h5 class="modal-title mb-0" id="updateFAQModalLabel">Edit FAQ Entry</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="updateFAQForm" method="post">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="editQuestion">Question</label>
-                        <input type="text" class="form-control" id="editQuestion" name="question" required>
+
+            <div class="modal-body p-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Main Edit Form -->
+                        <form id="updateFAQForm" method="post" class="needs-validation" novalidate>
+                            {% csrf_token %}
+                            <input type="hidden" id="faqId" name="faq_id">
+
+                            <!-- Category Selection -->
+                            <div class="form-group mb-4">
+                                <label class="form-label d-flex align-items-center">
+                                    <i class="fas fa-folder text-warning me-2"></i>
+                                    Category
+                                </label>
+                                <select class="form-select" name="category" required>
+                                    <option value="">Select category</option>
+                                    <option value="general">General</option>
+                                    <option value="technical">Technical</option>
+                                    <option value="billing">Billing</option>
+                                    <option value="security">Security</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Please select a category.
+                                </div>
+                            </div>
+
+                            <!-- Question Input -->
+                            <div class="form-group mb-4">
+                                <label class="form-label d-flex align-items-center" for="editQuestion">
+                                    <i class="fas fa-question-circle text-warning me-2"></i>
+                                    Question
+                                </label>
+                                <div class="input-group has-validation">
+                                    <input type="text"
+                                           class="form-control"
+                                           id="editQuestion"
+                                           name="question"
+                                           required>
+                                    <span class="input-group-text bg-light">
+                                        <i class="fas fa-pen"></i>
+                                    </span>
+                                    <div class="invalid-feedback">
+                                        Please enter a question.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Answer Input -->
+                            <div class="form-group mb-4">
+                                <label class="form-label d-flex align-items-center" for="editAnswer">
+                                    <i class="fas fa-comment-dots text-warning me-2"></i>
+                                    Answer
+                                </label>
+                                <div class="answer-editor mb-2">
+                                    <div class="btn-toolbar mb-2">
+                                        <div class="btn-group me-2">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="formatText('bold')">
+                                                <i class="fas fa-bold"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="formatText('italic')">
+                                                <i class="fas fa-italic"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="formatText('link')">
+                                                <i class="fas fa-link"></i>
+                                            </button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="formatText('list')">
+                                                <i class="fas fa-list-ul"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="formatText('code')">
+                                                <i class="fas fa-code"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <textarea class="form-control"
+                                              id="editAnswer"
+                                              name="answer"
+                                              rows="8"
+                                              required></textarea>
+                                    <div class="invalid-feedback">
+                                        Please provide an answer.
+                                    </div>
+                                </div>
+                                <small class="text-muted">
+                                    You can use Markdown formatting for better text organization.
+                                </small>
+                            </div>
+
+                            <!-- Tags Input -->
+                            <div class="form-group mb-4">
+                                <label class="form-label d-flex align-items-center">
+                                    <i class="fas fa-tags text-warning me-2"></i>
+                                    Tags
+                                </label>
+                                <input type="text"
+                                       class="form-control"
+                                       name="tags"
+                                       placeholder="Enter tags separated by commas">
+                                <small class="text-muted">
+                                    Optional: Add relevant tags to help with searching
+                                </small>
+                            </div>
+                        </form>
                     </div>
-                    <div class="form-group">
-                        <label for="editAnswer">Answer</label>
-                        <textarea class="form-control" id="editAnswer" name="answer" rows="4" required></textarea>
+
+                    <!-- Right Sidebar -->
+                    <div class="col-md-4">
+                        <div class="bg-light p-3 rounded-3">
+                            <h6 class="mb-3">
+                                <i class="fas fa-info-circle text-warning me-2"></i>
+                                FAQ Information
+                            </h6>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Last Updated</small>
+                                <span class="text-dark" id="lastUpdated">2024-03-15</span>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Created by</small>
+                                <span class="text-dark" id="createdBy">John Doe</span>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">View Count</small>
+                                <span class="text-dark" id="viewCount">1,234</span>
+                            </div>
+                            <hr>
+                            <h6 class="mb-3">
+                                <i class="fas fa-lightbulb text-warning me-2"></i>
+                                Tips
+                            </h6>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Keep answers clear and concise
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Use formatting for better readability
+                                </li>
+                                <li>
+                                    <i class="fas fa-check text-success me-2"></i>
+                                    Include relevant examples when possible
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                    <input type="hidden" id="faqId" name="faq_id">
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Update FAQ</button>
+            </div>
+
+            <div class="modal-footer bg-light">
+                <div class="d-flex justify-content-between w-100">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>Cancel
+                    </button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-primary" id="previewBtn">
+                            <i class="fas fa-eye me-2"></i>Preview
+                        </button>
+                        <button type="submit" form="updateFAQForm" class="btn btn-warning">
+                            <i class="fas fa-save me-2"></i>Update FAQ
+                        </button>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -802,6 +2318,197 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 </script>
+<script>
+// Form validation
+document.getElementById('addFAQForm').addEventListener('submit', function(event) {
+    if (!this.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    this.classList.add('was-validated');
+});
 
+// Preview functionality
+document.getElementById('previewBtn').addEventListener('click', function() {
+    const question = document.getElementById('newQuestion').value;
+    const answer = document.getElementById('newAnswer').value;
+    // Implement preview logic here
+});
+</script>
+
+<script>
+// Form validation
+document.getElementById('addCallNoteModal').addEventListener('submit', function(event) {
+    if (!this.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    this.classList.add('was-validated');
+});
+
+// Toggle follow-up date field
+document.getElementById('followupRequired').addEventListener('change', function() {
+    const followupDateGroup = document.getElementById('followupDateGroup');
+    followupDateGroup.classList.toggle('d-none');
+    if (!this.checked) {
+        followupDateGroup.querySelector('input').value = '';
+    }
+});
+
+// Preview functionality
+document.getElementById('previewNoteBtn').addEventListener('click', function() {
+    const note = document.getElementById('call-note').value;
+    // Implement preview logic here
+});
+</script>
+        <script>
+// Form validation
+document.getElementById('respondChatModal').addEventListener('submit', function(event) {
+    if (!this.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    this.classList.add('was-validated');
+});
+
+// Template handling
+document.getElementById('templateSelect').addEventListener('change', function() {
+    const templates = {
+        greeting: "Hello [Name],\n\nThank you for reaching out. I hope you're having a great day.",
+        technical: "Hello [Name],\n\nI understand you're experiencing technical difficulties. Let me help you with that.",
+        followup: "Hello [Name],\n\nI'm following up on your previous inquiry regarding [topic].",
+        urgent: "Hello [Name],\n\nI understand this is an urgent matter. I'll prioritize this for immediate attention."
+    };
+
+    const selectedTemplate = templates[this.value];
+    if (selectedTemplate) {
+        const responseMessage = document.getElementById('responseMessage');
+        responseMessage.value = selectedTemplate.replace('[Name]', document.getElementById('senderName').textContent);
+    }
+});
+
+// Text formatting
+function formatText(type) {
+    const textarea = document.getElementById('responseMessage');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+
+    let formattedText = '';
+    switch(type) {
+        case 'bold':
+            formattedText = `**${selectedText}**`;
+            break;
+        case 'italic':
+            formattedText = `*${selectedText}*`;
+            break;
+        case 'list':
+            formattedText = `\n- ${selectedText}`;
+            break;
+    }
+
+    textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+    textarea.focus();
+}
+
+// Preview functionality
+document.getElementById('previewResponseBtn').addEventListener('click', function() {
+    const response = document.getElementById('responseMessage').value;
+    // Implement preview logic here
+});
+</script>
+        <script>
+// Note type toggle
+document.querySelectorAll('.btn-group .btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        // Filter notes based on type
+    });
+});
+
+// Add note functionality
+document.getElementById('saveNoteBtn').addEventListener('click', function() {
+    const noteText = document.getElementById('noteText').value;
+    const isImportant = document.getElementById('markImportant').checked;
+
+    if (!noteText.trim()) {
+        alert('Please enter a note before saving.');
+        return;
+    }
+
+    // Create note HTML
+    const noteHtml = `
+        <div class="note-item ${isImportant ? 'important' : ''} animate__animated animate__fadeIn">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div class="fw-bold mb-1">Support Agent</div>
+                    <small class="text-muted">Just now</small>
+                </div>
+                ${isImportant ? '<span class="badge bg-danger">Important</span>' : ''}
+            </div>
+            <div class="mt-2">${noteText}</div>
+        </div>
+    `;
+
+    // Add note to container
+    const notesContainer = document.getElementById('notesContainer');
+    if (notesContainer.querySelector('.placeholder-content')) {
+        notesContainer.innerHTML = '';
+    }
+    notesContainer.insertAdjacentHTML('afterbegin', noteHtml);
+
+    // Clear form
+    document.getElementById('noteText').value = '';
+    document.getElementById('markImportant').checked = false;
+});
+</script>
+        <script>
+// Form validation
+document.getElementById('updateFAQForm').addEventListener('submit', function(event) {
+    if (!this.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    this.classList.add('was-validated');
+});
+
+// Text formatting functions
+function formatText(type) {
+    const textarea = document.getElementById('editAnswer');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+
+    let formattedText = '';
+    switch(type) {
+        case 'bold':
+            formattedText = `**${selectedText}**`;
+            break;
+        case 'italic':
+            formattedText = `*${selectedText}*`;
+            break;
+        case 'link':
+            formattedText = `[${selectedText}](url)`;
+            break;
+        case 'list':
+            formattedText = `\n- ${selectedText}`;
+            break;
+        case 'code':
+            formattedText = `\`${selectedText}\``;
+            break;
+    }
+
+    textarea.value = textarea.value.substring(0, start) + formattedText + textarea.value.substring(end);
+    textarea.focus();
+}
+
+// Preview functionality
+document.getElementById('previewBtn').addEventListener('click', function() {
+    const question = document.getElementById('editQuestion').value;
+    const answer = document.getElementById('editAnswer').value;
+    // Implement preview logic here
+});
+</script>
 
 {% endblock %}
