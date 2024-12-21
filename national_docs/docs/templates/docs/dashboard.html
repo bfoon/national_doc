@@ -37,155 +37,231 @@
 </header>
 
  <style>
-       /* General Styles */
-body, html {
+:root {
+    /* Color Palette */
+    --color-primary: #3498db;
+    --color-secondary: #2c3e50;
+    --color-background: #ecf0f1;
+    --color-text-dark: #333;
+    --color-text-light: #f4f4f4;
+    --color-white: #ffffff;
+    --color-success: #2ecc71;
+    --color-warning: #f39c12;
+    --color-danger: #e74c3c;
+    --color-info: #3498db;
+    --color-muted: #95a5a6;
+
+    /* Typography */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-size-base: 16px;
+    --font-size-small: 0.875rem;
+    --font-size-large: 1.25rem;
+
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+
+    /* Border Radius */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+
+    /* Shadows */
+    --shadow-subtle: 0 2px 4px rgba(0, 0, 0, 0.08);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --shadow-strong: 0 6px 20px rgba(0, 0, 0, 0.15);
+
+    /* Transitions */
+    --transition-quick: 0.2s ease;
+    --transition-smooth: 0.3s ease;
+}
+
+/* CSS Reset and Base Styles */
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+html {
     scroll-behavior: smooth;
-    font-family: 'Arial', sans-serif;
-    background-color: #f8f9fa;
+    font-size: var(--font-size-base);
+    height: 100%;
+}
+
+body {
+    font-family: var(--font-primary);
+    line-height: 1.6;
+    color: var(--color-text-dark);
+    background-color: var(--color-background);
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* Navbar Styles */
 .navbar {
-    background-color: #343a40;
+    background-color: var(--color-secondary);
+    box-shadow: var(--shadow-subtle);
+    transition: background-color var(--transition-quick);
 }
 
 .navbar-brand {
-    font-weight: bold;
     display: flex;
     align-items: center;
+    font-weight: 700;
+    color: var(--color-white);
 }
 
 .navbar-brand .logo {
     height: 40px;
-    margin-right: 10px;
+    margin-right: var(--spacing-sm);
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 /* Container Styles */
 .container {
+    flex: 1 0 auto;
     margin-top: 80px;
-    flex: 1;
+    padding: var(--spacing-md);
 }
 
-h2, h3 {
-    color: #343a40;
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--color-secondary);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
 }
 
 /* Dashboard Grid */
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    gap: var(--spacing-md);
 }
 
 .dashboard-item {
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    background: var(--color-white);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-medium);
+    padding: var(--spacing-md);
     text-align: center;
+    transition:
+        transform var(--transition-smooth),
+        box-shadow var(--transition-smooth);
+}
+
+.dashboard-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-strong);
 }
 
 .dashboard-item h3 {
-    margin-bottom: 15px;
-    font-size: 1.25rem;
+    margin-bottom: var(--spacing-sm);
+    font-size: var(--font-size-large);
 }
 
 .dashboard-item p {
-    margin-bottom: 10px;
-    color: #555;
+    color: var(--color-muted);
+    margin-bottom: var(--spacing-sm);
 }
 
 /* CTA Button Styles */
 .cta-button {
-    transition: all 0.3s ease;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition:
+        transform var(--transition-quick),
+        box-shadow var(--transition-quick),
+        background-color var(--transition-quick);
 }
 
 .cta-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-medium);
     text-decoration: none;
 }
 
 .cta-button i {
+    margin-right: var(--spacing-xs);
     font-size: 1.2rem;
-    margin-right: 8px;
 }
 
-/* Print Button Styles */
+/* Print Button */
 .print-button {
-    color: #495057;
-    border-color: #6c757d;
+    background-color: transparent;
+    border: 2px solid var(--color-muted);
+    color: var(--color-muted);
 }
 
 .print-button:hover {
-    background-color: #6c757d;
-    color: #fff;
-    text-decoration: none;
+    background-color: var(--color-muted);
+    color: var(--color-white);
 }
 
 /* Status Colors */
-.status.text-muted {
-    color: #6c757d;
+.status {
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
 }
 
-.status.text-warning {
-    color: #ffc107;
+.status i {
+    margin-right: var(--spacing-xs);
 }
 
-.status.text-success {
-    color: #28a745;
-}
+.status.text-muted { color: var(--color-muted); }
+.status.text-warning { color: var(--color-warning); }
+.status.text-success { color: var(--color-success); }
+.status.text-danger { color: var(--color-danger); }
 
 /* Footer Styles */
 footer {
-    background-color: #343a40;
-    color: white;
+    background-color: var(--color-secondary);
+    color: var(--color-text-light);
     text-align: center;
-    padding: 15px;
+    padding: var(--spacing-sm);
     margin-top: auto;
 }
 
-/* Modal Styles */
-#notesModal .modal-content {
-    border-radius: 10px;
-}
-
-.modal-header, .modal-footer {
-    border: none;
-}
-
-/* Floating Support Icon */
+/* Support Icon */
 .support-icon {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #007bff;
-    color: white;
+    bottom: var(--spacing-md);
+    right: var(--spacing-md);
+    background-color: var(--color-primary);
+    color: var(--color-white);
     border-radius: 50%;
     width: 60px;
     height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-medium);
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
     z-index: 1000;
+    transition:
+        background-color var(--transition-quick),
+        transform var(--transition-quick);
 }
 
 .support-icon:hover {
-    background-color: #0056b3;
+    background-color: var(--color-secondary);
     transform: scale(1.1);
 }
 
@@ -193,114 +269,75 @@ footer {
     font-size: 1.5rem;
 }
 
-/* Support Chatbox Styles */
+/* Support Chatbox */
 .support-chatbox {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: var(--spacing-md);
+    right: var(--spacing-md);
     width: 350px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: var(--color-white);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-strong);
     z-index: 1050;
     display: none;
     overflow: hidden;
 }
 
-/* Chatbox Header */
 .chatbox-header {
-    background-color: #007bff;
-    color: #fff;
-    padding: 10px;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    padding: var(--spacing-sm);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-weight: bold;
-    border-radius: 10px 10px 0 0;
+    font-weight: 600;
 }
 
-/* Close Button */
 .close-chatbox-btn {
     background: none;
     border: none;
-    color: #fff;
+    color: var(--color-white);
     font-size: 1.5rem;
     cursor: pointer;
+    transition: color var(--transition-quick);
 }
 
-/* Chatbox Body */
-.chatbox-body {
+.close-chatbox-btn:hover {
+    color: var(--color-warning);
+}
+
+/* Chat Messages */
+#chatMessages {
+    height: 400px;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    height: 400px;
+    padding: var(--spacing-sm);
+    background-color: var(--color-background);
 }
 
-/* Scrollable Chat Messages Area */
-#chatMessages {
-    flex: 1;
-    max-height: 300px;
-    overflow-y: auto;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    background-color: #f8f9fa;
-}
-
-/* Individual Messages */
 .message {
-    display: inline-block;
-    padding: 8px 12px;
-    border-radius: 20px;
     max-width: 80%;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-xs);
     word-wrap: break-word;
-    margin-bottom: 5px;
 }
 
-/* Current User Messages */
 .message.me {
-    background-color: #007bff;
-    color: #fff;
-    text-align: right;
-    margin-left: auto;
+    background-color: var(--color-primary);
+    color: var(--color-white);
+    align-self: flex-end;
 }
 
-/* Support User Messages */
 .message.other {
-    background-color: #e9ecef;
-    color: #000;
-    text-align: left;
-    margin-right: auto;
+    background-color: var(--color-muted);
+    color: var(--color-white);
+    align-self: flex-start;
 }
 
-/* Timestamp Styling */
-.timestamp {
-    font-size: 0.75rem;
-    color: #888;
-    display: block;
-    margin-top: 2px;
-    text-align: right;
-}
-
-/* Textarea */
-.chatbox-body textarea {
-    resize: none;
-}
-
-/* Send Button */
-.chatbox-body .btn-primary {
-    border-radius: 5px;
-}
-
-/* Animation for Showing Chatbox */
-.support-chatbox.show {
-    display: block;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Fade-in Animation */
+/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -312,18 +349,62 @@ footer {
     }
 }
 
+.support-chatbox.show {
+    display: flex;
+    flex-direction: column;
+    animation: fadeIn var(--transition-smooth);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .support-chatbox {
+        width: 95%;
+        right: 2.5%;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 </style>
 
 </head>
 
 
-<div class="container">
-    <h4>Welcome, <span>{{ user.first_name }}</span></h4>
+<div class="container user-dashboard">
+    <div class="dashboard-header">
+        <h2 class="greeting">
+            <i class="fas fa-hand-wave"></i> Welcome, {{ user.first_name|title }}
+        </h2>
+        <div class="user-summary">
+            <div class="user-avatar">
+                <img src="{{ user.profile_picture.url|default:'/static/img/default-avatar.png' }}"
+                     alt="{{ user.first_name }}'s profile picture">
+            </div>
+            <div class="user-details">
+                <p>Member since {{ user.date_joined|date:"F Y" }}</p>
+            </div>
+        </div>
+    </div>
+
     {% if messages %}
-        <div class="messages">
+        <div class="dashboard-alerts">
             {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
                     {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
             {% endfor %}
         </div>
@@ -331,124 +412,320 @@ footer {
 
     <div class="dashboard-grid">
         <!-- National ID Card Section -->
-            <div class="dashboard-item">
-                <h3>
-                    <i class="fas fa-id-card"></i> National ID Card
-                </h3>
-                <p>Status:
-                    <span class="status {% if national_id_application %}{% if national_id_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
+        <div class="dashboard-item {% if not national_id_application %}dashboard-item-empty{% endif %}">
+            <div class="dashboard-item-header">
+                <i class="fas fa-id-card"></i>
+                <h3>National ID Card</h3>
+            </div>
+            <div class="dashboard-item-content">
+                <div class="status-indicator">
+                    <span class="status-label">Status:</span>
+                    <span class="status
+                        {% if national_id_application %}
+                            {% if national_id_application.application.status == 'waiting' %}text-warning
+                            {% elif national_id_application.application.status == 'completed' %}text-success
+                            {% else %}text-info
+                            {% endif %}
+                        {% else %}text-muted{% endif %}">
                         {% if national_id_application %}
                             {{ national_id_application.application.status|capfirst }}
                         {% else %}
                             Not Applied
                         {% endif %}
                     </span>
-                </p>
-                <p>Required Documents:</p>
-                <ul>
-                    <li>Birth Certificate</li>
-                    <li>Proof of Address</li>
-                    <li>Passport-sized Photograph</li>
-                </ul>
-                {% if national_id_application %}
-                    <a class="btn btn-sm btn-info mt-2" data-toggle="modal" data-target="#applicationModal"
-                       data-application-id="{{ national_id_application.application.id }}"
-                       data-application-type="National ID Card"
-                       data-fetch-url="{% url 'fetch_application_details' %}">
-                        <i class="fas fa-eye"></i> View Application
-                    </a>
-                {% else %}
-                    <a href="{% url 'apply_national_id' %}" class="btn btn-sm btn-primary mt-2">
-                        <i class="fas fa-plus-circle"></i> Apply Now
-                    </a>
-                {% endif %}
-            </div>
+                </div>
 
-            <div class="dashboard-item">
-                <h3>
-                    <i class="fas fa-home"></i> Resident Permit
-                </h3>
-                <p>Status:
-                    <span class="status {% if resident_permit_application %}{% if resident_permit_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
+                <div class="document-requirements">
+                    <h4>Required Documents</h4>
+                    <ul>
+                        <li>
+                            <i class="fas fa-file-alt"></i> Birth Certificate
+                            {% if national_id_application and national_id_application.birth_certificate %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i> Proof of Address
+                            {% if national_id_application and national_id_application.proof_of_address %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <i class="fas fa-camera"></i> Passport Photo
+                            {% if national_id_application and national_id_application.passport_photo %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="dashboard-item-actions">
+                    {% if national_id_application %}
+                        <a href="#" class="btn btn-sm btn-info"
+                           data-toggle="modal"
+                           data-target="#applicationModal"
+                           data-application-id="{{ national_id_application.application.id }}"
+                           data-application-type="National ID Card"
+                           data-fetch-url="{% url 'fetch_application_details' %}">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    {% else %}
+                        <a href="{% url 'apply_national_id' %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus-circle"></i> Start Application
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Resident Permit Section -->
+        <div class="dashboard-item {% if not resident_permit_application %}dashboard-item-empty{% endif %}">
+            <div class="dashboard-item-header">
+                <i class="fas fa-home"></i>
+                <h3>Resident Permit</h3>
+            </div>
+            <div class="dashboard-item-content">
+                <div class="status-indicator">
+                    <span class="status-label">Status:</span>
+                    <span class="status
+                        {% if resident_permit_application %}
+                            {% if resident_permit_application.application.status == 'waiting' %}text-warning
+                            {% elif resident_permit_application.application.status == 'completed' %}text-success
+                            {% else %}text-info
+                            {% endif %}
+                        {% else %}text-muted{% endif %}">
                         {% if resident_permit_application %}
                             {{ resident_permit_application.application.status|capfirst }}
                         {% else %}
                             Not Applied
                         {% endif %}
                     </span>
-                </p>
-                <p>Required Documents:</p>
-                <ul>
-                    <li>Passport</li>
-                    <li>Proof of Entry</li>
-                    <li>Purpose of Stay Document</li>
-                </ul>
-                {% if resident_permit_application %}
-                    <a class="btn btn-sm btn-info mt-2" data-toggle="modal" data-target="#applicationModal"
-                       data-application-id="{{ resident_permit_application.application.id }}"
-                       data-application-type="Resident Permit"
-                       data-fetch-url="{% url 'fetch_application_details' %}">
-                        <i class="fas fa-eye"></i> View Application
-                    </a>
-                {% else %}
-                    <a href="{% url 'apply_resident_permit' %}" class="btn btn-sm btn-primary mt-2">
-                        <i class="fas fa-plus-circle"></i> Apply Now
-                    </a>
-                {% endif %}
-            </div>
+                </div>
 
-            <div class="dashboard-item">
-                <h3>
-                    <i class="fas fa-briefcase"></i> Work Permit
-                </h3>
-                <p>Status:
-                    <span class="status {% if work_permit_application %}{% if work_permit_application.application.status == 'waiting' %}text-warning{% else %}text-success{% endif %}{% else %}text-muted{% endif %}">
+                <div class="document-requirements">
+                    <h4>Required Documents</h4>
+                    <ul>
+                        <li>
+                            <i class="fas fa-passport"></i> Passport
+                            {% if resident_permit_application and resident_permit_application.passport %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <i class="fas fa-plane-arrival"></i> Proof of Entry
+                            {% if resident_permit_application and resident_permit_application.entry_proof %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <i class="fas fa-file-contract"></i> Purpose of Stay
+                            {% if resident_permit_application and resident_permit_application.purpose_document %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="dashboard-item-actions">
+                    {% if resident_permit_application %}
+                        <a href="#" class="btn btn-sm btn-info"
+                           data-toggle="modal"
+                           data-target="#applicationModal"
+                           data-application-id="{{ resident_permit_application.application.id }}"
+                           data-application-type="Resident Permit"
+                           data-fetch-url="{% url 'fetch_application_details' %}">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    {% else %}
+                        <a href="{% url 'apply_resident_permit' %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus-circle"></i> Start Application
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Permit Section -->
+        <div class="dashboard-item {% if not work_permit_application %}dashboard-item-empty{% endif %}">
+            <div class="dashboard-item-header">
+                <i class="fas fa-briefcase"></i>
+                <h3>Work Permit</h3>
+            </div>
+            <div class="dashboard-item-content">
+                <div class="status-indicator">
+                    <span class="status-label">Status:</span>
+                    <span class="status
+                        {% if work_permit_application %}
+                            {% if work_permit_application.application.status == 'waiting' %}text-warning
+                            {% elif work_permit_application.application.status == 'completed' %}text-success
+                            {% else %}text-info
+                            {% endif %}
+                        {% else %}text-muted{% endif %}">
                         {% if work_permit_application %}
                             {{ work_permit_application.application.status|capfirst }}
                         {% else %}
                             Not Applied
                         {% endif %}
                     </span>
-                </p>
-                <p>Required Documents:</p>
-                <ul>
-                    <li>Employment Contract</li>
-                    <li>Passport</li>
-                    <li>Proof of Address</li>
-                </ul>
-                {% if work_permit_application %}
-                    <a class="btn btn-sm btn-info mt-2" data-toggle="modal" data-target="#applicationModal"
-                       data-application-id="{{ work_permit_application.application.id }}"
-                       data-application-type="Work Permit"
-                       data-fetch-url="{% url 'fetch_application_details' %}">
-                        <i class="fas fa-eye"></i> View Application
-                    </a>
-                {% else %}
-                    <a href="{% url 'apply_work_permit' %}" class="btn btn-sm btn-primary mt-2">
-                        <i class="fas fa-plus-circle"></i> Apply Now
-                    </a>
-                {% endif %}
-            </div>
+                </div>
 
-            <!-- New Driver's License item -->
-            <div class="dashboard-item">
+                <div class="document-requirements">
+                    <h4>Required Documents</h4>
+                    <ul>
+                        <li>
+                            <i class="fas fa-file-contract"></i> Employment Contract
+                            {% if work_permit_application and work_permit_application.employment_contract %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <i class="fas fa-passport"></i> Passport
+                            {% if work_permit_application and work_permit_application.passport %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </li>
+                        <li>
+                            <i class="fas fa-map-marker-alt"></i> Proof of Address
+                            {% if work_permit_application and work_permit_application.proof_of_address %}
+                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                            {% endif %}
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="dashboard-item-actions">
+                    {% if work_permit_application %}
+                        <a href="#" class="btn btn-sm btn-info"
+                           data-toggle="modal"
+                           data-target="#applicationModal"
+                           data-application-id="{{ work_permit_application.application.id }}"
+                           data-application-type="Work Permit"
+                           data-fetch-url="{% url 'fetch_application_details' %}">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    {% else %}
+                        <a href="{% url 'apply_work_permit' %}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus-circle"></i> Start Application
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Drivers License Section -->
+        <div class="dashboard-item {% if not drivers_license %}dashboard-item-empty{% endif %}">
+            <div class="dashboard-item-header">
+                <i class="fas fa-car"></i>
                 <h3>Driver's License</h3>
-                <p>Status: <span class="status expired" id="drivers-license-status">Expired</span></p>
-                <p>Expiry Date: <span id="drivers-license-expiry">2023-05-31</span></p>
-                <p>Points: <span id="drivers-license-points">8/12</span></p>
-                <p>License Status: <span class="status" id="drivers-license-freeze-status">Active</span></p>
-                <div class="warning">Your license has expired. Please apply for an extension.</div>
-                <a href="#" class="cta-button">Apply for Extension</a>
-                <a href="#" class="cta-button">View Point History</a>
             </div>
+            <div class="dashboard-item-content">
+                <div class="status-indicator">
+                    <span class="status-label">Status:</span>
+                    <span class="status
+                        {% if drivers_license %}
+                            {% if drivers_license.is_expired %}text-danger
+                            {% elif drivers_license.is_near_expiry %}text-warning
+                            {% else %}text-success
+                            {% endif %}
+                        {% else %}text-muted{% endif %}">
+                        {% if drivers_license %}
+                            {% if drivers_license.is_expired %}Expired
+                            {% elif drivers_license.is_near_expiry %}Expiring Soon
+                            {% else %}Active
+                            {% endif %}
+                        {% else %}
+                            Not Issued
+                        {% endif %}
+                    </span>
+                </div>
 
-            <!-- Existing items continued -->
-            <div class="dashboard-item">
-                <h3>TIN Number</h3>
-                <p>Status: <span class="status" id="tin-status">Approved</span></p>
-                <p>TIN: <span id="tin-number">1234567890</span></p>
-                <a href="#" class="cta-button print-button" onclick="printTIN()">Print TIN Certificate</a>
+                {% if drivers_license %}
+                    <div class="license-details">
+                        <p>
+                            <strong>License Number:</strong>
+                            {{ drivers_license.license_number }}
+                        </p>
+                        <p>
+                            <strong>Expiry Date:</strong>
+                            {{ drivers_license.expiry_date }}
+                        </p>
+                        <p>
+                            <strong>Points:</strong>
+                            {{ drivers_license.current_points }}/12
+                        </p>
+                    </div>
+                {% endif %}
+
+                <div class="dashboard-item-actions">
+                    {% if drivers_license and drivers_license.is_expired %}
+                        <a href="#" class="btn btn-sm btn-danger">
+                            <i class="fas fa-sync"></i> Renew License
+                        </a>
+                    {% elif not drivers_license %}
+                        <a href="#" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus-circle"></i> Apply for License
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    {% endif %}
+                </div>
             </div>
+        </div>
+
+        <!-- Tax Identification Number Section -->
+        <div class="dashboard-item {% if not tax_info %}dashboard-item-empty{% endif %}">
+            <div class="dashboard-item-header">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <h3>Tax Information</h3>
+            </div>
+            <div class="dashboard-item-content">
+                <div class="status-indicator">
+                    <span class="status-label">Status:</span>
+                    <span class="status
+                        {% if tax_info %}
+                            {% if tax_info.is_active %}text-success
+                            {% else %}text-warning
+                            {% endif %}
+                        {% else %}text-muted{% endif %}">
+                        {% if tax_info %}
+                            {{ tax_info.status|capfirst }}
+                        {% else %}
+                            Not Registered
+                        {% endif %}
+                    </span>
+                </div>
+
+                {% if tax_info %}
+                    <div class="tax-details">
+                        <p>
+                            <strong>TIN Number:</strong>
+                            {{ tax_info.tin_number }}
+                        </p>
+                        <p>
+                            <strong>Registration Date:</strong>
+                            {{ tax_info.registration_date }}
+                        </p>
+                    </div>
+                {% endif %}
+
+                <div class="dashboard-item-actions">
+                    {% if tax_info %}
+                        <a href="#" class="btn btn-sm btn-info">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        <a href="#" class="btn btn-sm btn-primary" onclick="printTaxCertificate()">
+                            <i class="fas fa-print"></i> Print Certificate
+                        </a>
+                    {% else %}
+                        <a href="#" class="btn btn-sm btn-primary">
+                            <i class="fas fa-plus-circle"></i> Register TIN
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
             <div class="dashboard-item">
                 <h3>Upcoming Appointments</h3>

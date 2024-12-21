@@ -429,6 +429,7 @@
         </div>
     </div>
 </div>
+
 <!-- Add FAQ Modal -->
 <div class="modal fade" id="addFAQModal" tabindex="-1" role="dialog" aria-labelledby="addFAQModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -456,11 +457,13 @@
                         </label>
                         <select class="form-select" name="category" required>
                             <option value="">Select a category</option>
-                            <option value="general">General</option>
-                            <option value="account">Account & Security</option>
-                            <option value="billing">Billing</option>
-                            <option value="technical">Technical</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}">{{ category.name }}</option>
+                            {% empty %}
+                            <option value="">No categories available</option>
+                            {% endfor %}
                         </select>
+
                         <div class="invalid-feedback">
                             Please select a category.
                         </div>
@@ -1009,10 +1012,11 @@
                                 </label>
                                 <select class="form-select" name="category" required>
                                     <option value="">Select category</option>
-                                    <option value="general">General</option>
-                                    <option value="technical">Technical</option>
-                                    <option value="billing">Billing</option>
-                                    <option value="security">Security</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}" {% if category.id == faq.category.id %}selected{% endif %}>
+                                            {{ category.name }}
+                                        </option>
+                                    {% endfor %}
                                 </select>
                                 <div class="invalid-feedback">
                                     Please select a category.
@@ -1090,6 +1094,7 @@
                                 </label>
                                 <input type="text"
                                        class="form-control"
+                                       id="editTags"
                                        name="tags"
                                        placeholder="Enter tags separated by commas">
                                 <small class="text-muted">
@@ -1108,15 +1113,15 @@
                             </h6>
                             <div class="mb-3">
                                 <small class="text-muted d-block">Last Updated</small>
-                                <span class="text-dark" id="lastUpdated">2024-03-15</span>
+                                <span class="text-dark" id="lastUpdated">{{ faq.last_updated }}</span>
                             </div>
                             <div class="mb-3">
                                 <small class="text-muted d-block">Created by</small>
-                                <span class="text-dark" id="createdBy">John Doe</span>
+                                <span class="text-dark" id="createdBy">{{ faq.created_by }}</span>
                             </div>
                             <div class="mb-3">
                                 <small class="text-muted d-block">View Count</small>
-                                <span class="text-dark" id="viewCount">1,234</span>
+                                <span class="text-dark" id="viewCount">{{ faq.view_count }}</span>
                             </div>
                             <hr>
                             <h6 class="mb-3">
@@ -1160,6 +1165,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
     // Handle Respond button click
@@ -1500,7 +1506,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 </script>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         // Populate the update modal with FAQ data
@@ -1509,10 +1514,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 const faqId = this.getAttribute('data-faq-id');
                 const question = this.getAttribute('data-question');
                 const answer = this.getAttribute('data-answer');
+                const createdBy = this.getAttribute('data-created-by');
+                const lastUpdated = this.getAttribute('data-last-updated');
+                const tags = this.getAttribute('data-tags');
 
+                // Set the values in the modal form fields
                 document.getElementById('faqId').value = faqId;
                 document.getElementById('editQuestion').value = question;
                 document.getElementById('editAnswer').value = answer;
+                document.getElementById('editTags').value = tags;
+
+                // Set the last updated and created by values in the modal
+                document.getElementById('lastUpdated').innerText = lastUpdated;
+                document.getElementById('createdBy').innerText = createdBy;
             });
         });
 
@@ -1522,6 +1536,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const formData = new FormData(this);
             const faqId = formData.get('faq_id');
+
+            // Add the current logged-in user to the form data
+            formData.append('updated_by', '{{ request.user.id }}');  // Passing the logged-in user's ID
 
             fetch(`/immigration/update_faq/${faqId}/`, {
                 method: 'POST',
@@ -1545,6 +1562,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 </script>
+
+
 <script>
     // Function to animate numbers
     function animateCountUp(targetElement, start, end, duration) {

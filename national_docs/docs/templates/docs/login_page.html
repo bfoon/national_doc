@@ -7,14 +7,29 @@
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            height: 100vh;
+             :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #ecf0f1;
+            --text-color: #2c3e50;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+          body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--background-color);
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0;
+            min-height: 100vh;
+            background-image: linear-gradient(135deg, rgba(44, 62, 80, 0.1) 0%, rgba(52, 152, 219, 0.1) 100%);
+            padding: 1rem;
         }
         .container {
             background-color: white;
@@ -25,10 +40,35 @@
             max-width: 400px;
             text-align: center;
         }
-        .logo {
-            width: 100px;
-            height: auto;
-            margin-bottom: 1rem;
+         .logo {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin-bottom: 1.5rem;
+            border-radius: 50%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .form-control {
+            height: 50px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding-left: 40px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
         }
         h1 {
             font-size: 1.5rem;
@@ -39,27 +79,87 @@
         .form-group label {
             font-weight: 600;
         }
-        .btn-primary {
-            background-color: #0069d9;
-            border-color: #0069d9;
-            padding: 0.5rem 1.5rem;
-            font-size: 1rem;
+           .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--white);
+            height: 50px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
         }
+
+
         .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
+            background-color: #34495e;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
         .links {
-            margin-top: 1rem;
+           margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
             font-size: 0.9rem;
         }
         .links a {
-            color: #0069d9;
+            color: var(--secondary-color);
             text-decoration: none;
+            transition: color 0.3s ease;
         }
         .links a:hover {
+            color: var(--primary-color);
             text-decoration: underline;
         }
+        messages {
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 576px) {
+            .login-container {
+                padding: 1.5rem;
+                max-width: 100%;
+            }
+
+            .links {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .links a {
+                margin-bottom: 0.75rem;
+            }
+        }
+         /* Additional Modal Styling */
+    .modal-content {
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .accordion .card {
+        border: none;
+        margin-bottom: 10px;
+    }
+
+    .accordion .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .accordion .card-header button {
+        color: #495057;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .accordion .card-header button:hover {
+        color: #007bff;
+    }
+
+    .accordion .card-body {
+        background-color: #f1f3f5;
+    }
     </style>
 </head>
 <body>
@@ -104,34 +204,92 @@
         </div>
     </div>
 
-    <!-- Disclaimer Modal -->
-    <div class="modal fade" id="disclaimerModal" tabindex="-1" role="dialog" aria-labelledby="disclaimerModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-warning text-white">
-                    <h5 class="modal-title" id="disclaimerModalLabel">Disclaimer</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+  <!-- Enhanced Legal Disclaimer Modal -->
+<div class="modal fade" id="disclaimerModal" tabindex="-1" role="dialog" aria-labelledby="disclaimerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="disclaimerModalLabel">
+                    <i class="fas fa-exclamation-triangle mr-3"></i>Legal Disclaimer and System Use Agreement
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <strong>IMPORTANT:</strong> Unauthorized use of this system is strictly prohibited and may result in criminal prosecution.
                 </div>
-                <div class="modal-body">
-                    <p>
-                        <strong>Warning:</strong> Any illegal activity conducted on this system is punishable by the court of law.
-                    </p>
-                    <p>
-                        According to the Constitution of The Gambia, engaging in the creation of fake national documents or digital fraud is a serious offense.
-                    </p>
-                    <p>
-                        By clicking "Accept", you agree to comply with these laws and understand the consequences of any fraudulent activities.
-                    </p>
+
+                <div class="accordion" id="disclaimerAccordion">
+                    <div class="card">
+                        <div class="card-header" id="legalWarningHeader">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#legalWarningContent">
+                                    <i class="fas fa-balance-scale mr-2"></i>Legal Consequences
+                                </button>
+                            </h2>
+                        </div>
+
+                        <div id="legalWarningContent" class="collapse show" aria-labelledby="legalWarningHeader" data-parent="#disclaimerAccordion">
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <i class="fas fa-gavel mr-2 text-danger"></i>
+                                        Fraudulent document creation is a criminal offense under The Gambia's Penal Code
+                                    </li>
+                                    <li class="mb-2">
+                                        <i class="fas fa-file-contract mr-2 text-danger"></i>
+                                        Penalties may include imprisonment, significant fines, and permanent legal record
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-user-shield mr-2 text-danger"></i>
+                                        All system activities are logged, monitored, and can be used as evidence
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header" id="systemUsageHeader">
+                            <h2 class="mb-0">
+                                <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#systemUsageContent">
+                                    <i class="fas fa-user-check mr-2"></i>User Responsibilities
+                                </button>
+                            </h2>
+                        </div>
+                        <div id="systemUsageContent" class="collapse" aria-labelledby="systemUsageHeader" data-parent="#disclaimerAccordion">
+                            <div class="card-body">
+                                <ol>
+                                    <li>Use this system only for legitimate and authorized purposes</li>
+                                    <li>Protect your login credentials</li>
+                                    <li>Report any suspicious activities immediately</li>
+                                    <li>Understand that all actions are traceable to your account</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Decline</button>
-                    <button type="button" class="btn btn-success" id="acceptDisclaimer">Accept</button>
+
+                <div class="form-check mt-3">
+                    <input type="checkbox" class="form-check-input" id="disclaimerConsent">
+                    <label class="form-check-label" for="disclaimerConsent">
+                        I have read, understood, and agree to the legal disclaimer
+                    </label>
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times mr-2"></i>Decline
+                </button>
+                <button type="button" class="btn btn-success" id="acceptDisclaimer" disabled>
+                    <i class="fas fa-check mr-2"></i>Accept
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
@@ -156,6 +314,27 @@
             });
         });
     </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const disclaimerConsent = document.getElementById('disclaimerConsent');
+    const acceptDisclaimerBtn = document.getElementById('acceptDisclaimer');
+
+    // Enable/disable accept button based on checkbox
+    disclaimerConsent.addEventListener('change', function() {
+        acceptDisclaimerBtn.disabled = !this.checked;
+    });
+
+    // Optional: Expand/collapse sections with keyboard
+    document.querySelectorAll('.card-header button').forEach(button => {
+        button.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                this.click();
+            }
+        });
+    });
+});
+</script>
 
 </body>
 </html>

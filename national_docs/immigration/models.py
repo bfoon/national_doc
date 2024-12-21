@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from docs.models import Application, ChatMessage
+from django.utils.text import slugify
 
 
 class PostLocation(models.Model):
@@ -145,19 +146,124 @@ class Notification(models.Model):
     def __str__(self):
         return f'Notification for {self.user.username}: {self.message}'
 
-class FAQ(models.Model):
-    question = models.CharField(max_length=255)
-    answer = models.TextField()
+class FAQCategory(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    slug = models.SlugField(unique=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = "FAQ Category"
+        verbose_name_plural = "FAQ Categories"
+        ordering = ['name']
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+class FAQ(models.Model):
+    PRIORITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+    ]
+
+    # Basic Fields
+    question = models.CharField(max_length=255)
+    answer = models.TextField()
+    slug = models.SlugField(unique=True, editable=False)
+
+    # Categorization
+    category = models.ForeignKey(
+        FAQCategory,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='faqs'
+    )
+    tags = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Comma-separated tags"
+    )
+    priority = models.CharField(
+        max_length=10,
+        choices=PRIORITY_CHOICES,
+        default='low'
+    )
+
+    # Metadata
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='created_faqs'
+    )
+    updated_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='updated_faqs'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+    view_count = models.PositiveIntegerField(default=0)
+
+    class Meta:
         verbose_name = "FAQ"
         verbose_name_plural = "FAQs"
-        ordering = ['-created_at']
+        ordering = ['-priority', '-updated_at']
+        indexes = [
+            models.Index(fields=['slug']),
+            models.Index(fields=['priority', '-updated_at']),
+        ]
 
     def __str__(self):
         return self.question
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.question)[:50]
+        super().save(*args, **kwargs)
+
+    def increment_view_count(self):
+        """Increment the view count of the FAQ"""
+        self.view_count += 1
+        self.save(update_fields=['view_count'])
+
+    @property
+    def tag_list(self):
+        """Return list of tags"""
+        if self.tags:
+            return [tag.strip() for tag in self.tags.split(',')]
+        return []
+
+    @property
+    def is_recently_updated(self):
+        """Check if FAQ was updated in the last 7 days"""
+        from django.utils import timezone
+        from datetime import timedelta
+        return self.updated_at >= timezone.now() - timedelta(days=7)
+
+    @classmethod
+    def get_popular_faqs(cls, limit=5):
+        """Get most viewed FAQs"""
+        return cls.objects.filter(is_active=True).order_by('-view_count')[:limit]
+
+    @classmethod
+    def search(cls, query):
+        """Search FAQs by question, answer, or tags"""
+        return cls.objects.filter(
+            models.Q(question__icontains=query) |
+            models.Q(answer__icontains=query) |
+            models.Q(tags__icontains=query),
+            is_active=True
+        ).distinct()
 
 class CallNote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='call_notes')

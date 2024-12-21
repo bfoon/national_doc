@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head>{% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>National Document Services</title>
@@ -8,97 +8,132 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
+  <style>
+        /* Root Variables */
+        :root {
+            --primary-color: #2989d8;
+            --secondary-color: #1e5799;
+            --text-color: #333;
+            --background-light: #f4f7f6;
+        }
+
+        /* General Reset */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
             scroll-behavior: smooth;
         }
 
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1590650153855-d9e808231d41?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-align: center;
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
         }
+
+        /* Hero Section */
+     .hero {
+    position: relative;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(41, 137, 216, 0.4), rgba(30, 87, 153, 0.4)),
+                url('https://images.unsplash.com/photo-1590650153855-d9e808231d41?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center/cover;
+    color: white;
+    text-align: center;
+}
+
 
         .hero-content {
-            background: rgba(0, 0, 0, 0.7);
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
             padding: 2rem;
-            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
         }
 
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 3rem 1rem;
+            background-color: var(--background-light);
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Buttons */
         .btn-primary {
-            background-color: #2989d8;
-            border-color: #2989d8;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
             padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 20px;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            border-radius: 30px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
         }
 
         .btn-primary:hover {
-            background-color: #1e5799;
+            background-color: var(--secondary-color);
             transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
         }
 
-        .card {
-            border: none;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            color: #2989d8;
-        }
-
-        .modal-header {
-            background-color: #2989d8;
-            color: white;
-        }
-
-        .modal-footer .btn {
-            border-radius: 20px;
-        }
-
+        /* Footer */
         footer {
-            background-color: #2989d8;
+            background-color: var(--primary-color);
             color: white;
-            padding: 1rem;
+            text-align: center;
+            padding: 2rem;
         }
 
-        footer p {
-            margin: 0;
+        @media (max-width: 768px) {
+            .hero-content {
+                padding: 1rem;
+                margin: 0 1rem;
+            }
         }
     </style>
 </head>
 <body>
 
     <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
-        <a class="navbar-brand" href="#">National Documents</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
-                <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-                <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-                <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-            </ul>
-        </div>
-    </nav>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+            <a class="navbar-brand" href="#">
+                <img src="{% static 'img/logo.png' %}" alt="National Documents Logo" style="height: 40px; width: auto;">
+                National Documents
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+
 
     <!-- Hero Section -->
     <section id="home" class="hero">
@@ -158,25 +193,53 @@
         </div>
     </section>
 
-    <!-- Modal for Document Requirements -->
-    <div class="modal fade" id="documentsModal" tabindex="-1" role="dialog" aria-labelledby="documentsModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="documentsModalLabel"></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+   <!-- Enhanced Document Requirements Modal -->
+<div class="modal fade" id="documentsModal" tabindex="-1" role="dialog" aria-labelledby="documentsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="documentsModalLabel">
+                    <i class="fas fa-file-alt mr-2"></i>Document Requirements
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true" class="text-white">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-list-ul mr-2"></i>Required Documents
+                        </h6>
+                        <ul id="documentsList" class="list-group list-group-flush"></ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-primary mb-3">
+                            <i class="fas fa-info-circle mr-2"></i>Important Notes
+                        </h6>
+                        <div id="documentNotes" class="alert alert-info">
+                            <p>Please ensure all documents are:</p>
+                            <ul class="pl-3">
+                                <li>Original or certified copies</li>
+                                <li>Not older than 6 months</li>
+                                <li>Clearly readable</li>
+                                <li>Translated to English if in another language</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <ul id="documentsList"></ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times mr-2"></i>Close
+                </button>
+                <button type="button" class="btn btn-primary" id="downloadRequirementsBtn">
+                    <i class="fas fa-download mr-2"></i>Download Checklist
+                </button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- About Section -->
     <section id="about" class="py-5 bg-light text-center">
@@ -228,31 +291,149 @@
     </footer>
 
     <!-- Scripts -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const buttons = document.querySelectorAll('.view-documents-btn');
-            buttons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const card = this.closest('.card');
-                    const serviceName = card.getAttribute('data-service');
-                    const documents = JSON.parse(card.getAttribute('data-documents'));
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('.view-documents-btn');
+    const documentsList = document.getElementById('documentsList');
+    const modalTitle = document.getElementById('documentsModalLabel');
+    const downloadBtn = document.getElementById('downloadRequirementsBtn');
 
-                    const modalTitle = document.getElementById('documentsModalLabel');
-                    const documentsList = document.getElementById('documentsList');
+    buttons.forEach(button => {
+        button.addEventListener('click', function () {
+            const card = this.closest('[data-service]');
+            const serviceName = card.getAttribute('data-service');
+            const documents = JSON.parse(card.getAttribute('data-documents'));
 
-                    modalTitle.textContent = `Required Documents for ${serviceName}`;
-                    documentsList.innerHTML = '';
-                    documents.forEach(doc => {
-                        const li = document.createElement('li');
-                        li.textContent = doc;
-                        documentsList.appendChild(li);
-                    });
+            // Update modal title
+            modalTitle.innerHTML = `
+                <i class="fas fa-file-alt mr-2"></i>
+                Document Requirements for ${serviceName}
+            `;
 
-                    $('#documentsModal').modal('show');
-                });
+            // Populate documents list
+            documentsList.innerHTML = '';
+            documents.forEach(doc => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex align-items-center';
+                li.innerHTML = `
+                    <i class="fas fa-check-circle text-success mr-2"></i>
+                    ${doc}
+                `;
+                documentsList.appendChild(li);
             });
+
+            // Configure download button
+            downloadBtn.onclick = function() {
+                downloadDocumentChecklist(serviceName, documents);
+            };
+
+            // Show modal
+            $('#documentsModal').modal('show');
         });
-    </script>
+    });
+
+    // Function to download document checklist
+    function downloadDocumentChecklist(serviceName, documents) {
+        const element = document.createElement('a');
+        const checklist = [
+            `Document Checklist for ${serviceName}`,
+            '-----------------------------------',
+            ...documents.map((doc, index) => `${index + 1}. ${doc}`),
+            '',
+            'Additional Notes:',
+            '- Ensure all documents are original or certified copies',
+            '- Documents should not be older than 6 months',
+            '- All documents must be clearly readable',
+            '- Non-English documents must be translated'
+        ].join('\n');
+
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(checklist));
+        element.setAttribute('download', `${serviceName.replace(/\s+/g, '_')}_Checklist.txt`);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+});
+</script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a.nav-link[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Active state for navigation items
+    const currentLocation = location.href;
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        if (link.href === currentLocation) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+
+<style>
+    /* Enhanced Navbar Styles */
+    .navbar {
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .navbar-brand img {
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .navbar-nav .nav-link {
+        transition: color 0.3s ease, transform 0.2s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .navbar-nav .nav-link:hover {
+        transform: translateY(-2px);
+    }
+
+    .dropdown-menu {
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        transition: background-color 0.3s ease;
+    }
+
+    .dropdown-item:hover {
+        background-color: rgba(0,0,0,0.05);
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 991px) {
+        .navbar-nav .btn-outline-light {
+            margin: 10px 0;
+            width: 100%;
+        }
+    }
+</style>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

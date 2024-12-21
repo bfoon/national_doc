@@ -1,14 +1,129 @@
 <style>
-        footer {
-            background-color: #3498db;
-            color: white;
+    :root {
+        --footer-bg-color: #2980b9;
+        --footer-text-color: #ffffff;
+        --footer-link-color: #e6f2ff;
+        --footer-hover-color: #f1c40f;
+    }
+
+    footer {
+        background-color: var(--footer-bg-color);
+        color: var(--footer-text-color);
+        padding: 2rem 1rem;
+        width: 100%;
+        margin-top: auto;
+        box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease;
+    }
+
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .footer-section {
+        flex: 1;
+        margin: 0.5rem;
+        min-width: 200px;
+    }
+
+    .footer-links {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .footer-links a {
+        color: var(--footer-link-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease, transform 0.2s ease;
+    }
+
+    .footer-links a:hover {
+        color: var(--footer-hover-color);
+        transform: scale(1.05);
+    }
+
+    .footer-social {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .footer-social a {
+        color: var(--footer-text-color);
+        font-size: 1.5rem;
+        transition: color 0.3s ease, transform 0.2s ease;
+    }
+
+    .footer-social a:hover {
+        color: var(--footer-hover-color);
+        transform: scale(1.2);
+    }
+
+    .footer-bottom {
+        text-align: center;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .footer-content {
+            flex-direction: column;
             text-align: center;
-            padding: 1rem;
-            width: 100%;
-            margin-top: auto;
         }
+
+        .footer-section {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+    }
 </style>
 
 <footer>
-    <p>Developed by Akaine Consulting</p>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h5>Quick Links</h5>
+            <div class="footer-links">
+                <a href="{% url 'home' %}">Home</a>
+                <a href="{% url 'about' %}">About</a>
+                <a href="{% url 'contact' %}">Contact</a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h5>Contact Us</h5>
+            <p>Email: support@nationaldocuments.gov</p>
+            <p>Phone: +254 (0) 123 456 789</p>
+        </div>
+
+        <div class="footer-section">
+            <h5>Connect</h5>
+            <div class="footer-social">
+                <a href="#" aria-label="Facebook" title="Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" aria-label="Twitter" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" aria-label="LinkedIn" title="LinkedIn">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; {% now "Y" %} National Documents Portal.
+            Developed by <a href="#" class="text-light">Akaine Consulting</a>.
+            All Rights Reserved.</p>
+    </div>
 </footer>

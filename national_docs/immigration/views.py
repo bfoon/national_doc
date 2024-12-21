@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from docs.models import Application, UploadedDocument, ChatMessage
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile, Notification,
-                     FAQ, CallNote, MessageNote)
+                     FAQ, FAQCategory, CallNote, MessageNote)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.dateparse import parse_date
@@ -32,6 +32,8 @@ from threading import Thread
 from django.core.mail import send_mail
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
+from django.utils.text import slugify
+import logging
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -1258,6 +1260,9 @@ def support_desk(request):
     open_chats = ChatMessage.objects.filter(is_read=False, parent__isnull=True).count()
     closed_chats = ChatMessage.objects.filter(is_read=True, parent__isnull=True).count()
 
+    # Fetch FAQ categories for the form
+    faq_categories = FAQCategory.objects.all()
+
     # Context data for the template
     context = {
         'faqs': faqs,
@@ -1267,103 +1272,207 @@ def support_desk(request):
         'closed_applications': closed_applications,
         'open_chats': open_chats,
         'closed_chats': closed_chats,
+        'categories': faq_categories,
     }
     return render(request, 'immigration/support_desk.html', context)
 
+# Validation function for FAQ data
+def validate_faq_data(data):
+    """Validate FAQ data and return any errors"""
+    errors = {}
+
+    if len(data['question']) < 10:
+        errors['question'] = 'Question must be at least 10 characters long.'
+
+    if len(data['answer']) < 20:
+        errors['answer'] = 'Answer must be at least 20 characters long.'
+
+    if data['category_id']:
+        try:
+            FAQCategory.objects.get(id=data['category_id'])
+        except FAQCategory.DoesNotExist:
+            errors['category'] = 'Invalid category selected.'
+
+    if data['priority'] not in dict(FAQ.PRIORITY_CHOICES):
+        errors['priority'] = 'Invalid priority selected.'
+
+    return errors
+
+@login_required
+def add_faq(request):
+    if request.method == 'POST':
+        # Extract data from the form
+        category_id = request.POST.get('category')
+        question = request.POST.get('question')
+        answer = request.POST.get('answer')
+        tags = request.POST.get('tags', '')
+        priority = request.POST.get('priority', 'low')
+
+        # Validate and process the category
+        try:
+            category = FAQCategory.objects.get(id=category_id)
+        except FAQCategory.DoesNotExist:
+            category = None
+
+        # Create the FAQ
+        faq = FAQ(
+            category=category,
+            question=question,
+            answer=answer,
+            tags=tags,
+            priority=priority,
+            created_by=request.user,
+            updated_by=request.user,
+        )
+        faq.save()
+
+        # Display success message and redirect
+        messages.success(request, 'FAQ added successfully.')
+        return redirect('support_desk')  # Redirect to the support desk view
+
+    return redirect('support_desk')  # Redirect for non-POST requests
+
+@login_required
+def update_faq(request, faq_id):
+    faq = FAQ.objects.get(id=faq_id)
+
+    if request.method == 'POST':
+        # Ensure the user is authenticated
+        if not request.user.is_authenticated:
+            return JsonResponse({"success": False, "error": "User not authenticated"})
+
+        # Get the data from the form submission
+        question = request.POST.get('question')
+        answer = request.POST.get('answer')
+        category_id = request.POST.get('category')
+        tags = request.POST.get('tags')
+
+        # Set the updated fields
+        faq.question = question
+        faq.answer = answer
+        faq.category_id = category_id  # Assuming category ID is sent
+        faq.tags = tags
+        faq.updated_by = request.user  # Set the user who updated the FAQ
+
+        # Save the changes
+        faq.save()
+
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"success": False, "error": "Invalid request"})
+
+# Delete FAQ View
+@login_required
+@require_http_methods(["POST", "DELETE"])
+def delete_faq(request, faq_id):
+    try:
+        faq = get_object_or_404(FAQ, id=faq_id)
+
+        # Soft delete
+        faq.is_active = False
+        faq.updated_by = request.user
+        faq.save()
+
+        messages.success(request, 'FAQ deleted successfully!')
+        return redirect('support_desk')
+
+    except Exception as e:
+        logging.error(f"Error deleting FAQ: {str(e)}", exc_info=True)
+        messages.error(request, 'An unexpected error occurred while deleting the FAQ.')
+        return redirect('support_desk')
+
+# AJAX Add FAQ View
 @login_required
 @require_http_methods(["POST"])
-def add_faq(request):
+def add_faq_ajax(request):
     try:
-        # Get form data
-        question = request.POST.get('question', '').strip()
-        answer = request.POST.get('answer', '').strip()
+        # Extract and clean form data
+        data = {
+            'question': request.POST.get('question', '').strip(),
+            'answer': request.POST.get('answer', '').strip(),
+            'category_id': request.POST.get('category'),
+            'priority': request.POST.get('priority', 'low'),
+            'tags': request.POST.get('tags', '').strip(),
+        }
 
         # Validate input
-        if len(question) < 10:
-            return JsonResponse({
-                'success': False,
-                'error': 'Question must be at least 10 characters long'
-            })
+        errors = validate_faq_data(data)
+        if errors:
+            return JsonResponse({'success': False, 'errors': errors}, status=400)
 
-        if len(answer) < 20:
-            return JsonResponse({
-                'success': False,
-                'error': 'Answer must be at least 20 characters long'
-            })
-
-        # Create new FAQ
-        FAQ.objects.create(
-            question=question,
-            answer=answer
+        # Create FAQ
+        faq = FAQ.objects.create(
+            question=data['question'],
+            answer=data['answer'],
+            category_id=data['category_id'],
+            priority=data['priority'],
+            tags=data['tags'],
+            created_by=request.user,
+            updated_by=request.user,
         )
 
         return JsonResponse({
             'success': True,
-            'message': 'FAQ added successfully'
+            'message': 'FAQ added successfully!',
+            'faq': {
+                'id': faq.id,
+                'question': faq.question,
+                'answer': faq.answer,
+                'category': faq.category.name if faq.category else None,
+                'priority': faq.priority,
+                'tags': faq.tags,
+                'created_at': faq.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            }
         })
 
     except Exception as e:
-        print(f"Error adding FAQ: {str(e)}")  # For debugging
-        return JsonResponse({
-            'success': False,
-            'error': 'An unexpected error occurred'
-        })
-
-
-@require_http_methods(["POST"])
-def update_faq(request, faq_id):
-    try:
-        faq = FAQ.objects.get(id=faq_id)
-        question = request.POST.get('question')
-        answer = request.POST.get('answer')
-
-        if len(question) < 10:
-            raise ValidationError('Question must be at least 10 characters long')
-        if len(answer) < 20:
-            raise ValidationError('Answer must be at least 20 characters long')
-
-        faq.question = question
-        faq.answer = answer
-        faq.save()
-
-        return JsonResponse({'success': True})
-    except FAQ.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'FAQ not found'})
-    except ValidationError as e:
-        return JsonResponse({'success': False, 'error': str(e)})
-    except Exception as e:
-        return JsonResponse({'success': False, 'error': 'An unexpected error occurred'})
+        logging.error(f"Error in AJAX Add FAQ: {str(e)}", exc_info=True)
+        return JsonResponse({'success': False, 'error': 'An unexpected error occurred.'}, status=500)
 
 @login_required
-def delete_faq(request, faq_id):
-    faq = get_object_or_404(FAQ, id=faq_id)
-    faq.delete()
-    messages.success(request, 'FAQ deleted successfully!')
-    return redirect('support_desk')
-
 def search_faqs(request):
     try:
         query = request.GET.get('q', '').strip()
+        category = request.GET.get('category')
+        priority = request.GET.get('priority')
 
+        faqs = FAQ.objects.filter(is_active=True)
+
+        # Apply filters
         if query:
-            # Search in both question and answer fields
-            faqs = FAQ.objects.filter(
-                Q(question__icontains=query) |
-                Q(answer__icontains=query)
-            ).values('id', 'question', 'answer')
-        else:
-            # If no query, return all FAQs
-            faqs = FAQ.objects.all().values('id', 'question', 'answer')
+            faqs = FAQ.search(query)
+
+        if category:
+            faqs = faqs.filter(category_id=category)
+
+        if priority:
+            faqs = faqs.filter(priority=priority)
+
+        # Increment view count for search results
+        for faq in faqs:
+            faq.increment_view_count()
+
+        faqs_data = faqs.values(
+            'id', 'question', 'answer', 'priority',
+            'view_count', 'tags', 'created_at', 'updated_at',
+            'category__name', 'created_by__first_name',
+            'created_by__last_name'
+        )
 
         return JsonResponse({
             'success': True,
-            'faqs': list(faqs)
+            'faqs': list(faqs_data)
         })
+
     except Exception as e:
+        import logging
+        logging.error(f"Error searching FAQs: {str(e)}", exc_info=True)
         return JsonResponse({
             'success': False,
-            'error': str(e)
-        }, status=400)
+            'error': 'An error occurred while searching FAQs'
+        }, status=500)
+
+
 
 @login_required
 @user_passes_test(is_staff_or_superuser)

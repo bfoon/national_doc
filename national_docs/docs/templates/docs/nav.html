@@ -1,85 +1,100 @@
+{% load static %}
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-            <!-- Profile Link -->
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mainNavbar" 
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-            <!-- Admin Link for System Admin and Superuser -->
-                {% if user.groups.all %}
-                    {% for group in user.groups.all %}
-                        {% if group.name == 'sysadmin' %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="/system-admin/officer_profiles">Admin</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-             {% elif user.is_superuser %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/system-admin/officer_profiles">Admin</a>
-                    </li>
-                {% endif %}
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ml-auto">
+                {% comment %}Contextual Navigation Items{% endcomment %}
+                {% with groups=user.groups.all %}
+                    {% if user.is_superuser or 'sysadmin' in groups|join:","|lower %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'officer_profile_list' %}">
+                                <i class="fas fa-tools mr-1"></i>Admin
+                            </a>
+                        </li>
+                    {% endif %}
 
+                    {% comment %}Dashboard Navigation{% endcomment %}
+                    {% if user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'immigration_dashboard' %}">
+                                <i class="fas fa-chart-line mr-1"></i>Admin Dashboard
+                            </a>
+                        </li>
+                    {% else %}
+                        {% for group in groups %}
+                            {% if group.name == 'immigration' %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'immigration_queue' %}">
+                                        <i class="fas fa-clipboard-list mr-1"></i>Queue Info
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'immigration_dashboard' %}">
+                                        <i class="fas fa-chart-line mr-1"></i>Immigration Dashboard
+                                    </a>
+                                </li>
+                            {% elif group.name == 'police' %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'police_dashboard' %}">
+                                        <i class="fas fa-shield-alt mr-1"></i>Police Dashboard
+                                    </a>
+                                </li>
+                            {% elif group.name == 'tax' %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'tax_dashboard' %}">
+                                        <i class="fas fa-coins mr-1"></i>Tax Dashboard
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
-            <!-- Profile Link -->
+                {% comment %}Profile and Notifications{% endcomment %}
                 <li class="nav-item">
-                    <a class="nav-link" href="/profile"><i class="fas fa-user"></i> Profile</a>
+                    <a class="nav-link" href="{% url 'profile_view' %}">
+                        <i class="fas fa-user mr-1"></i>Profile
+                    </a>
                 </li>
 
-           <!-- Notifications Dropdown -->
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-bell"></i> Notifications
+                    <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" 
+                       role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-bell mr-1"></i>Notifications
                         {% if notifications_count > 0 %}
                             <span class="badge badge-danger">{{ notifications_count }}</span>
                         {% endif %}
                     </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationsDropdown">
                         {% if notifications %}
                             {% for notification in notifications %}
                                 <a class="dropdown-item" href="{% url 'mark_notification_as_read' notification.id %}">
-                                    {{ notification.message }}
+                                    {{ notification.message|truncatechars:50 }}
                                 </a>
                             {% endfor %}
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item text-primary" href="/notifications">View all</a>
+                            <a class="dropdown-item text-primary" href="#">
+                                View all notifications
+                            </a>
                         {% else %}
-                            <a class="dropdown-item" href="#">No new notifications</a>
+                            <span class="dropdown-item text-muted">No new notifications</span>
                         {% endif %}
                     </div>
                 </li>
 
-          <!-- Conditional Dashboard Links Based on Groups -->
-                {% if user.is_superuser %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/immigration/dashboard"><i class="fas fa-tools"></i> Admin Dashboard</a>
-                    </li>
-                {% elif user.groups.exists %}
-                    {% for group in user.groups.all %}
-                        {% if group.name == 'immigration' %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="/immigration/queue-info"><i class="fas fa-clipboard-list"></i> Queue Info</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/immigration/dashboard"><i class="fas fa-chart-line"></i> Admin Dashboard</a>
-                            </li>
-                        {% elif group.name == 'police' %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="/police/dashboard"><i class="fas fa-shield-alt"></i> Police Dashboard</a>
-                            </li>
-                        {% elif group.name == 'tax' %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="/tax/dashboard"><i class="fas fa-coins"></i> Tax Dashboard</a>
-                            </li>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-
-                <!-- Logout Link -->
+                {% comment %}Logout{% endcomment %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <a class="nav-link text-danger" href="{% url 'logout' %}">
+                        <i class="fas fa-sign-out-alt mr-1"></i>Logout
+                    </a>
                 </li>
-        </ul>
+            </ul>
+        </div>
     </div>
 </nav>
