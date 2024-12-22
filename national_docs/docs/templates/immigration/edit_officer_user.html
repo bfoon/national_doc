@@ -1,86 +1,290 @@
 {% extends 'docs/header.html' %}
 {% block content %}
-<div class="container my-5">
-    <!-- Breadcrumb Navigation -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-2 rounded">
-            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}">Officer Users</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Edit User</li>
-        </ol>
-    </nav>
-
-    <!-- Edit User Card -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h2 class="mb-0"><i class="fas fa-user-edit"></i> Edit User</h2>
+<div class="container-fluid py-4 px-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">Edit User Profile</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}" class="text-decoration-none">Officer Users</a></li>
+                    <li class="breadcrumb-item active">Edit User</li>
+                </ol>
+            </nav>
         </div>
-        <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="username"><i class="fas fa-user"></i> Username</label>
-                    <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
-                </div>
-                <div class="form-group">
-                    <label for="first_name"><i class="fas fa-id-card"></i> First Name</label>
-                    <input type="text" class="form-control" id="first_name" name="first_name" value="{{ user.first_name }}" required>
-                </div>
-                <div class="form-group">
-                    <label for="last_name"><i class="fas fa-id-card-alt"></i> Last Name</label>
-                    <input type="text" class="form-control" id="last_name" name="last_name" value="{{ user.last_name }}" required>
-                </div>
-                <div class="form-group">
-                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
-                </div>
-                <div class="form-group">
-                    <label for="officer_batch_number"><i class="fas fa-user-tag"></i> Officer Batch Number</label>
-                    <input type="text" class="form-control" id="officer_batch_number" name="officer_batch_number" value="{{ officer_profile.officer_batch_number }}" required>
-                </div>
-                <div class="form-group">
-                    <label for="post_location"><i class="fas fa-map-marker-alt"></i> Post Location</label>
-                    <select class="form-control" id="post_location" name="post_location" required>
-                        {% for location in post_locations %}
-                            <option value="{{ location.id }}" {% if location.id == officer_profile.post_location.id %}selected{% endif %}>{{ location.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="groups"><i class="fas fa-users"></i> Groups</label>
-                    <select multiple class="form-control" id="groups" name="groups">
-                        {% for group in groups %}
-                            <option value="{{ group.id }}" {% if group in user.groups.all %}selected{% endif %}>{{ group.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Update User
-                </button>
-                <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Cancel
-                </a>
-            </form>
+        <div>
+            <a href="{% url 'list_officer_users' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Users
+            </a>
         </div>
     </div>
 
-    <!-- Current Groups Card -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-secondary text-white">
-            <h3 class="mb-0"><i class="fas fa-users-cog"></i> Current Groups</h3>
+    <div class="row">
+        <!-- User Profile Form -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="editUserForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Personal Information Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Personal Information</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="username" class="form-label">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="username" name="username"
+                                               value="{{ user.username }}" required
+                                               pattern="^[a-zA-Z0-9._-]{3,}$">
+                                        <div class="invalid-feedback">
+                                            Username must be at least 3 characters long and contain only letters, numbers, dots, underscores, or hyphens.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" name="email"
+                                               value="{{ user.email }}" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a valid email address.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                        <input type="text" class="form-control" id="first_name" name="first_name"
+                                               value="{{ user.first_name }}" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a first name.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-id-card-alt"></i></span>
+                                        <input type="text" class="form-control" id="last_name" name="last_name"
+                                               value="{{ user.last_name }}" required>
+                                        <div class="invalid-feedback">
+                                            Please provide a last name.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Officer Details Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Officer Details</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="officer_batch_number" class="form-label">Officer Batch Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                        <input type="text" class="form-control" id="officer_batch_number"
+                                               name="officer_batch_number" value="{{ officer_profile.officer_batch_number }}"
+                                               required pattern="^[A-Z0-9-]{3,}$">
+                                        <div class="invalid-feedback">
+                                            Please provide a valid batch number.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="post_location" class="form-label">Post Location</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                        <select class="form-select" id="post_location" name="post_location" required>
+                                            <option value="">Select location...</option>
+                                            {% for location in post_locations %}
+                                                <option value="{{ location.id }}"
+                                                    {% if location.id == officer_profile.post_location.id %}selected{% endif %}>
+                                                    {{ location.name }}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Please select a post location.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Groups Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Group Assignments</h5>
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="groups" class="form-label">Assigned Groups</label>
+                                    <select class="form-select" id="groups" name="groups" multiple
+                                            data-live-search="true" data-actions-box="true">
+                                        {% for group in groups %}
+                                            <option value="{{ group.id }}"
+                                                {% if group in user.groups.all %}selected{% endif %}>
+                                                {{ group.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                    <div class="form-text">
+                                        Hold Ctrl/Cmd to select multiple groups
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="window.location.href='{% url 'list_officer_users' %}'">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <ul class="list-group">
-                {% for group in user.groups.all %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ group.name }}
-                        <span class="badge badge-primary badge-pill"><i class="fas fa-user-shield"></i></span>
-                    </li>
-                {% empty %}
-                    <li class="list-group-item text-muted">No groups assigned</li>
-                {% endfor %}
-            </ul>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- User Summary Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-xl bg-primary-subtle rounded-circle mx-auto mb-3">
+                            {{ user.first_name|slice:":1"|add:user.last_name|slice:":1"|upper }}
+                        </div>
+                        <h5 class="mb-1">{{ user.get_full_name }}</h5>
+                        <p class="text-muted mb-0">{{ user.email }}</p>
+                    </div>
+                    <hr>
+                    <div class="mb-4">
+                        <h6 class="card-subtitle mb-3">Current Groups</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for group in user.groups.all %}
+                                <span class="badge-app bg-primary-subtle text-primary">
+                                    <i class="fas fa-users me-1"></i>{{ group.name }}
+                                </span>
+                            {% empty %}
+                                <span class="text-muted">No groups assigned</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="small">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">Last Login</span>
+                            <span>{{ user.last_login|date:"M d, Y H:i" }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Date Joined</span>
+                            <span>{{ user.date_joined|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Log Preview -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Recent Activity</h6>
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <small class="text-muted">Profile updated</small>
+                            <small>2 days ago</small>
+                        </div>
+                    </div>
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <small class="text-muted">Group membership changed</small>
+                            <small>5 days ago</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Custom CSS -->
+<style>
+.avatar-xl {
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 0 0.875rem 0 rgba(33,37,41,.05);
+    margin-bottom: 24px;
+}
+
+.card-title {
+    color: #495057;
+    font-weight: 600;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.form-control {
+    border-left: none;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #86b7fe;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+.badge-app {
+    padding: 0.5em 1em;
+    font-weight: 500;
+}
+</style>
+
+<!-- Form Validation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editUserForm');
+
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
 {% endblock %}

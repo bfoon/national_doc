@@ -1,85 +1,335 @@
 {% extends 'docs/header.html' %}
 {% block content %}
-<div class="container my-5">
-    <!-- Breadcrumb Navigation -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
-            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}">Officer Users</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Create Officer</li>
-        </ol>
-    </nav>
-
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Create New Officer Account</h3>
+<div class="container-fluid py-4 px-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">Create Officer Account</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}" class="text-decoration-none">Officer Users</a></li>
+                    <li class="breadcrumb-item active">Create Officer</li>
+                </ol>
+            </nav>
         </div>
-        <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="username" class="font-weight-bold">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" placeholder="Enter username" required>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="email" class="font-weight-bold">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
-                    </div>
-                </div>
+        <div>
+            <a href="{% url 'list_officer_users' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+    </div>
 
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="first_name" class="font-weight-bold">First Name</label>
-                        <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter first name" required>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="last_name" class="font-weight-bold">Last Name</label>
-                        <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter last name" required>
-                    </div>
-                </div>
+    <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="officerForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
 
-                <div class="form-group">
-                    <label for="password" class="font-weight-bold">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter a secure password" required>
-                </div>
+                        <!-- Account Information Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Account Information</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="username" class="form-label">Username</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="username" name="username"
+                                               required minlength="4" pattern="^[a-zA-Z0-9._-]+$"
+                                               placeholder="Enter username">
+                                        <div class="invalid-feedback">
+                                            Username must be at least 4 characters and contain only letters, numbers, dots, or hyphens.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" name="email"
+                                               required placeholder="Enter email">
+                                        <div class="invalid-feedback">
+                                            Please provide a valid email address.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="role" class="font-weight-bold">Role</label>
-                        <select class="form-control" id="role" name="role" required>
-                            <option value="" disabled selected>Select role</option>
-                            {% for group in groups %}
-                                <option value="{{ group.name }}">{{ group.name|capfirst }}</option>
-                            {% endfor %}
-                        </select>
+                        <!-- Personal Information Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Personal Information</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="first_name" class="form-label">First Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                        <input type="text" class="form-control" id="first_name" name="first_name"
+                                               required placeholder="Enter first name">
+                                        <div class="invalid-feedback">
+                                            Please provide a first name.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="last_name" class="form-label">Last Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-id-card-alt"></i></span>
+                                        <input type="text" class="form-control" id="last_name" name="last_name"
+                                               required placeholder="Enter last name">
+                                        <div class="invalid-feedback">
+                                            Please provide a last name.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Security</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="password" class="form-label">Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="password" name="password"
+                                               required minlength="8"
+                                               placeholder="Enter password">
+                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <div class="invalid-feedback">
+                                            Password must be at least 8 characters long.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        <input type="password" class="form-control" id="confirm_password"
+                                               required placeholder="Confirm password">
+                                        <div class="invalid-feedback">
+                                            Passwords must match.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Officer Details Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Officer Details</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="role" class="form-label">Role</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
+                                        <select class="form-select" id="role" name="role" required>
+                                            <option value="">Select role...</option>
+                                            {% for group in groups %}
+                                                <option value="{{ group.name }}">{{ group.name|capfirst }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Please select a role.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="post_location" class="form-label">Post Location</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                        <select class="form-select" id="post_location" name="post_location" required>
+                                            <option value="">Select location...</option>
+                                            {% for post_location in post_locations %}
+                                                <option value="{{ post_location.id }}">{{ post_location.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Please select a post location.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label for="officer_batch_number" class="form-label">Officer Batch Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                                        <input type="text" class="form-control" id="officer_batch_number"
+                                               name="officer_batch_number" required
+                                               placeholder="Enter batch number">
+                                        <div class="invalid-feedback">
+                                            Please provide a batch number.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="window.location.href='{% url 'list_officer_users' %}'">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i>Create Officer
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Password Requirements Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-shield-alt me-2"></i>Password Requirements</h5>
+                    <hr>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            At least 8 characters long
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Include uppercase letters
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Include lowercase letters
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Include numbers
+                        </li>
+                        <li>
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Include special characters
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Guidelines Card -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Important Notes</h5>
+                    <hr>
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">Username Guidelines</h6>
+                        <p class="small">Choose a unique username that follows department naming conventions.</p>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="post_location" class="font-weight-bold">Post Location</label>
-                        <select class="form-control" id="post_location" name="post_location" required>
-                            <option value="" disabled selected>Select post location</option>
-                            {% for post_location in post_locations %}
-                                <option value="{{ post_location.id }}">{{ post_location.name }}</option>
-                            {% endfor %}
-                        </select>
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">Email Policy</h6>
+                        <p class="small">Use official department email address for registration.</p>
+                    </div>
+                    <div class="mb-0">
+                        <h6 class="text-muted mb-2">Batch Number Format</h6>
+                        <p class="small">Enter the batch number as assigned by the department.</p>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label for="officer_batch_number" class="font-weight-bold">Officer Batch Number</label>
-                    <input type="text" class="form-control" id="officer_batch_number" name="officer_batch_number" placeholder="Enter batch number" required>
-                </div>
-
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-user-plus"></i> Create User
-                    </button>
-                    <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Cancel
-                    </a>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Custom CSS -->
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0 0.875rem 0 rgba(33,37,41,.05);
+    margin-bottom: 24px;
+}
+
+.card-title {
+    color: #495057;
+    font-weight: 600;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.form-control, .form-select {
+    border-left: none;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #86b7fe;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+.list-unstyled li {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+</style>
+
+<!-- Form Validation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('officerForm');
+    const password = document.getElementById('password');
+    const confirmPassword = document.getElementById('confirm_password');
+    const togglePassword = document.getElementById('togglePassword');
+
+    // Password visibility toggle
+    togglePassword.addEventListener('click', function() {
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.querySelector('i').classList.toggle('fa-eye');
+        this.querySelector('i').classList.toggle('fa-eye-slash');
+    });
+
+    // Password confirmation validation
+    function validatePassword() {
+        if (password.value !== confirmPassword.value) {
+            confirmPassword.setCustomValidity("Passwords don't match");
+        } else {
+            confirmPassword.setCustomValidity('');
+        }
+    }
+
+    password.addEventListener('change', validatePassword);
+    confirmPassword.addEventListener('keyup', validatePassword);
+
+    // Form validation
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Initialize Select2 if available
+    if (typeof $.fn.select2 !== 'undefined') {
+        $('#role, #post_location').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        });
+    }
+});
+</script>
 {% endblock %}

@@ -822,17 +822,80 @@ def todo_list(request):
     # Check if the user is in the admin group for their location
     is_admin = user.groups.filter(name='admin').exists() and user.officerprofile.post_location
 
+    # Base queryset based on user permissions
     if user.is_superuser:
-        todos = ToDo.objects.all().order_by('-created_at')
+        base_queryset = ToDo.objects.all()
     elif is_admin:
-        todos = ToDo.objects.filter(application__post_location=user.officerprofile.post_location).order_by('-created_at')
+        base_queryset = ToDo.objects.filter(
+            application__post_location=user.officerprofile.post_location
+        )
     else:
         messages.warning(request, "You do not have permission to view ToDo items.")
-        return redirect('immigration_dashboard')  # Redirect to a suitable page
+        return redirect('immigration_dashboard')
 
-    return render(request, 'immigration/todo_list.html', {
-        'todos': todos,
-    })
+    # Apply filters if provided
+    filters = Q()
+
+    # Application Type filter
+    application_type = request.GET.get('application_type')
+    if application_type:
+        filters &= Q(application__application_type=application_type)
+
+    # Status filter
+    status = request.GET.get('status')
+    if status:
+        filters &= Q(status=status)
+
+    # Date Range filter
+    date_range = request.GET.get('date_range')
+    if date_range:
+        try:
+            selected_date = datetime.strptime(date_range, '%Y-%m-%d').date()
+            filters &= Q(created_at__date=selected_date)
+        except ValueError:
+            messages.error(request, "Invalid date format")
+
+    # Apply filters and ordering to base queryset
+    todos = base_queryset.filter(filters).order_by('-created_at')
+
+    # Pagination
+    page = request.GET.get('page', 1)
+    items_per_page = 10  # You can adjust this number
+    paginator = Paginator(todos, items_per_page)
+
+    try:
+        todos_page = paginator.page(page)
+    except PageNotAnInteger:
+        todos_page = paginator.page(1)
+    except EmptyPage:
+        todos_page = paginator.page(paginator.num_pages)
+
+    # Calculate completed today count
+    today = timezone.now().date()
+    completed_today = base_queryset.filter(
+        status=1,  # Approved status
+        updated_at__date=today
+    ).count()
+
+    # Get unique application types for the filter dropdown
+    application_types = ToDo.objects.values_list(
+        'application__application_type',
+        'application__application_type'
+    ).distinct()
+
+    # Prepare context with all necessary data
+    context = {
+        'todos': todos_page,  # Now using paginated queryset
+        'completed_today': completed_today,
+        'application_types': application_types,
+        'current_filters': {
+            'application_type': application_type,
+            'status': status,
+            'date_range': date_range,
+        }
+    }
+
+    return render(request, 'immigration/todo_list.html', context)
 
 @login_required
 def todo_detail(request, todo_id):

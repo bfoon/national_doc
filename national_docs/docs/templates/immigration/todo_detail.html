@@ -2,114 +2,222 @@
 {% block content %}
 
 <style>
-/* Container for the passport photo */
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --success-color: #10b981;
+    --danger-color: #ef4444;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --bg-gray: #f3f4f6;
+}
+
+/* Modern Card Styling */
+.card {
+    background: white;
+    border: none;
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    border-radius: 1rem;
+    padding-top: 85px;
+    margin-bottom: 2rem;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Enhanced Passport Photo */
 .passport-photo-container {
     position: absolute;
-    top: 5px;
+    top: 0.5px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
 }
 
-/* Circular Passport Photo */
 .passport-photo {
-    width: 75px;
-    height: 75px;
+    width: 90px;
+    height: 90px;
     object-fit: cover;
-    border: 2px solid #fff;
+    border: 4px solid white;
     border-radius: 50%;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    transition: transform 0.3s ease;
 }
 
-/* Additional styling for the card to accommodate the photo */
-.card {
-    padding-top: 70px;
-    overflow: hidden;
+.passport-photo:hover {
+    transform: scale(1.05);
+}
+
+/* Modern Card Header */
+.card-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.25rem;
+    border: none;
+}
+
+/* Improved Breadcrumb */
+.breadcrumb {
+    background-color: transparent;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+}
+
+.breadcrumb-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb-item a:hover {
+    color: var(--primary-hover);
+}
+
+/* Enhanced Form Elements */
+.form-control {
+    border: 1px solid #e5e7eb;
     border-radius: 0.5rem;
+    padding: 0.75rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Signature Style */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.form-control:disabled {
+    background-color: var(--bg-gray);
+    cursor: not-allowed;
+}
+
+/* Modern Signature */
 .signature {
     font-family: 'Pacifico', cursive;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
+    color: var(--text-primary);
     text-align: right;
-    margin-top: 10px;
-    color: #495057;
+    margin-top: 1rem;
+    opacity: 0.8;
 }
 
-/* QR Code Positioning */
-.qr-code {
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
+/* Enhanced Badges */
+.badge-app {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    font-size: 0.875rem;
 }
 
-/* Card Header with Gradient */
-.card-header {
-    background: linear-gradient(45deg, #007bff, #00d4ff);
+.badge-success {
+    background-color: var(--success-color);
     color: white;
-    font-weight: bold;
-    border-radius: 0.5rem 0.5rem 0 0;
 }
 
-/* Breadcrumb Navigation */
-.breadcrumb {
-    background-color: #f8f9fa;
+.badge-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.badge-warning {
+    background-color: #f59e0b;
+    color: white;
+}
+
+/* Improved Buttons */
+.btn {
+    padding: 0.625rem 1.25rem;
     border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.breadcrumb a {
-    color: #007bff;
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
 }
 
-/* Modal Header Styling */
+.btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+.btn-success:hover, .btn-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Enhanced Modal */
+.modal-content {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
 .modal-header {
-    background: #007bff;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
     color: white;
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.5rem;
 }
 
-/* Button Styling */
-.btn-primary, .btn-success, .btn-danger {
-    border-radius: 0.3rem;
+.modal-body {
+    padding: 1.5rem;
 }
 
-/* Table Header Styling */
-.table thead th {
-    background-color: #007bff;
-    color: white;
+.modal-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 1.25rem;
 }
 
-/* Alert for Danger */
+/* Enhanced Alert */
 .alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background-color: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #991b1b;
+    border-radius: 0.75rem;
+    padding: 1rem;
 }
 
-/* Disabled Form Fields */
-.form-control:disabled, .form-control[readonly] {
-    background-color: #e9ecef;
-}
+/* Responsive Design Improvements */
+@media (max-width: 768px) {
+    .card {
+        margin: 1rem;
+        padding-top: 70px;
+    }
 
+    .passport-photo {
+        width: 80px;
+        height: 80px;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
 </style>
 
 <!-- Link to Google Fonts for the signature font -->
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
 
 <div class="container my-5">
-
-
-    <!-- Breadcrumb navigation -->
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb p-2">
+        <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{% url 'todo_list' %}">ToDo List</a></li>
-            <li class="breadcrumb-item active" aria-current="page">ToDo Details</li>
+            <li class="breadcrumb-item active">ToDo Details</li>
         </ol>
     </nav>
-    <h2 class="mb-4 text-center">ToDo Details</h2>
+
+    <h2 class="text-2xl font-bold text-center mb-6">ToDo Details</h2>
 
 <div class="card shadow mb-4 position-relative">
     <!-- Circular Passport Photo -->
@@ -149,11 +257,11 @@
         </p>
         <p><strong>Status:</strong>
             {% if todo.status == 1 %}
-                <span class="badge badge-success">Approved</span>
+                <span class="badge badge-app badge-success">Approved</span>
             {% elif todo.status == 2 %}
-                <span class="badge badge-danger">Rejected</span>
+                <span class="badge badge-app badge-danger">Rejected</span>
             {% else %}
-                <span class="badge badge-warning">Pending</span>
+                <span class="badge badge-app badge-warning">Pending</span>
             {% endif %}
         </p>
 

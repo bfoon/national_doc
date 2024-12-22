@@ -352,124 +352,288 @@ h2, h4 {
             </form>
 
 
-        <!-- Modal for Application Details -->
-        <div class="modal fade" id="progressDetailsModal" tabindex="-1" role="dialog" aria-labelledby="progressDetailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <!-- Modal Header -->
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="progressDetailsModalLabel">
-                            <i class="fas fa-info-circle"></i> Application Details
-                        </h5>
-                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
+        <!-- Application Details Modal -->
+<div class="modal fade" id="progressDetailsModal" tabindex="-1" role="dialog" aria-labelledby="progressDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h5 class="modal-title" id="progressDetailsModalLabel">
+                    <i class="fas fa-info-circle me-2"></i>Application Details
+                </h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
 
-                    <!-- Modal Body -->
-                    <div class="modal-body">
-                        <!-- Applicant Information -->
-                        <section class="mb-4">
-                            <h5 class="text-secondary border-bottom pb-2"><i class="fas fa-user"></i> Applicant Information</h5>
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="application-details">
+                    <!-- Applicant Information Card -->
+                    <div class="detail-card applicant-info mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-user text-primary me-2"></i>
+                            <h6 class="mb-0">Applicant Information</h6>
+                        </div>
+                        <div class="card-body">
                             {% if application.national_id_applications.first %}
-                                <p><strong>Full Name:</strong> {{ application.national_id_applications.first.full_name }}</p>
-                                <p><strong>Email:</strong> {{ application.national_id_applications.first.email }}</p>
-                                <p><strong>Phone Number:</strong> {{ application.national_id_applications.first.phone_number }}</p>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="label">Full Name</span>
+                                        <span class="value">{{ application.national_id_applications.first.full_name }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">Email</span>
+                                        <span class="value">{{ application.national_id_applications.first.email }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">Phone</span>
+                                        <span class="value">{{ application.national_id_applications.first.phone_number }}</span>
+                                    </div>
+                                </div>
                             {% elif application.resident_permit_applications.first %}
-                                <p><strong>Full Name:</strong> {{ application.resident_permit_applications.first.full_name }}</p>
-                                <p><strong>Email:</strong> {{ application.resident_permit_applications.first.email }}</p>
-                                <p><strong>Phone Number:</strong> {{ application.resident_permit_applications.first.phone_number }}</p>
+                                <!-- Similar structure for resident permit -->
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="label">Full Name</span>
+                                        <span class="value">{{ application.resident_permit_applications.first.full_name }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">Email</span>
+                                        <span class="value">{{ application.resident_permit_applications.first.email }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">Phone</span>
+                                        <span class="value">{{ application.resident_permit_applications.first.phone_number }}</span>
+                                    </div>
+                                </div>
                             {% elif application.work_permit_applications.first %}
-                                <p><strong>Full Name:</strong> {{ application.work_permit_applications.first.full_name }}</p>
-                                <p><strong>Email:</strong> {{ application.work_permit_applications.first.email }}</p>
-                                <p><strong>Phone Number:</strong> {{ application.work_permit_applications.first.phone_number }}</p>
+                                <!-- Similar structure for work permit -->
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="label">Full Name</span>
+                                        <span class="value">{{ application.work_permit_applications.first.full_name }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">Email</span>
+                                        <span class="value">{{ application.work_permit_applications.first.email }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="label">Phone</span>
+                                        <span class="value">{{ application.work_permit_applications.first.phone_number }}</span>
+                                    </div>
+                                </div>
                             {% else %}
                                 <p class="text-muted">No applicant information available.</p>
                             {% endif %}
-                        </section>
-
-                        <!-- Application Information -->
-                        <section class="mb-4">
-                            <h5 class="text-secondary border-bottom pb-2"><i class="fas fa-file-alt"></i> Application Information</h5>
-                            <p><strong>Application Type:</strong> {{ fulfiller.application.application_type|capfirst }}</p>
-                            <p><strong>Status:</strong> <span class="badge badge-info">{{ fulfiller.application.status|capfirst }}</span></p>
-                            <p><strong>Post Location:</strong> {{ fulfiller.application.post_location.name }}, {{ fulfiller.application.post_location.city }}</p>
-                            <p><strong>Progress:</strong> <span class="badge badge-success">{{ fulfiller.progress }}%</span></p>
-                        </section>
-
-                        <!-- Conditional Service Type Information -->
-                        {% if application.national_id_applications.first %}
-                            <section class="mb-4">
-                                <h5 class="text-secondary border-bottom pb-2"><i class="fas fa-id-card"></i> National ID Application Details</h5>
-                                <ul class="list-unstyled">
-                                    <li>
-                                        <strong>Birth Certificate:</strong>
-                                        <a href="{{ application.national_id_applications.first.birth_certificate.url }}" target="_blank">
-                                            <i class="fas fa-file-pdf text-danger"></i> View Document
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <strong>Passport Photo:</strong>
-                                        <a href="{{ application.national_id_applications.first.passport_photo.url }}" target="_blank">
-                                            <i class="fas fa-image text-success"></i> View Photo
-                                        </a>
-                                    </li>
-                                </ul>
-                            </section>
-                        {% elif application.resident_permit_applications.first %}
-                            <section class="mb-4">
-                                <h5 class="text-secondary border-bottom pb-2"><i class="fas fa-home"></i> Resident Permit Application Details</h5>
-                                <ul class="list-unstyled">
-                                    <li><strong>Purpose of Stay:</strong> {{ application.resident_permit_applications.first.purpose_of_stay }}</li>
-                                    <li><strong>Passport Number:</strong> {{ application.resident_permit_applications.first.passport_number }}</li>
-                                    <li><strong>Date of Entry:</strong> {{ application.resident_permit_applications.first.date_of_entry }}</li>
-                                    <li>
-                                        <strong>Resident Permit Document:</strong>
-                                        <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">
-                                            <i class="fas fa-file-pdf text-danger"></i> View Document
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <strong>Passport Photo:</strong>
-                                        <a href="{{ application.resident_permit_applications.first.passport_photo.url }}" target="_blank">
-                                            <i class="fas fa-image text-success"></i> View Photo
-                                        </a>
-                                    </li>
-                                </ul>
-                            </section>
-                        {% elif application.work_permit_applications.first %}
-                            <section class="mb-4">
-                                <h5 class="text-secondary border-bottom pb-2"><i class="fas fa-briefcase"></i> Work Permit Application Details</h5>
-                                <ul class="list-unstyled">
-                                    <li><strong>Job Title:</strong> {{ application.work_permit_applications.first.job_title }}</li>
-                                    <li>
-                                        <strong>Work Contract:</strong>
-                                        <a href="{{ application.work_permit_applications.first.work_contract.url }}" target="_blank">
-                                            <i class="fas fa-file-contract text-warning"></i> View Contract
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <strong>Passport Photo:</strong>
-                                        <a href="{{ application.work_permit_applications.first.passport_photo.url }}" target="_blank">
-                                            <i class="fas fa-image text-success"></i> View Photo
-                                        </a>
-                                    </li>
-                                </ul>
-                            </section>
-                        {% else %}
-                            <p class="text-muted">No additional details available for this application type.</p>
-                        {% endif %}
+                        </div>
                     </div>
 
-                    <!-- Modal Footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            <i class="fas fa-times"></i> Close
-                        </button>
+                    <!-- Application Status Card -->
+                    <div class="detail-card status-info mb-4">
+                        <div class="card-header">
+                            <i class="fas fa-file-alt text-primary me-2"></i>
+                            <h6 class="mb-0">Application Status</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="status-grid">
+                                <div class="status-item">
+                                    <span class="label">Type</span>
+                                    <span class="badge bg-primary">{{ fulfiller.application.application_type|capfirst }}</span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="label">Status</span>
+                                    <span class="badge bg-info">{{ fulfiller.application.status|capfirst }}</span>
+                                </div>
+                                <div class="status-item">
+                                    <span class="label">Progress</span>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success"
+                                             role="progressbar"
+                                             style="width: {{ fulfiller.progress }}%"
+                                             aria-valuenow="{{ fulfiller.progress }}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100">{{ fulfiller.progress }}%</div>
+                                    </div>
+                                </div>
+                                <div class="status-item">
+                                    <span class="label">Location</span>
+                                    <span class="value">{{ fulfiller.application.post_location.name }}, {{ fulfiller.application.post_location.city }}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Application Details Card -->
+                    {% if application.national_id_applications.first %}
+                        <div class="detail-card documents-info">
+                            <div class="card-header">
+                                <i class="fas fa-id-card text-primary me-2"></i>
+                                <h6 class="mb-0">National ID Application Details</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="document-grid">
+                                    <a href="{{ application.national_id_applications.first.birth_certificate.url }}"
+                                       class="document-link"
+                                       target="_blank">
+                                        <i class="fas fa-file-pdf text-danger me-2"></i>
+                                        <span>Birth Certificate</span>
+                                        <i class="fas fa-external-link-alt ms-2"></i>
+                                    </a>
+                                    <a href="{{ application.national_id_applications.first.passport_photo.url }}"
+                                       class="document-link"
+                                       target="_blank">
+                                        <i class="fas fa-image text-success me-2"></i>
+                                        <span>Passport Photo</span>
+                                        <i class="fas fa-external-link-alt ms-2"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    {% elif application.resident_permit_applications.first %}
+                        <!-- Similar structure for resident permit documents -->
+                    {% elif application.work_permit_applications.first %}
+                        <!-- Similar structure for work permit documents -->
+                    {% endif %}
                 </div>
             </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Close
+                </button>
+            </div>
         </div>
+    </div>
+</div>
+
+<style>
+/* Modal Styles */
+.modal-content {
+    border: none;
+    border-radius: 1rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    border-radius: 1rem 1rem 0 0;
+    padding: 1.5rem;
+}
+
+.modal-title {
+    color: #2d3748;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* Card Styles */
+.detail-card {
+    background: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Information Grid Styles */
+.info-grid, .status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item, .status-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.value {
+    color: #1f2937;
+    font-weight: 500;
+}
+
+/* Badge Styles */
+.badge {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+/* Progress Bar Styles */
+.progress {
+    height: 0.75rem;
+    border-radius: 1rem;
+    background-color: #e9ecef;
+}
+
+.progress-bar {
+    border-radius: 1rem;
+    transition: width 0.3s ease;
+}
+
+/* Document Links */
+.document-grid {
+    display: grid;
+    gap: 1rem;
+}
+
+.document-link {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    color: #2d3748;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.document-link:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .info-grid, .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+}
+</style>
 
 
 

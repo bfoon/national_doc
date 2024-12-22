@@ -1,104 +1,179 @@
 {% extends 'docs/header.html' %}
 {% block content %}
-<!-- Enhanced Responsive Dashboard Template -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 
 <style>
     :root {
-        --primary-color: #007bff;
-        --secondary-color: #6c757d;
-        --success-color: #28a745;
-        --warning-color: #ffc107;
-        --danger-color: #dc3545;
-        --info-color: #17a2b8;
+        --primary-color: #2563eb;
+        --secondary-color: #475569;
+        --success-color: #16a34a;
+        --warning-color: #ca8a04;
+        --danger-color: #dc2626;
+        --info-color: #0891b2;
+        --light-bg: #f8fafc;
+        --card-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --hover-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    }
+
+    body {
+        background-color: var(--light-bg);
+        color: #1e293b;
     }
 
     .dashboard-container {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 2rem;
+    }
+
+    .dashboard-header {
+        margin-bottom: 2.5rem;
+        text-align: center;
+    }
+
+    .dashboard-header h2 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 1rem;
+    }
+
+    .dashboard-header p {
+        color: #64748b;
+        font-size: 1.1rem;
     }
 
     .status-tiles .card {
         border: none;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+        background: white;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .status-tiles .card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
     }
 
     .status-tiles .card-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 15px;
-        color: white;
+        background: transparent;
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1.25rem;
     }
 
     .status-tiles .card-header i {
-        font-size: 1.5rem;
-        margin-right: 10px;
+        font-size: 1.75rem;
+        margin-right: 0.75rem;
     }
 
     .status-tiles .card-body {
-        text-align: center;
-        padding: 20px;
+        padding: 1.5rem;
+    }
+
+    .status-tiles .card-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-tiles .card-text {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .menu-items {
+        margin-top: 3rem;
     }
 
     .menu-items .card {
-        border: 1px solid #e9ecef;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+        background: white;
+        box-shadow: var(--card-shadow);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .menu-items .card:hover {
-        transform: scale(1.05);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+        box-shadow: var(--hover-shadow);
         border-color: var(--primary-color);
     }
 
     .menu-items .card-body {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        padding: 20px;
+        padding: 1.75rem;
     }
 
     .menu-items .card i {
-        margin-bottom: 15px;
-        transition: color 0.3s ease;
+        font-size: 2rem;
+        margin-bottom: 1.25rem;
+        transition: all 0.3s ease;
     }
 
-    .menu-items .card:hover i {
-        color: var(--primary-color) !important;
+    .menu-items .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #0f172a;
+    }
+
+    .menu-items .card-text {
+        color: #64748b;
+        font-size: 0.95rem;
+        line-height: 1.5;
     }
 
     .badge-notification {
         position: absolute;
-        top: 10px;
-        right: 10px;
-        min-width: 25px;
-        padding: 3px 7px;
-        font-size: 0.8rem;
-        border-radius: 50%;
+        top: 0.75rem;
+        right: 0.75rem;
+        min-width: 1.75rem;
+        height: 1.75rem;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        border-radius: 9999px;
         background-color: var(--danger-color);
         color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
     }
 
-    /* Responsive Adjustments */
+    .messages {
+        margin-bottom: 2rem;
+    }
+
+    .alert {
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .alert-dismissible .close {
+        padding: 1.25rem;
+    }
+
+    @media (max-width: 1200px) {
+        .dashboard-container {
+            padding: 1.5rem;
+        }
+    }
+
     @media (max-width: 768px) {
         .status-tiles .col-md-3,
         .menu-items .col-md-3 {
             flex: 0 0 50%;
             max-width: 50%;
+        }
+
+        .dashboard-header h2 {
+            font-size: 1.875rem;
         }
     }
 
@@ -108,15 +183,18 @@
             flex: 0 0 100%;
             max-width: 100%;
         }
+
+        .dashboard-container {
+            padding: 1rem;
+        }
     }
 </style>
 
 <div class="dashboard-container">
-    <!-- Display Messages -->
     {% if messages %}
-        <div class="messages mb-4">
+        <div class="messages">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show animate__animated animate__fadeIn" role="alert">
                     {{ message }}
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -126,84 +204,74 @@
         </div>
     {% endif %}
 
-    <!-- Dashboard Header -->
-    <h2 class="text-center mb-4 display-4">Immigration Dashboard</h2>
+    <div class="dashboard-header">
+        <h2>Immigration Management System</h2>
+        <p>Welcome to the centralized immigration services dashboard</p>
+    </div>
 
-    <!-- Status Tiles -->
     <div class="row status-tiles">
-        <!-- New Requests Tile -->
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-info text-white">
-                <div class="card-header">
-                    <span><i class="fas fa-file-alt"></i> New Requests</span>
-                    <span class="badge badge-light text-dark">{{ new_requests_count }}</span>
+            <div class="card">
+                <div class="card-header bg-info bg-opacity-10 text-info">
+                    <span><i class="fas fa-file-alt"></i> New Applications</span>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ new_requests_count }}</h5>
-                    <p class="card-text">Applications awaiting processing</p>
+                    <p class="card-text">Pending initial review</p>
                 </div>
             </div>
         </div>
 
-        <!-- Pending Requests Tile -->
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-warning text-white">
-                <div class="card-header">
-                    <span><i class="fas fa-spinner"></i> Pending Requests</span>
-                    <span class="badge badge-light text-dark">{{ pending_requests_count }}</span>
+            <div class="card">
+                <div class="card-header bg-warning bg-opacity-10 text-warning">
+                    <span><i class="fas fa-spinner"></i> In Progress</span>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ pending_requests_count }}</h5>
-                    <p class="card-text">In-process applications</p>
+                    <p class="card-text">Under processing</p>
                 </div>
             </div>
         </div>
 
-        <!-- Waiting Requests Tile -->
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-danger text-white">
-                <div class="card-header">
-                    <span><i class="fas fa-exclamation-circle"></i> Waiting Requests</span>
-                    <span class="badge badge-light text-dark">{{ waiting_requests_count }}</span>
+            <div class="card">
+                <div class="card-header bg-danger bg-opacity-10 text-danger">
+                    <span><i class="fas fa-exclamation-circle"></i> Attention Required</span>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ waiting_requests_count }}</h5>
-                    <p class="card-text">Requests needing attention</p>
+                    <p class="card-text">Needs immediate action</p>
                 </div>
             </div>
         </div>
 
-        <!-- Interviews Today Tile -->
         <div class="col-md-3 col-sm-6">
-            <div class="card bg-success text-white">
-                <div class="card-header">
-                    <span><i class="fas fa-calendar-check"></i> Interviews Today</span>
-                    <span class="badge badge-light text-dark">{{ interview_requests_count }}</span>
+            <div class="card">
+                <div class="card-header bg-success bg-opacity-10 text-success">
+                    <span><i class="fas fa-calendar-check"></i> Today's Schedule</span>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{ interview_requests_count }}</h5>
-                    <p class="card-text">Scheduled interviews</p>
+                    <p class="card-text">Interviews scheduled</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Menu Items Section -->
-    <div class="row menu-items mt-4">
-        <!-- Fulfiller -->
+    <div class="row menu-items">
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/fulfiller" class="text-decoration-none">
                 <div class="card">
                     <div class="card-body">
-                        <i class="fas fa-tasks fa-2x text-primary"></i>
-                        <h5 class="card-title mt-3">Fulfiller</h5>
-                        <p class="card-text text-muted">Manage application fulfillments</p>
+                        <i class="fas fa-tasks text-primary"></i>
+                        <h5 class="card-title">Application Processing</h5>
+                        <p class="card-text">Process and review immigration applications</p>
                     </div>
                 </div>
             </a>
         </div>
 
-        <!-- To-do -->
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/todos" class="text-decoration-none position-relative">
                 {% if pending_todo_count > 0 %}
@@ -211,48 +279,45 @@
                 {% endif %}
                 <div class="card">
                     <div class="card-body">
-                        <i class="fas fa-list-check fa-2x text-success"></i>
-                        <h5 class="card-title mt-3">To-do</h5>
-                        <p class="card-text text-muted">View tasks and pending actions</p>
+                        <i class="fas fa-list-check text-success"></i>
+                        <h5 class="card-title">Task Management</h5>
+                        <p class="card-text">Track and manage pending tasks</p>
                     </div>
                 </div>
             </a>
         </div>
 
-        <!-- Interview -->
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/interviews" class="text-decoration-none">
                 <div class="card">
                     <div class="card-body">
-                        <i class="fas fa-user-clock fa-2x text-warning"></i>
-                        <h5 class="card-title mt-3">Interview</h5>
-                        <p class="card-text text-muted">Manage interview schedules</p>
+                        <i class="fas fa-user-clock text-warning"></i>
+                        <h5 class="card-title">Interview Management</h5>
+                        <p class="card-text">Schedule and conduct interviews</p>
                     </div>
                 </div>
             </a>
         </div>
 
-        <!-- Schedule Management -->
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/available_slots" class="text-decoration-none">
                 <div class="card">
                     <div class="card-body">
-                        <i class="fas fa-calendar-alt fa-2x text-danger"></i>
-                        <h5 class="card-title mt-3">Schedule</h5>
-                        <p class="card-text text-muted">Control scheduling timelines</p>
+                        <i class="fas fa-calendar-alt text-danger"></i>
+                        <h5 class="card-title">Schedule Management</h5>
+                        <p class="card-text">Manage appointment schedules</p>
                     </div>
                 </div>
             </a>
         </div>
 
-        <!-- Additional Menu Items (Kept from original template) -->
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/post_locations" class="text-decoration-none">
                 <div class="card">
                     <div class="card-body">
-                        <i class="fas fa-map-marker-alt fa-2x text-info"></i>
-                        <h5 class="card-title mt-3">Post Locations</h5>
-                        <p class="card-text text-muted">Configure immigration posts</p>
+                        <i class="fas fa-map-marker-alt text-info"></i>
+                        <h5 class="card-title">Location Management</h5>
+                        <p class="card-text">Manage immigration office locations</p>
                     </div>
                 </div>
             </a>
@@ -262,9 +327,9 @@
             <a href="/immigration/list_officer_users" class="text-decoration-none">
                 <div class="card">
                     <div class="card-body">
-                        <i class="fas fa-users fa-2x text-dark"></i>
-                        <h5 class="card-title mt-3">Officer Users</h5>
-                        <p class="card-text text-muted">Manage officer accounts</p>
+                        <i class="fas fa-users text-secondary"></i>
+                        <h5 class="card-title">Officer Directory</h5>
+                        <p class="card-text">Manage immigration officers</p>
                     </div>
                 </div>
             </a>
@@ -274,23 +339,22 @@
             <a href="{% url 'birth_certificate_request' %}" class="text-decoration-none">
                 <div class="card">
                     <div class="card-body">
-                        <i class="fas fa-file-alt fa-2x text-secondary"></i>
-                        <h5 class="card-title mt-3">Birth Certificates</h5>
-                        <p class="card-text text-muted">Manage certificate requests</p>
+                        <i class="fas fa-file-alt text-primary"></i>
+                        <h5 class="card-title">Certificate Services</h5>
+                        <p class="card-text">Process certificate requests</p>
                     </div>
                 </div>
             </a>
         </div>
 
-        <!-- Support Desk (Restricted Access) -->
         {% if request.user.is_staff or request.user.is_superuser %}
             <div class="col-md-3 col-sm-6">
                 <a href="{% url 'support_desk' %}" class="text-decoration-none">
                     <div class="card">
                         <div class="card-body">
-                            <i class="fas fa-life-ring fa-2x text-primary"></i>
-                            <h5 class="card-title mt-3">Support Desk</h5>
-                            <p class="card-text text-muted">Provide assistance</p>
+                            <i class="fas fa-life-ring text-info"></i>
+                            <h5 class="card-title">Support Services</h5>
+                            <p class="card-text">Manage support requests</p>
                         </div>
                     </div>
                 </a>

@@ -1,36 +1,190 @@
 {% extends 'docs/header.html' %}
 {% block content %}
-<div class="container my-5">
-    <!-- Breadcrumb Navigation -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-2 rounded">
-            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'create_group' %}">Officer Users</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Delete Group</li>
-        </ol>
-    </nav>
-
+<div class="container-fluid py-4 px-4">
     <!-- Page Header -->
-    <div class="mb-4">
-        <h2 class="text-danger"><i class="fas fa-trash-alt"></i> Delete Group</h2>
-    </div>
-
-    <!-- Confirmation Message -->
-    <div class="alert alert-warning">
-        <p>Are you sure you want to delete the group <strong>{{ group.name }}</strong>? This action cannot be undone.</p>
-    </div>
-
-    <!-- Form with Action Buttons -->
-    <form method="POST">
-        {% csrf_token %}
-        <div class="d-flex justify-content-start">
-            <button type="submit" class="btn btn-danger mr-2">
-                <i class="fas fa-check"></i> Confirm Delete
-            </button>
-            <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">
-                <i class="fas fa-times"></i> Cancel
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">Delete Group</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'create_group' %}" class="text-decoration-none">Officer Users</a></li>
+                    <li class="breadcrumb-item active">Delete Group</li>
+                </ol>
+            </nav>
+        </div>
+        <div>
+            <a href="{% url 'list_officer_users' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Groups
             </a>
         </div>
-    </form>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Delete Confirmation Card -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Delete Confirmation Required
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-lg bg-danger-subtle rounded-circle mx-auto mb-3">
+                            <i class="fas fa-trash-alt fa-2x text-danger"></i>
+                        </div>
+                        <h4 class="mb-1">Delete Group: {{ group.name }}</h4>
+                        <p class="text-muted">This action cannot be undone</p>
+                    </div>
+
+                    <!-- Impact Information -->
+                    <div class="alert alert-warning">
+                        <h6 class="alert-heading mb-2">
+                            <i class="fas fa-info-circle me-2"></i>Impact of Deletion
+                        </h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fas fa-users me-2"></i>
+                                <strong>{{ group.user_set.count }}</strong> members will be removed from this group
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Members will lose access to group-specific permissions
+                            </li>
+                            <li>
+                                <i class="fas fa-clock me-2"></i>
+                                Group data will be permanently deleted
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Current Members Preview -->
+                    {% if group.user_set.exists %}
+                    <div class="mb-4">
+                        <h6 class="text-muted mb-3">Current Group Members</h6>
+                        <div class="list-group">
+                            {% for user in group.user_set.all|slice:":5" %}
+                                <div class="list-group-item">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-primary-subtle rounded-circle me-3">
+                                            {{ user.first_name|slice:":1"|add:user.last_name|slice:":1"|upper }}
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ user.get_full_name }}</h6>
+                                            <small class="text-muted">{{ user.email }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            {% if group.user_set.count > 5 %}
+                                <div class="list-group-item text-center text-muted">
+                                    And {{ group.user_set.count|add:"-5" }} more members...
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Confirmation Form -->
+                    <form method="POST" id="deleteGroupForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="confirmText" class="form-label">Type "DELETE" to confirm</label>
+                            <input type="text" class="form-control" id="confirmText"
+                                   required pattern="DELETE"
+                                   placeholder="Type DELETE in uppercase">
+                            <div class="invalid-feedback">
+                                Please type "DELETE" to confirm
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{% url 'list_officer_users' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <button type="submit" class="btn btn-danger" id="deleteButton" disabled>
+                                <i class="fas fa-trash-alt me-2"></i>Delete Group
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Custom CSS -->
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0 0.875rem 0 rgba(33,37,41,.05);
+}
+
+.avatar-lg {
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.alert {
+    border: none;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #dc3545;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+.list-group-item {
+    border-left: none;
+    border-right: none;
+    border-color: #dee2e6;
+}
+
+.list-group-item:first-child {
+    border-top: none;
+}
+
+.list-group-item:last-child {
+    border-bottom: none;
+}
+</style>
+
+<!-- Delete Confirmation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('deleteGroupForm');
+    const confirmInput = document.getElementById('confirmText');
+    const deleteButton = document.getElementById('deleteButton');
+
+    confirmInput.addEventListener('input', function(e) {
+        deleteButton.disabled = e.target.value !== 'DELETE';
+    });
+
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity() || confirmInput.value !== 'DELETE') {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
 {% endblock %}

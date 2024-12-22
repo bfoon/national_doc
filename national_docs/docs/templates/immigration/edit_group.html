@@ -1,37 +1,297 @@
 {% extends 'docs/header.html' %}
 {% block content %}
-<div class="container my-5">
-    <!-- Breadcrumb Navigation -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
-            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'create_group' %}">Group List</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Edit Group</li>
-        </ol>
-    </nav>
-
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Edit Group</h3>
+<div class="container-fluid py-4 px-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">Edit Group: {{ group.name }}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'create_group' %}" class="text-decoration-none">Group List</a></li>
+                    <li class="breadcrumb-item active">Edit Group</li>
+                </ol>
+            </nav>
         </div>
-        <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="group_name" class="font-weight-bold">Group Name</label>
-                    <input type="text" class="form-control" id="group_name" name="group_name" value="{{ group.name }}" placeholder="Enter group name" required>
-                </div>
+        <div>
+            <a href="{% url 'create_group' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Groups
+            </a>
+        </div>
+    </div>
 
-                <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Update Group
-                    </button>
-                    <a href="{% url 'create_group' %}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Cancel
-                    </a>
+    <div class="row">
+        <!-- Main Edit Form -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="editGroupForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Group Information Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Group Information</h5>
+                            <div class="row">
+                                <div class="col-12">
+                                    <label for="group_name" class="form-label">Group Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-users"></i></span>
+                                        <input type="text" class="form-control" id="group_name"
+                                               name="group_name" value="{{ group.name }}"
+                                               required minlength="3" pattern="^[a-zA-Z0-9_-]+$">
+                                        <div class="invalid-feedback">
+                                            Please provide a valid group name (minimum 3 characters).
+                                        </div>
+                                    </div>
+                                    <div class="form-text">
+                                        Use only letters, numbers, underscores, and hyphens
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Member Management Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Group Members</h5>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Role</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in group.user_set.all %}
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-sm bg-primary-subtle rounded-circle me-3">
+                                                            {{ user.first_name|slice:":1"|add:user.last_name|slice:":1"|upper }}
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-medium">{{ user.get_full_name }}</div>
+                                                            <small class="text-muted">{{ user.email }}</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>{{ user.profile.role|default:"Member" }}</td>
+                                                <td class="text-end">
+                                                    <button type="button" class="btn btn-outline-danger btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#removeMemberModal{{ user.id }}">
+                                                        <i class="fas fa-user-minus me-1"></i>Remove
+                                                    </button>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Remove Member Modal -->
+                                            <div class="modal fade" id="removeMemberModal{{ user.id }}" tabindex="-1">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Confirm Member Removal</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <p>Are you sure you want to remove <strong>{{ user.get_full_name }}</strong> from this group?</p>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                            <a href="#" class="btn btn-danger">Remove Member</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="3" class="text-center py-4">
+                                                    <div class="text-muted">
+                                                        <i class="fas fa-users-slash fa-2x mb-3"></i>
+                                                        <p class="mb-0">No members in this group</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Add Member Section -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Add Members</h5>
+                                <button type="button" class="btn btn-outline-primary btn-sm"
+                                        data-bs-toggle="modal" data-bs-target="#addMemberModal">
+                                    <i class="fas fa-user-plus me-2"></i>Add Member
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="window.location.href='{% url 'create_group' %}'">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Update Group
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Group Info Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Group Details</h5>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Total Members</span>
+                        <span class="badge bg-primary">{{ group.user_set.count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Created On</span>
+                        <span>{{ group.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Last Updated</span>
+                        <span>{{ group.updated_at|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guidelines Card -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Important Notes</h5>
+                    <hr>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3">
+                            <i class="fas fa-info-circle text-primary me-2"></i>
+                            <small>Changes to group names will affect all members</small>
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-info-circle text-primary me-2"></i>
+                            <small>Removed members will lose access to group resources</small>
+                        </li>
+                        <li>
+                            <i class="fas fa-info-circle text-primary me-2"></i>
+                            <small>Group names must be unique in the system</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Add Member Modal -->
+<div class="modal fade" id="addMemberModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Group Member</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addMemberForm">
+                    <div class="mb-3">
+                        <label for="newMember" class="form-label">Select User</label>
+                        <select class="form-select" id="newMember" required>
+                            <option value="">Choose user...</option>
+                            {% for user in available_users %}
+                                <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Add Member</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Custom CSS -->
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0 0.875rem 0 rgba(33,37,41,.05);
+    margin-bottom: 24px;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.card-title {
+    color: #495057;
+    font-weight: 600;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.form-control {
+    border-left: none;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #86b7fe;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+</style>
+
+<!-- Form Validation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('editGroupForm');
+
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Initialize Select2 if available
+    if (typeof $.fn.select2 !== 'undefined') {
+        $('#newMember').select2({
+            theme: 'bootstrap4',
+            width: '100%',
+            dropdownParent: $('#addMemberModal')
+        });
+    }
+});
+</script>
 {% endblock %}

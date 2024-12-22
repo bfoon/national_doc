@@ -1,0 +1,58 @@
+   .breadcrumb {
+        background-color: #f8f9fa;
+        border-radius: 0.25rem;
+        padding: 10px 15px;
+        font-size: 0.9rem;
+    }
+
+    h2 {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border-color: #3498db;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+    }
+
+    .pagination .page-link {
+        color: #3498db;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #3498db;
+        border-color: #3498db;
+        color: #fff;
+    }
+
+    .card-header {
+        background-color: #3498db;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .form-group label {
+        font-weight: bold;
+    }
+
+    .form-control {
+        border-radius: 0.25rem;
+    }
+
+    .card {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .btn {
+        border-radius: 0.25rem;
+    }

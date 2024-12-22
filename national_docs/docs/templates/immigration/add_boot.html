@@ -1,78 +1,247 @@
 {% extends 'docs/header.html' %}
 {% block content %}
-<div class="container my-5">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
-            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'boot_list' %}">Boot List</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Add Boot</li>
-        </ol>
-    </nav>
-
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h3 class="mb-0">Add New Boot</h3>
+<div class="container-fluid py-4 px-4">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-2">Create New Boot</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'boot_list' %}" class="text-decoration-none">Boot List</a></li>
+                    <li class="breadcrumb-item active">Add Boot</li>
+                </ol>
+            </nav>
         </div>
-        <div class="card-body">
-            <form method="POST">
-                {% csrf_token %}
-                <!-- Name Field -->
-                <div class="form-group">
-                    <label for="name" class="font-weight-bold">Boot Name</label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter boot name" required>
-                </div>
+        <div>
+            <a href="{% url 'boot_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to List
+            </a>
+        </div>
+    </div>
 
-                <!-- Description Field -->
-                <div class="form-group">
-                    <label for="description" class="font-weight-bold">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter a brief description"></textarea>
-                </div>
+    <div class="row">
+        <!-- Main Form Column -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" id="bootForm" class="needs-validation" novalidate>
+                        {% csrf_token %}
 
-                <!-- Assign To Field -->
-                <div class="form-group">
-                    <label for="assigned_to" class="font-weight-bold">Assign To</label>
-                    <select class="form-control" id="assigned_to" name="assigned_to" required>
-                        <option value="" disabled selected>Select a user</option>
-                        {% for user in users %}
-                            <option value="{{ user.id }}">{{ user.get_full_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                        <!-- Basic Information Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Basic Information</h5>
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="name" class="form-label">Boot Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-boot"></i></span>
+                                        <input type="text" class="form-control" id="name" name="name"
+                                               required minlength="3"
+                                               placeholder="Enter boot name">
+                                        <div class="invalid-feedback">
+                                            Please provide a boot name (minimum 3 characters).
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label for="description" class="form-label">Description</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-align-left"></i></span>
+                                        <textarea class="form-control" id="description" name="description"
+                                                  rows="4" placeholder="Enter a detailed description"
+                                                  required minlength="10"></textarea>
+                                        <div class="invalid-feedback">
+                                            Please provide a description (minimum 10 characters).
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <!-- Group Field -->
-                <div class="form-group">
-                    <label for="group" class="font-weight-bold">Group</label>
-                    <select class="form-control" id="group" name="group" required>
-                        <option value="" disabled selected>Select a group</option>
-                        {% for group in groups %}
-                            <option value="{{ group.id }}">{{ group.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
+                        <!-- Assignment Section -->
+                        <div class="mb-4">
+                            <h5 class="card-title mb-3">Assignment Details</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="assigned_to" class="form-label">Assign To</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <select class="form-select" id="assigned_to" name="assigned_to" required>
+                                            <option value="">Select user...</option>
+                                            {% for user in users %}
+                                                <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Please select a user.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="group" class="form-label">Group</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-users"></i></span>
+                                        <select class="form-select" id="group" name="group" required>
+                                            <option value="">Select group...</option>
+                                            {% for group in groups %}
+                                                <option value="{{ group.id }}">{{ group.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Please select a group.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label for="post_location" class="form-label">Post Location</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                        <select class="form-select" id="post_location" name="post_location" required>
+                                            <option value="">Select location...</option>
+                                            {% for post_location in post_locations %}
+                                                <option value="{{ post_location.id }}">{{ post_location.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Please select a post location.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <!-- Post Location Field -->
-                <div class="form-group">
-                    <label for="post_location" class="font-weight-bold">Post Location</label>
-                    <select class="form-control" id="post_location" name="post_location" required>
-                        <option value="" disabled selected>Select a post location</option>
-                        {% for post_location in post_locations %}
-                            <option value="{{ post_location.id }}">{{ post_location.name }}</option>
-                        {% endfor %}
-                    </select>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="window.location.href='{% url 'boot_list' %}'">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>Create Boot
+                            </button>
+                        </div>
+                    </form>
                 </div>
+            </div>
+        </div>
 
-                <!-- Buttons -->
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary mr-2">
-                        <i class="fas fa-save"></i> Save Boot
-                    </button>
-                    <a href="{% url 'boot_list' %}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Cancel
-                    </a>
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Help Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-info-circle me-2"></i>Guidelines</h5>
+                    <hr>
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">Boot Name</h6>
+                        <p class="small">Choose a unique and descriptive name that clearly identifies the boot.</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">Description</h6>
+                        <p class="small">Include relevant details about the boot's purpose, condition, and any special requirements.</p>
+                    </div>
+                    <div class="mb-3">
+                        <h6 class="text-muted mb-2">Assignment</h6>
+                        <p class="small">Select the appropriate user, group, and location for proper tracking and management.</p>
+                    </div>
                 </div>
-            </form>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Quick Stats</h5>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Total Boots</span>
+                        <span class="badge bg-primary">{{ total_boots }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Available Users</span>
+                        <span class="badge bg-success">{{ users|length }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Active Groups</span>
+                        <span class="badge bg-info">{{ groups|length }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<!-- Custom CSS -->
+<style>
+.card {
+    border: none;
+    box-shadow: 0 0 0.875rem 0 rgba(33,37,41,.05);
+    margin-bottom: 24px;
+}
+
+.card-title {
+    color: #495057;
+    font-weight: 600;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.form-control, .form-select {
+    border-left: none;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #86b7fe;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+}
+
+textarea.form-control {
+    min-height: 100px;
+}
+</style>
+
+<!-- Form Validation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('bootForm');
+
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Initialize Select2 for better dropdown experience
+    if (typeof $.fn.select2 !== 'undefined') {
+        $('#assigned_to, #group, #post_location').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        });
+    }
+});
+</script>
 {% endblock %}

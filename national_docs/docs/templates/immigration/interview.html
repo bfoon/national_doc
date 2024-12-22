@@ -1,72 +1,165 @@
 {% extends 'docs/header.html' %}
 {% block content %}
 <style>
-    /* General Border Styling */
-.border {
-    border: 1px solid #007bff;     /* Bootstrap primary color for a clean, vibrant border */
-    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1); /* Subtle shadow for depth */
+/* Enhanced styling with modern design principles */
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #1e40af;
+    --success-color: #059669;
+    --warning-color: #d97706;
+    --danger-color: #dc2626;
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --background-light: #f3f4f6;
 }
 
-/* Rounded Corners */
-.rounded {
-    border-radius: 0.5rem;         /* Slightly rounded corners for a modern look */
+/* Card improvements */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    border-radius: 1rem;
 }
 
-/* Passport Photo Styling */
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    border-top-left-radius: 1rem !important;
+    border-top-right-radius: 1rem !important;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+/* Improved applicant photo styling */
+.applicant-section {
+    position: relative;
+    padding: 1.5rem;
+}
+
 .passport-photo {
-    max-width: 120px;              /* Slightly larger for better visibility */
-    border: 2px solid #dee2e6;     /* Soft gray border for a clean, professional look */
-    border-radius: 0.5rem;         /* Rounded corners to match the design */
-    margin-left: 20px;             /* Consistent spacing from adjacent elements */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for subtle depth */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 0.75rem;
+    border: 3px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
 }
 
-/* Hover Effect for Passport Photo */
 .passport-photo:hover {
-    transform: scale(1.05);        /* Slight zoom on hover for interactivity */
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    transform: scale(1.05);
 }
 
-.token-number {
-    font-size: 0.7rem;           /* Slightly increased font size for readability */
-    color: #6c757d;              /* Subtle gray color for a professional look */
-    margin-top: 8px;             /* Increased spacing for better separation from the photo */
-    letter-spacing: 0.5px;       /* Slight letter spacing for clarity */
-    font-weight: 600;            /* Slightly bolder font for emphasis */
-    text-transform: uppercase;   /* Convert the token to uppercase for uniformity */
-    padding: 2px 6px;            /* Small padding for a touch of spacing */
-    background-color: #f8f9fa;   /* Light background to make the token stand out subtly */
-    border: 1px solid #dee2e6;   /* Soft border for definition */
-    border-radius: 4px;          /* Rounded corners for a polished look */
-}
-.modal-header {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: #fff;
-}
-
-.modal-title i {
-    margin-right: 8px;
-}
-
-.modal-body h5 {
-    color: #007bff;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.list-unstyled li {
-    margin-bottom: 10px;
-}
-
-.btn-link {
-    color: #007bff;
+.token-number{
+    background: var(--primary-color);
+    color: white;
+    margin-top: 8px;
+    letter-spacing: 0.5px;
+    padding: 0.25rem 1rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
     font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.btn-link:hover {
-    text-decoration: underline;
-    color: #0056b3;
+/* Enhanced form controls */
+.form-control {
+    border-radius: 0.5rem;
+    border: 2px solid #e5e7eb;
+    padding: 0.75rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Improved timer section */
+.interview-timer {
+    background: var(--background-light);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.timer-display {
+    font-family: 'Monaco', monospace;
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Enhanced buttons */
+.btn {
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--secondary-color);
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background: var(--success-color);
+    border: none;
+}
+
+.btn-warning {
+    background: var(--warning-color);
+    border: none;
+}
+
+/* Document list styling */
+.document-list {
+    list-style: none;
+    padding: 0;
+}
+
+.document-list li {
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+    background: var(--background-light);
+    border-radius: 0.5rem;
+    transition: background-color 0.2s;
+}
+
+.document-list li:hover {
+    background: #e5e7eb;
+}
+
+.document-list a {
+    color: var(--primary-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Modal improvements */
+.modal-content {
+    border-radius: 1rem;
+    border: none;
+}
+
+.modal-header {
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    padding: 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
 }
 
 </style>
@@ -397,69 +490,147 @@
 </div>
 
 <script>
-    document.getElementById('confirmSubmit').addEventListener('click', function () {
-        updateDuration();
-        document.getElementById('interview-form').submit();
+// Enhanced timer functionality
+let timerInterval;
+let startTime;
+let elapsedTime = 0;
+const timerDisplay = document.getElementById('timer');
+const startButton = document.getElementById('start-timer');
+const stopButton = document.getElementById('stop-timer');
+const resetButton = document.getElementById('reset-timer');
+
+function formatTime(ms) {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+    const seconds = String(totalSeconds % 60).padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+}
+
+function startTimer() {
+    startTime = Date.now() - elapsedTime;
+    timerInterval = setInterval(() => {
+        elapsedTime = Date.now() - startTime;
+        timerDisplay.textContent = formatTime(elapsedTime);
+        timerDisplay.classList.add('active');
+    }, 1000);
+    startButton.disabled = true;
+    stopButton.disabled = false;
+    resetButton.disabled = true;
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    timerDisplay.classList.remove('active');
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    resetButton.disabled = false;
+}
+
+function resetTimer() {
+    clearInterval(timerInterval);
+    elapsedTime = 0;
+    timerDisplay.textContent = '00:00:00';
+    timerDisplay.classList.remove('active');
+    startButton.disabled = false;
+    stopButton.disabled = true;
+    resetButton.disabled = false;
+}
+
+// Event listeners
+startButton.addEventListener('click', startTimer);
+stopButton.addEventListener('click', stopTimer);
+resetButton.addEventListener('click', resetTimer);
+
+// Form submission handling
+document.getElementById('confirmSubmit').addEventListener('click', function() {
+    updateDuration();
+    document.getElementById('interview-form').submit();
+});
+
+document.getElementById('interview-form').addEventListener('submit', function() {
+    updateDuration();
+});
+
+function updateDuration() {
+    const durationField = document.getElementById('duration');
+    durationField.value = elapsedTime;
+}
+
+// Add smooth transitions for UI interactions
+document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-4px)';
     });
 
-    document.getElementById('interview-form').addEventListener('submit', function () {
-        updateDuration();
+    card.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
     });
+});
 
-    function updateDuration() {
-        const durationField = document.getElementById('duration');
-        durationField.value = elapsedTime; // Store elapsed time in milliseconds
+// Enhance form validation
+const interviewForm = document.getElementById('interview-form');
+interviewForm.addEventListener('submit', function(event) {
+    const questionnaire = document.getElementById('questionnaire').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+
+    if (!questionnaire || !notes) {
+        event.preventDefault();
+        alert('Please complete both the questionnaire and notes sections before submitting.');
     }
-</script>
+});
 
+// Add autosave functionality
+let autosaveTimeout;
+function autosave() {
+    clearTimeout(autosaveTimeout);
+    autosaveTimeout = setTimeout(() => {
+        const formData = new FormData(interviewForm);
+        formData.append('autosave', 'true');
 
-<script>
-    let timerInterval;
-    let startTime;
-    let elapsedTime = 0;
-    const timerDisplay = document.getElementById('timer');
-    const startButton = document.getElementById('start-timer');
-    const stopButton = document.getElementById('stop-timer');
-    const resetButton = document.getElementById('reset-timer');
+        fetch(window.location.href, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        }).then(response => {
+            if (response.ok) {
+                console.log('Autosaved successfully');
+            }
+        }).catch(error => {
+            console.error('Autosave failed:', error);
+        });
+    }, 3000);
+}
 
-    function formatTime(ms) {
-        const totalSeconds = Math.floor(ms / 1000);
-        const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-        const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-        const seconds = String(totalSeconds % 60).padStart(2, '0');
-        return `${hours}:${minutes}:${seconds}`;
+document.getElementById('questionnaire').addEventListener('input', autosave);
+document.getElementById('notes').addEventListener('input', autosave);
+
+// Add keyboard shortcuts
+document.addEventListener('keydown', function(event) {
+    // Alt + S to start/stop timer
+    if (event.altKey && event.key === 's') {
+        event.preventDefault();
+        if (!startButton.disabled) {
+            startTimer();
+        } else if (!stopButton.disabled) {
+            stopTimer();
+        }
     }
 
-    function startTimer() {
-        startTime = Date.now() - elapsedTime;
-        timerInterval = setInterval(() => {
-            elapsedTime = Date.now() - startTime;
-            timerDisplay.textContent = formatTime(elapsedTime);
-        }, 1000);
-        startButton.disabled = true;
-        stopButton.disabled = false;
-        resetButton.disabled = true;
+    // Alt + R to reset timer
+    if (event.altKey && event.key === 'r') {
+        event.preventDefault();
+        if (!resetButton.disabled) {
+            resetTimer();
+        }
     }
+});
 
-    function stopTimer() {
-        clearInterval(timerInterval);
-        startButton.disabled = false;
-        stopButton.disabled = true;
-        resetButton.disabled = false;
-    }
-
-    function resetTimer() {
-        clearInterval(timerInterval);
-        elapsedTime = 0;
-        timerDisplay.textContent = '00:00:00';
-        startButton.disabled = false;
-        stopButton.disabled = true;
-        resetButton.disabled = false;
-    }
-
-    startButton.addEventListener('click', startTimer);
-    stopButton.addEventListener('click', stopTimer);
-    resetButton.addEventListener('click', resetTimer)
-
+// Initialize tooltips for better UX
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});
 </script>
 {% endblock %}
