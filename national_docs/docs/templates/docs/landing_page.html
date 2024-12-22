@@ -46,6 +46,16 @@
     color: white;
     text-align: center;
 }
+        .nav-link {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
 
 
         .hero-content {
@@ -64,6 +74,11 @@
             padding: 3rem 1rem;
             background-color: var(--background-light);
         }
+         .contact-info {
+            background: var(--accent-color);
+            border-radius: 15px;
+            padding: 2rem;
+        }
 
         .service-card {
             background: white;
@@ -78,24 +93,22 @@
             transform: translateY(-10px);
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
         }
-
-        /* Buttons */
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+     .btn-primary {
+            background-color: var(--secondary-color);
+            border: none;
             padding: 0.75rem 1.5rem;
             border-radius: 30px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         .btn-primary:hover {
-            background-color: var(--secondary-color);
+            background-color: var(--primary-color);
             transform: translateY(-3px);
-            box-shadow: 0 7px 14px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
+
+
 
         /* Footer */
         footer {
@@ -126,7 +139,7 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link " href="#home">Home</a></li>
                     <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
                     <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
