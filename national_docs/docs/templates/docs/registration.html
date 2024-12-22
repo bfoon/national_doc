@@ -3,96 +3,379 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create your account - National ID and Permit Portal">
     <title>Register - National ID and Permit Portal</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #1a4b84;
+            --secondary-color: #2c7be5;
+            --success-color: #00b074;
+            --error-color: #dc3545;
+            --text-color: #2d3748;
+            --bg-color: #f8fafc;
+            --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
         body {
-            background-color: #f0f0f0;
+            background: linear-gradient(135deg, #f6f9fc 0%, #eef2f7 100%);
+            color: var(--text-color);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 2rem 0;
         }
+
         .register-container {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 400px;
-            margin: 2rem auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--card-shadow);
+            max-width: 500px;
+            width: 90%;
+            margin: auto;
+            padding: 2.5rem;
         }
-        h1 {
+
+        .logo-section {
             text-align: center;
-            color: #2c3e50;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
+
+        .logo-section img {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.1);
+        }
+
+        .password-field {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .password-requirements {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .requirement i {
+            font-size: 0.75rem;
+        }
+
+        .requirement.valid {
+            color: var(--success-color);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border: none;
+            padding: 0.875rem 1.5rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: #64748b;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+
         .links {
             text-align: center;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
+
         .links a {
-            color: #3498db;
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
         }
+
         .links a:hover {
+            color: var(--primary-color);
             text-decoration: underline;
+        }
+
+        .invalid-feedback {
+            font-size: 0.85rem;
+            color: var(--error-color);
+        }
+
+        @media (max-width: 576px) {
+            .register-container {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="register-container">
         {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
-                    {{ message }}
-                </div>
-            {% endfor %}
+            <div class="messages mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="logo-section">
+            <img src="/media/Coat_of_arms_of_The_Gambia.svg" alt="Logo" class="rounded-circle">
+            <h1>Create Account</h1>
+            <p class="subtitle">Join our secure document management platform</p>
         </div>
-    {% endif %}
-        <h1>Create Account</h1>
-        <form id="registerForm" method="POST" action="{% url 'register' %}">  <!-- Replace 'your_register_view' with the actual view name -->
+
+        <form id="registerForm" method="POST" action="{% url 'register' %}" novalidate>
             {% csrf_token %}
-            <div class="form-group">
-                <label for="firstName">First Name</label>
-                <input type="text" id="firstName" name="first_name" class="form-control" required>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="first_name" class="form-control" required>
+                        <div class="invalid-feedback">Please enter your first name</div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label" for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="last_name" class="form-control" required>
+                        <div class="invalid-feedback">Please enter your last name</div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-              <label for="lastName">Last Name</label>
-                <input type="text" id="lastName" name="last_name" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
+
+            <div class="form-group mt-3">
+                <label class="form-label" for="email">Email Address</label>
                 <input type="email" id="email" name="email" class="form-control" required>
+                <div class="invalid-feedback">Please enter a valid email address</div>
             </div>
-            <div class="form-group">
-                <label for="dateOfBirth">Date of Birth</label>
+
+            <div class="form-group mt-3">
+                <label class="form-label" for="dateOfBirth">Date of Birth</label>
                 <input type="date" id="dateOfBirth" name="dateOfBirth" class="form-control" required>
+                <div class="invalid-feedback">Please enter your date of birth</div>
             </div>
-            <div class="form-group">
-                <label for="nationality">Nationality</label>
+
+            <div class="form-group mt-3">
+                <label class="form-label" for="nationality">Nationality</label>
                 <select id="nationality" name="nationality" class="form-control" required>
                     <option value="">Select Nationality</option>
                     <option value="national">National</option>
                     <option value="foreigner">Foreigner</option>
                 </select>
+                <div class="invalid-feedback">Please select your nationality</div>
             </div>
-            <div class="form-group">
-                <label for="username">Username</label>
+
+            <div class="form-group mt-3">
+                <label class="form-label" for="username">Username</label>
                 <input type="text" id="username" name="username" class="form-control" required>
+                <div class="invalid-feedback">Please choose a username</div>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" required>
+
+            <div class="form-group mt-3">
+                <label class="form-label" for="password">Password</label>
+                <div class="password-field">
+                    <input type="password" id="password" name="password" class="form-control" required>
+                    <i class="password-toggle fas fa-eye"></i>
+                </div>
+                <div class="password-requirements mt-2">
+                    <div class="requirement" data-requirement="length">
+                        <i class="fas fa-circle"></i>
+                        <span>At least 8 characters</span>
+                    </div>
+                    <div class="requirement" data-requirement="uppercase">
+                        <i class="fas fa-circle"></i>
+                        <span>One uppercase letter</span>
+                    </div>
+                    <div class="requirement" data-requirement="number">
+                        <i class="fas fa-circle"></i>
+                        <span>One number</span>
+                    </div>
+                    <div class="requirement" data-requirement="special">
+                        <i class="fas fa-circle"></i>
+                        <span>One special character</span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="confirmPassword">Confirm Password</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+
+            <div class="form-group mt-3">
+                <label class="form-label" for="confirmPassword">Confirm Password</label>
+                <div class="password-field">
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                    <i class="password-toggle fas fa-eye"></i>
+                </div>
+                <div class="invalid-feedback">Passwords do not match</div>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Register</button>
+
+            <button type="submit" class="btn btn-primary w-100 mt-4">Create Account</button>
+
+            <div class="links">
+                <a href="/login">Already have an account? Sign in</a>
+            </div>
         </form>
-        <div class="links">
-            <a href="/login">Already have an account? Login</a>
-        </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registerForm');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+            const requirements = document.querySelectorAll('.requirement');
+            const toggleButtons = document.querySelectorAll('.password-toggle');
+
+            // Password visibility toggle
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const input = this.previousElementSibling;
+                    const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                    input.setAttribute('type', type);
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                });
+            });
+
+            // Password requirements validation
+            function validatePassword(password) {
+                const requirements = {
+                    length: password.length >= 8,
+                    uppercase: /[A-Z]/.test(password),
+                    number: /[0-9]/.test(password),
+                    special: /[!@#$%^&*]/.test(password)
+                };
+
+                Object.entries(requirements).forEach(([key, valid]) => {
+                    const requirement = document.querySelector(`[data-requirement="${key}"]`);
+                    if (requirement) {
+                        requirement.classList.toggle('valid', valid);
+                        const icon = requirement.querySelector('i');
+                        icon.className = valid ? 'fas fa-check-circle' : 'fas fa-circle';
+                    }
+                });
+
+                return Object.values(requirements).every(Boolean);
+            }
+
+            // Real-time password validation
+            passwordInput.addEventListener('input', function() {
+                validatePassword(this.value);
+            });
+
+            // Form submission validation
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                let isValid = true;
+                const inputs = form.querySelectorAll('input, select');
+
+                inputs.forEach(input => {
+                    if (input.hasAttribute('required') && !input.value) {
+                        input.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        input.classList.remove('is-invalid');
+                    }
+                });
+
+                if (passwordInput.value !== confirmPasswordInput.value) {
+                    confirmPasswordInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                if (!validatePassword(passwordInput.value)) {
+                    passwordInput.classList.add('is-invalid');
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    this.submit();
+                }
+            });
+
+            // Clear invalid state on input
+            const inputs = form.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    this.classList.remove('is-invalid');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

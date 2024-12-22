@@ -89,6 +89,7 @@
     }
 
     .menu-items .card {
+        position: relative;
         border: 1px solid #e2e8f0;
         border-radius: 1rem;
         margin-bottom: 1.5rem;
@@ -259,7 +260,7 @@
         </div>
     </div>
 
-    <div class="row menu-items">
+       <div class="row menu-items">
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/fulfiller" class="text-decoration-none">
                 <div class="card">
@@ -273,11 +274,11 @@
         </div>
 
         <div class="col-md-3 col-sm-6">
-            <a href="/immigration/todos" class="text-decoration-none position-relative">
-                {% if pending_todo_count > 0 %}
-                    <span class="badge-notification">{{ pending_todo_count }}</span>
-                {% endif %}
-                <div class="card">
+            <a href="/immigration/todos" class="text-decoration-none">
+                <div class="card position-relative">
+                    {% if pending_todo_count > 0 %}
+                        <span class="badge-notification">{{ pending_todo_count }}</span>
+                    {% endif %}
                     <div class="card-body">
                         <i class="fas fa-list-check text-success"></i>
                         <h5 class="card-title">Task Management</h5>
