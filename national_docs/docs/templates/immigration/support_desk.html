@@ -223,88 +223,86 @@
     <div class="card-body p-0">
         <div class="chat-container" style="max-height: 600px; overflow-y: auto;">
             {% for chat in chats %}
-                {% if not chat.parent %}
-                    <div class="chat-thread p-4 border-bottom" id="chat-{{ chat.id }}">
-                        <!-- Main Message -->
-                        <div class="d-flex gap-3">
-                            <!-- User Avatar -->
-                            <div class="flex-shrink-0">
-                                <div class="avatar-circle bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
-                                    <i class="fas fa-user text-primary"></i>
+                <div class="chat-thread p-4 border-bottom" id="chat-{{ chat.id }}">
+                    <!-- Main Message -->
+                    <div class="d-flex gap-3">
+                        <!-- User Avatar -->
+                        <div class="flex-shrink-0">
+                            <div class="avatar-circle bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                <i class="fas fa-user text-primary"></i>
+                            </div>
+                        </div>
+
+                        <!-- Message Content -->
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <a href="#" class="text-decoration-none sender-details-link fw-bold"
+                                           data-bs-toggle="modal"
+                                           data-bs-target="#senderDetailsModal"
+                                           data-sender-id="{{ chat.sender.id }}"
+                                           data-chat-id="{{ chat.id }}"
+                                           data-sender-name="{{ chat.sender.get_full_name }}">
+                                            {{ chat.sender.get_full_name }}
+                                        </a>
+                                        <span class="badge bg-info ms-2 fs-xs">New User</span>
+                                    </h6>
+                                    <div class="text-muted fs-sm">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ chat.timestamp|date:"Y-m-d H:i" }}
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 respond-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#respondChatModal"
+                                            data-chat-id="{{ chat.id }}"
+                                            data-sender-name="{{ chat.sender.get_full_name }}">
+                                        <i class="fas fa-reply"></i>
+                                        <span>Reply</span>
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 close-btn"
+                                            data-chat-id="{{ chat.id }}">
+                                        <i class="fas fa-times"></i>
+                                        <span>Close</span>
+                                    </button>
                                 </div>
                             </div>
+                            <div class="message-content p-3 bg-light rounded-3">
+                                {{ chat.message }}
+                            </div>
 
-                            <!-- Message Content -->
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <h6 class="mb-1">
-                                            <a href="#" class="text-decoration-none sender-details-link fw-bold"
-                                               data-bs-toggle="modal"
-                                               data-bs-target="#senderDetailsModal"
-                                               data-sender-id="{{ chat.sender.id }}"
-                                               data-chat-id="{{ chat.id }}"
-                                               data-sender-name="{{ chat.sender.get_full_name }}">
-                                                {{ chat.sender.get_full_name }}
-                                            </a>
-                                            <span class="badge bg-info ms-2 fs-xs">New User</span>
-                                        </h6>
-                                        <div class="text-muted fs-sm">
-                                            <i class="fas fa-clock me-1"></i>
-                                            {{ chat.timestamp|date:"Y-m-d H:i" }}
-                                        </div>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 respond-btn"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#respondChatModal"
-                                                data-chat-id="{{ chat.id }}"
-                                                data-sender-name="{{ chat.sender.get_full_name }}">
-                                            <i class="fas fa-reply"></i>
-                                            <span>Reply</span>
-                                        </button>
-                                        <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 close-btn"
-                                                data-chat-id="{{ chat.id }}">
-                                            <i class="fas fa-times"></i>
-                                            <span>Close</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="message-content p-3 bg-light rounded-3">
-                                    {{ chat.message }}
-                                </div>
-
-                                <!-- Replies Section -->
-                                {% if chat.replies.all %}
-                                    <div class="replies-section mt-3 ms-4 border-start border-success border-3">
-                                        {% for reply in chat.replies.all %}
-                                            <div class="reply-item ms-3 mb-3">
-                                                <div class="d-flex gap-2">
-                                                    <!-- Reply Avatar -->
-                                                    <div class="flex-shrink-0">
-                                                        <div class="avatar-circle bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                                            <i class="fas fa-headset text-success"></i>
-                                                        </div>
+                            <!-- Replies Section -->
+                            {% if chat.replies.exists %}
+                                <div class="replies-section mt-3 ms-4 border-start border-success border-3">
+                                    {% for reply in chat.replies.all %}
+                                        <div class="reply-item ms-3 mb-3">
+                                            <div class="d-flex gap-2">
+                                                <!-- Reply Avatar -->
+                                                <div class="flex-shrink-0">
+                                                    <div class="avatar-circle bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                        <i class="fas fa-headset text-success"></i>
                                                     </div>
-                                                    <!-- Reply Content -->
-                                                    <div class="flex-grow-1">
-                                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                                            <h6 class="mb-0 fw-semibold">{{ reply.sender.get_full_name }}</h6>
-                                                            <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
-                                                        </div>
-                                                        <div class="message-content p-2 bg-white rounded-3 border">
-                                                            {{ reply.message }}
-                                                        </div>
+                                                </div>
+                                                <!-- Reply Content -->
+                                                <div class="flex-grow-1">
+                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                        <h6 class="mb-0 fw-semibold">{{ reply.sender.get_full_name }}</h6>
+                                                        <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
+                                                    </div>
+                                                    <div class="message-content p-2 bg-white rounded-3 border">
+                                                        {{ reply.message }}
                                                     </div>
                                                 </div>
                                             </div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
-                {% endif %}
+                </div>
             {% empty %}
                 <div class="text-center py-5">
                     <div class="mb-3">
@@ -317,6 +315,7 @@
         </div>
     </div>
 </div>
+
 
     <!-- Call Notes Section -->
 <div class="card border-0 shadow-sm">
@@ -893,7 +892,7 @@
                             <div class="customer-details">
                                 <div class="detail-item mb-3">
                                     <label class="text-muted mb-1">
-                                        <i class="fas fa-fingerprint text-primary me-2"></i>Application ID
+                                        <i class="fas fa-fingerprint text-primary me-2"></i>Application Type
                                     </label>
                                     <p class="mb-0 fw-bold" id="modalApplicationID">Loading...</p>
                                 </div>
@@ -919,7 +918,7 @@
                                     <div class="progress" style="height: 10px;">
                                         <div class="progress-bar bg-success" role="progressbar" style="width: 75%"></div>
                                     </div>
-                                    <small class="text-muted">Application Progress: 75%</small>
+                                    <small  id="applicationProgressText" class="text-muted">Application Progress: 0%</small>
                                 </div>
                             </div>
                         </div>
@@ -933,11 +932,12 @@
                                 <h5 class="mb-0">
                                     <i class="fas fa-sticky-note text-primary me-2"></i>Notes & Activity
                                 </h5>
-                                <div class="btn-group">
-                                    <button class="btn btn-outline-primary btn-sm active">All Notes</button>
-                                    <button class="btn btn-outline-primary btn-sm">Important</button>
-                                    <button class="btn btn-outline-primary btn-sm">Follow-ups</button>
+                               <div class="btn-group">
+                                    <button class="btn btn-outline-primary btn-sm active" data-filter="all">All Notes</button>
+                                    <button class="btn btn-outline-primary btn-sm" data-filter="important">Important</button>
+                                    <button class="btn btn-outline-primary btn-sm" data-filter="followup">Follow-ups</button>
                                 </div>
+
                             </div>
 
                             <!-- Notes Container -->
@@ -954,7 +954,7 @@
                                     <i class="fas fa-plus-circle text-primary me-2"></i>Add New Note
                                 </h6>
                                 <div class="mb-3">
-                                    <select class="form-select form-select-sm mb-3">
+                                    <select id="noteTitle" class="form-select form-select-sm mb-3">
                                         <option value="general">General Note</option>
                                         <option value="important">Important</option>
                                         <option value="followup">Follow-up Required</option>
@@ -976,6 +976,7 @@
                                     </button>
                                 </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -1221,7 +1222,9 @@
 document.addEventListener('DOMContentLoaded', function () {
     let senderId = null;
     let chatId = null;
+    const currentUserName = "{{ request.user.get_full_name }}"; // Pass current user name dynamically
 
+    // Sender details click event to load sender info and notes
     $('.sender-details-link').on('click', function () {
         senderId = $(this).data('sender-id');
         chatId = $(this).data('chat-id');
@@ -1236,6 +1239,8 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#modalApplicationLocation').text('Loading...');
         $('#noteText').val('');
         $('#notesContainer').html('<p class="text-muted">Loading notes...</p>');
+        $('.progress-bar').css('width', '0%'); // Reset progress bar
+        $('#applicationProgressText').text('Application Progress: 0%');
 
         // Fetch application details via AJAX
         $.ajax({
@@ -1246,6 +1251,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     $('#modalApplicationID').text(data.application_id);
                     $('#modalApplicationDate').text(data.application_date);
                     $('#modalApplicationLocation').text(data.application_location);
+
+                    // Update the progress bar and text dynamically
+                    const progressPercentage = data.progress || 0; // Default to 0 if no progress value is provided
+                    $('.progress-bar').css('width', progressPercentage + '%');
+                    $('#applicationProgressText').text(`Application Progress: ${progressPercentage}%`);
                 } else {
                     $('#modalApplicationID').text('No application found');
                     $('#modalApplicationDate').text('-');
@@ -1256,6 +1266,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 $('#modalApplicationID').text('Error fetching data');
                 $('#modalApplicationDate').text('-');
                 $('#modalApplicationLocation').text('-');
+                $('.progress-bar').css('width', '0%');
+                $('#applicationProgressText').text('Application Progress: 0%');
             }
         });
 
@@ -1267,10 +1279,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.notes.length > 0) {
                     let notesHtml = '';
                     data.notes.forEach(note => {
+                        // Add color based on the importance
+                        const importantClass = note.important ? 'important' : '';
+                        const noteTitleColor = note.important ? 'badge-danger' : 'badge-secondary';
+
                         notesHtml += `
-                            <div class="note">
-                                <p><strong>${note.created_by}</strong>: ${note.note}</p>
-                                <small class="text-muted">${note.created_at}</small>
+                            <div class="note-item ${note.title}" data-title="${note.title.toLowerCase()}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p><strong>${note.created_by} ${note.title}</strong>: ${note.note}</p>
+                                        <small class="text-muted">${note.created_at}</small>
+                                    </div>
+                                    <span class="badge ${noteTitleColor}">${note.title}</span>
+                                </div>
                             </div>
                         `;
                     });
@@ -1285,12 +1306,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Save Note via AJAX and Display Immediately
+    // Save note functionality via AJAX and display immediately
     $('#saveNoteBtn').on('click', function () {
         const noteText = $('#noteText').val().trim();
+        const noteTitle = $('#noteTitle').val(); // Get selected note title (General, Important, Follow-up)
+        const isImportant = $('#markImportant').prop('checked'); // Check if "Important" checkbox is ticked
 
-        if (!noteText) {
-            alert('Please enter a note before saving.');
+        if (!noteText || !noteTitle) {
+            alert('Please enter both a title and a note before saving.');
             return;
         }
 
@@ -1301,18 +1324,31 @@ document.addEventListener('DOMContentLoaded', function () {
                 'sender_id': senderId,
                 'chat_id': chatId,
                 'note': noteText,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
+                'title': noteTitle, // Include title field (General, Important, Follow-up)
+                'important': isImportant ? 1 : 0, // Include the "important" flag based on checkbox state
+                'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val() // CSRF token
             },
             success: function (data) {
                 if (data.success) {
+                    // Add color based on importance
+                    const importantClass = isImportant ? 'important' : '';
+                    const noteTitleColor = isImportant ? 'badge-danger' : 'badge-secondary';
+
                     const newNoteHtml = `
-                        <div class="note">
-                            <p><strong>{{ request.user.get_full_name }}</strong>: ${noteText}</p>
-                            <small class="text-muted">${new Date().toLocaleString()}</small>
+                        <div class="note-item ${importantClass}" data-title="${noteTitle.toLowerCase()}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p><strong>${currentUserName}</strong>: <strong>${noteTitle}</strong> - ${noteText}</p>
+                                    <small class="text-muted">${new Date().toLocaleString()}</small>
+                                </div>
+                                <span class="badge ${noteTitleColor}">${noteTitle}</span>
+                            </div>
                         </div>
                     `;
-                    $('#notesContainer').prepend(newNoteHtml);
-                    $('#noteText').val('');
+                    $('#notesContainer').prepend(newNoteHtml); // Prepend the new note to the notes container
+                    $('#noteText').val(''); // Clear the text area
+                    $('#noteTitle').val('general'); // Reset the title dropdown to default value
+                    $('#markImportant').prop('checked', false); // Reset the "important" checkbox
                     alert('Note saved successfully.');
                 } else {
                     alert('Failed to save note: ' + data.error);
@@ -1323,8 +1359,42 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-});
 
+    // Note type toggle functionality
+    document.querySelectorAll('.btn-group .btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all buttons
+            document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+
+            // Filter notes based on the active button (General, Important, Follow-ups)
+            const filterType = this.textContent.trim().toLowerCase(); // General, Important, Follow-ups
+            filterNotes(filterType);
+        });
+    });
+
+    // Filter notes based on type
+    function filterNotes(type) {
+        const notesContainer = document.getElementById('notesContainer');
+        const notes = notesContainer.querySelectorAll('.note-item');
+
+        // Loop through all notes and toggle visibility based on the selected type
+        notes.forEach(note => {
+            const noteType = note.dataset.title; // Get the data-title attribute for each note
+
+            // Display notes based on the selected filter type
+            if (type === 'all' || noteType === type) {
+                note.style.display = ''; // Show note
+            } else {
+                note.style.display = 'none'; // Hide note
+            }
+        });
+    }
+
+    // Initialize the default filter (show all notes)
+    filterNotes('all');
+});
 </script>
 
 <script>
@@ -1642,7 +1712,7 @@ document.getElementById('previewNoteBtn').addEventListener('click', function() {
     // Implement preview logic here
 });
 </script>
-        <script>
+<script>
 // Form validation
 document.getElementById('respondChatModal').addEventListener('submit', function(event) {
     if (!this.checkValidity()) {
@@ -1698,53 +1768,7 @@ document.getElementById('previewResponseBtn').addEventListener('click', function
     // Implement preview logic here
 });
 </script>
-        <script>
-// Note type toggle
-document.querySelectorAll('.btn-group .btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-        document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        // Filter notes based on type
-    });
-});
-
-// Add note functionality
-document.getElementById('saveNoteBtn').addEventListener('click', function() {
-    const noteText = document.getElementById('noteText').value;
-    const isImportant = document.getElementById('markImportant').checked;
-
-    if (!noteText.trim()) {
-        alert('Please enter a note before saving.');
-        return;
-    }
-
-    // Create note HTML
-    const noteHtml = `
-        <div class="note-item ${isImportant ? 'important' : ''} animate__animated animate__fadeIn">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="fw-bold mb-1">Support Agent</div>
-                    <small class="text-muted">Just now</small>
-                </div>
-                ${isImportant ? '<span class="badge bg-danger">Important</span>' : ''}
-            </div>
-            <div class="mt-2">${noteText}</div>
-        </div>
-    `;
-
-    // Add note to container
-    const notesContainer = document.getElementById('notesContainer');
-    if (notesContainer.querySelector('.placeholder-content')) {
-        notesContainer.innerHTML = '';
-    }
-    notesContainer.insertAdjacentHTML('afterbegin', noteHtml);
-
-    // Clear form
-    document.getElementById('noteText').value = '';
-    document.getElementById('markImportant').checked = false;
-});
-</script>
-        <script>
+<script>
 // Form validation
 document.getElementById('updateFAQForm').addEventListener('submit', function(event) {
     if (!this.checkValidity()) {

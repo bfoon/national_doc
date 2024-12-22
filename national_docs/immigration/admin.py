@@ -10,6 +10,7 @@ admin.site.register(Interview)
 admin.site.register(ToDo)
 admin.site.register(Notification)
 admin.site.register(Boot)
+admin.site.register(MessageNote)
 
 @admin.register(FAQCategory)
 class FAQCategoryAdmin(admin.ModelAdmin):

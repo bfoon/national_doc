@@ -177,13 +177,21 @@ class UploadedDocument(models.Model):
         return f"Document {self.document_type} for {self.application.user.username}"
 
 class ChatMessage(models.Model):
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_chats')
-    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_chats')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_messages")
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_messages")
     message = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)
-    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+    response_type = models.CharField(max_length=50, choices=[
+        ('general', 'General'),
+        ('technical', 'Technical Support'),
+        ('inquiry', 'Information Inquiry'),
+        ('urgent', 'Urgent Matter')
+    ], null=True, blank=True)
+    is_urgent = models.BooleanField(default=False)
+    requires_follow_up = models.BooleanField(default=False)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies',  on_delete=models.SET_NULL)
 
     def __str__(self):
-        return f"Message from {self.sender.username} to {self.recipient.username} at {self.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"Message from {self.sender} to {self.recipient} - {self.timestamp}"
 

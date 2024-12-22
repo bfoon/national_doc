@@ -69,7 +69,7 @@ class InterviewSlot(models.Model):
     is_available = models.BooleanField(default=True)  # Whether the slot is available or not
 
     def __str__(self):
-        return f"Interview Slot on {self.date_time} at {self.location.name}"
+        return f"Interview Slot on {self.date_time} at {self.location}"
 
     def check_availability(self):
         # Update availability status based on current interviewees count
@@ -280,10 +280,27 @@ class CallNote(models.Model):
         return f"Call Note by {self.user.get_full_name()} on {self.created_at.strftime('%Y-%m-%d %H:%M')}"
 
 class MessageNote(models.Model):
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_notes')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_notes')
-    chat = models.ForeignKey(ChatMessage, on_delete=models.CASCADE, null=True ,related_name='notes')  # Link to ChatMessage
-    note = models.TextField()
+    created_by = models.ForeignKey(
+        User, on_delete=models.CASCADE,
+        related_name='created_notes',
+        help_text="The user who created the note."
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='received_notes'
+    )
+    chat = models.ForeignKey(
+        ChatMessage,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='notes',
+        db_index=True,
+        help_text="Associated chat message."
+    )
+    note = models.TextField(help_text="Details of the note.")
+    title = models.CharField(max_length=255, blank=True, help_text="Title of the note (optional).")
+    important = models.BooleanField(default=False, db_index=True, help_text="Mark as important.")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -292,4 +309,10 @@ class MessageNote(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Note by {self.created_by.get_full_name()} on {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+        title_part = f" - {self.title}" if self.title else ""
+        importance = " (Important)" if self.important else ""
+        return f"Note by {self.created_by.get_full_name()} on {self.created_at.strftime('%Y-%m-%d %H:%M')}{title_part}{importance}"
+
+    @property
+    def is_important(self):
+        return self.important

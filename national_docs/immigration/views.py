@@ -35,6 +35,9 @@ from django.views.decorators.http import require_http_methods
 from django.utils.text import slugify
 import logging
 from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
+from django.views.decorators.http import require_POST
+from django.db.models import Prefetch
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -1256,7 +1259,11 @@ def support_desk(request):
     faqs = FAQ.objects.all()
 
     # Fetch top-level unread chats (main chats) and prefetch replies for efficiency
-    chats = ChatMessage.objects.filter(parent__isnull=True, is_read=False).order_by('-timestamp').prefetch_related('replies')
+    chats = (
+        ChatMessage.objects.filter(parent__isnull=True, is_read=False)
+        .order_by('-timestamp')
+        .prefetch_related(Prefetch('replies', queryset=ChatMessage.objects.all()))
+    )
 
     # Fetch call notes for the logged-in user
     call_notes = CallNote.objects.filter(user=request.user)
@@ -1501,32 +1508,55 @@ def add_call_note(request):
 
     return redirect('support_desk')
 
-
 @login_required
-@user_passes_test(is_staff_or_superuser)
+@user_passes_test(lambda user: user.is_staff or user.is_superuser, login_url='login')
 def respond_chat(request):
     if request.method == 'POST':
         chat_id = request.POST.get('chat_id')
         response_text = request.POST.get('response')
+        response_type = request.POST.get('response_type')
+
+        if not response_type:
+            messages.error(request, "Response type is required.")
+            return redirect('support_desk')
+
+        is_urgent = 'markUrgent' in request.POST  # Checkbox, True if checked
+        requires_follow_up = 'requireFollowup' in request.POST  # Checkbox, True if checked
+
+        # Fetch the original chat message
         original_chat = get_object_or_404(ChatMessage, id=chat_id)
 
         # Create the response message
-        ChatMessage.objects.create(
+        response_message = ChatMessage.objects.create(
             sender=request.user,
             recipient=original_chat.sender,
             message=response_text,
-            parent=original_chat
+            parent=original_chat,
+            response_type=response_type,
+            is_urgent=is_urgent,  # Ensure this field exists in the model
+            requires_follow_up=requires_follow_up  # Ensure this field exists in the model
         )
 
-        # Send email notification in a thread
+        # Prepare and send email notification in a thread
         subject = 'New Response to Your Support Request'
-        message = f'Hello {original_chat.sender.get_full_name()},\n\nYou have received a new response to your support request:\n\n"{response_text}"\n\nPlease check your support chat for more details.'
+        message = (
+            f"Hello {original_chat.sender.get_full_name()},\n\n"
+            f"You have received a new response to your support request:\n\n"
+            f'"{response_text}"\n\n'
+            "Please check your support chat for more details."
+        )
         recipient_email = original_chat.sender.email
 
-        send_email_in_thread(subject, message, recipient_email)
+        if recipient_email:
+            send_email_in_thread(subject, message, recipient_email)
 
         messages.success(request, 'Response sent successfully.')
         return redirect('support_desk')
+    else:
+        messages.error(request, 'Invalid request method.')
+        return redirect('support_desk')
+
+
 
 @login_required
 @user_passes_test(is_staff_or_superuser)
@@ -1565,62 +1595,114 @@ def close_chat(request):
 def birth_certificate_request(request):
     return render(request, 'immigration/birth_certificate_request.html')
 
+
 @login_required
 def get_user_application(request, user_id):
     try:
+        # Fetch the latest application for the user
         application = Application.objects.filter(user_id=user_id).latest('application_date')
-        return JsonResponse({
+
+        # Get the related fulfiller and its progress (assuming 1:1 relationship between Application and Fulfiller)
+        fulfiller = application.fulfiller  # Adjust if the relationship is different
+
+        # Prepare the response data
+        response_data = {
             'success': True,
             'application_id': application.get_service_type(),
             'application_date': application.application_date.strftime('%Y-%m-%d'),
             'application_location': application.post_location.name if application.post_location else 'N/A',
-        })
+        }
+
+        # Add the progress percentage if a fulfiller exists
+        if fulfiller:
+            response_data['progress'] = fulfiller.progress  # Using the method from Fulfiller model
+
+        return JsonResponse(response_data)
+
     except Application.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'No application found for this user'})
 
+
 # Take not for chat
 @login_required
+@require_POST
 def save_note(request):
-    if request.method == 'POST':
-        sender_id = request.POST.get('sender_id')
-        chat_id = request.POST.get('chat_id')
-        note_text = request.POST.get('note')
+    """
+    Save a new note for a chat with optional title and importance.
+    """
+    # Extract POST data
+    sender_id = request.POST.get('sender_id')
+    chat_id = request.POST.get('chat_id')
+    note_text = request.POST.get('note')
+    title = request.POST.get('title', '').strip()  # Optional field
+    important = request.POST.get('important', '0') == '1' # Boolean conversion
 
-        try:
-            sender = User.objects.get(id=sender_id)
-            chat = ChatMessage.objects.get(id=chat_id)
+    # Validate input data
+    if not note_text:
+        return JsonResponse({'success': False, 'error': 'Note content cannot be empty'}, status=400)
 
-            MessageNote.objects.create(
-                user=sender,
-                chat=chat,  # Ensure the note is tied to the chat
-                note=note_text,
-                created_by=request.user
-            )
+    try:
+        # Fetch sender and chat objects
+        sender = User.objects.get(id=sender_id)
+        chat = ChatMessage.objects.get(id=chat_id)
 
-            return JsonResponse({
-                'success': True,
-                'created_by': request.user.get_full_name(),
-                'note': note_text,
-                'created_at': timezone.now().strftime('%Y-%m-%d %H:%M')
-            })
-        except User.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'User not found'})
-        except ChatMessage.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Chat not found'})
+        # Optional: Check if the user has permission to create a note for the chat
+        if not request.user.has_perm('can_add_note', chat):  # Example permission
+            raise PermissionDenied("You do not have permission to add notes to this chat.")
 
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+        # Create the note
+        new_note = MessageNote.objects.create(
+            user=sender,
+            chat=chat,
+            note=note_text,
+            title=title,
+            important=important,
+            created_by=request.user
+        )
+
+        # Return success response
+        return JsonResponse({
+            'success': True,
+            'created_by': request.user.get_full_name(),
+            'note': new_note.note,
+            'title': new_note.title,
+            'important': new_note.important,
+            'created_at': new_note.created_at.strftime('%Y-%m-%d %H:%M'),
+        })
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Sender not found'}, status=404)
+    except ChatMessage.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Chat not found'}, status=404)
+    except PermissionDenied as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=403)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': 'An unexpected error occurred'}, status=500)
 
 @login_required
 def get_user_notes(request, user_id):
-    """Fetches notes for a specific user where the chat is not closed."""
+    """
+    Fetches notes for a specific user where the chat is not closed.
+    Includes title and important fields in the response.
+    """
+    # Validate if the user exists
+    get_object_or_404(User, id=user_id)
+
+    # Fetch notes for the user with non-closed chats
     notes = MessageNote.objects.filter(user_id=user_id, chat__is_read=False).order_by('-created_at')
+
+    # Prepare notes data
     notes_data = [
         {
             'created_by': note.created_by.get_full_name(),
             'note': note.note,
-            'created_at': note.created_at.strftime('%Y-%m-%d %H:%M')
-        } for note in notes
+            'title': note.title,
+            'important': note.important,
+            'created_at': note.created_at.strftime('%Y-%m-%d %H:%M'),
+        }
+        for note in notes
     ]
+
+    # Return notes as JSON
     return JsonResponse({'notes': notes_data})
 
 @login_required
