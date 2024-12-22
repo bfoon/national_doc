@@ -2,6 +2,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 from docs.models import Application, ChatMessage
+from django.utils import timezone
 from django.utils.text import slugify
 
 
@@ -265,19 +266,69 @@ class FAQ(models.Model):
             is_active=True
         ).distinct()
 
+
 class CallNote(models.Model):
+    # User related to the call note
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='call_notes')
+
+    # Customer information (optional)
+    customer = models.CharField(max_length=255, blank=True)
+
+    # Type of the call (e.g., 'Sales', 'Support', etc.)
+    CALL_TYPE_CHOICES = [
+        ('general', 'General Inquiry'),
+        ('support', 'Technical Support'),
+        ('inquiry', 'Compliant'),
+        ('followup', 'Follow Up')
+    ]
+    call_type = models.CharField(max_length=255, choices=CALL_TYPE_CHOICES, blank=True)
+
+    # Priority level of the call (e.g., 'High', 'Medium', 'Low')
+    PRIORITY_CHOICES = [
+        ('high', 'High'),
+        ('medium', 'Medium'),
+        ('low', 'Low')
+    ]
+    priority = models.CharField(max_length=255, choices=PRIORITY_CHOICES, blank=True)
+
+    # Detailed note about the call
     note = models.TextField()
+
+    # Follow-up flag and follow-up date
+    followup = models.BooleanField(default=False, db_index=True)
+    followup_date = models.DateTimeField(null=True, blank=True)
+
+    # Completion status of the call note
     completed = models.BooleanField(default=False)
+
+    # Timestamp when the call note was created
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # Meta class to set the verbose name and ordering
     class Meta:
         verbose_name = "Call Note"
         verbose_name_plural = "Call Notes"
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Call Note by {self.user.get_full_name()} on {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+        return f"Call Note by {self.user.get_full_name()} on {self.created_at.strftime('%Y-%m-%d %H:%M')} - {self.call_type.title()} ({self.priority.title()})"
+
+    def is_followup_due(self):
+        """Returns whether the follow-up is overdue."""
+        if self.followup and self.followup_date and timezone.now() > self.followup_date:
+            return True
+        return False
+
+    def mark_completed(self):
+        """Marks the call note as completed."""
+        self.completed = True
+        self.save()
+
+    # Optional: Custom manager for filtering completed or followup-related notes
+    @classmethod
+    def get_pending_followups(cls):
+        """Returns all call notes that are due for follow-up."""
+        return cls.objects.filter(followup=True, followup_date__lte=timezone.now(), completed=False)
 
 class MessageNote(models.Model):
     created_by = models.ForeignKey(

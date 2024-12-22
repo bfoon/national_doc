@@ -273,33 +273,42 @@
                                 {{ chat.message }}
                             </div>
 
-                            <!-- Replies Section -->
-                            {% if chat.replies.exists %}
-                                <div class="replies-section mt-3 ms-4 border-start border-success border-3">
-                                    {% for reply in chat.replies.all %}
-                                        <div class="reply-item ms-3 mb-3">
-                                            <div class="d-flex gap-2">
-                                                <!-- Reply Avatar -->
-                                                <div class="flex-shrink-0">
-                                                    <div class="avatar-circle bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                                        <i class="fas fa-headset text-success"></i>
-                                                    </div>
+                          <!-- Replies Section -->
+                        {% if chat.replies.exists %}
+                            <div class="replies-section mt-3 ms-4 border-start border-success border-3" style="max-height: 300px; overflow-y: auto;">
+                                {% for reply in chat.replies.all %}
+                                    <div class="reply-item ms-3 mb-3">
+                                        <div class="d-flex gap-2">
+                                            <!-- Reply Avatar -->
+                                            <div class="flex-shrink-0">
+                                                <div class="avatar-circle bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                    <i class="fas fa-headset text-success"></i>
                                                 </div>
-                                                <!-- Reply Content -->
-                                                <div class="flex-grow-1">
-                                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                                        <h6 class="mb-0 fw-semibold">{{ reply.sender.get_full_name }}</h6>
-                                                        <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
-                                                    </div>
-                                                    <div class="message-content p-2 bg-white rounded-3 border">
-                                                        {{ reply.message }}
-                                                    </div>
+                                            </div>
+                                            <!-- Reply Content -->
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                    <h6 class="mb-0 fw-semibold">
+                                                        {{ reply.sender.get_full_name }}
+                                                        <span class="badge
+                                                            {% if reply.response_type == 'general' %}text-primary{% elif reply.response_type == 'technical' %}text-warning{% elif reply.response_type == 'inquiry' %}text-info{% elif reply.response_type == 'urgent' %}text-danger{% endif %}
+                                                            fw-semibold">
+                                                            {{ reply.response_type|title }}
+                                                        </span>
+                                                    </h6>
+
+                                                    <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
+                                                </div>
+                                                <div class="message-content p-2 bg-white rounded-3 border">
+                                                    {{ reply.message }}
                                                 </div>
                                             </div>
                                         </div>
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
                         </div>
                     </div>
                 </div>
@@ -316,8 +325,7 @@
     </div>
 </div>
 
-
-    <!-- Call Notes Section -->
+<!-- Call Notes Section -->
 <div class="card border-0 shadow-sm">
     <div class="card-header bg-gradient bg-warning text-white py-3">
         <div class="d-flex justify-content-between align-items-center">
@@ -378,7 +386,7 @@
                                             <i class="fas fa-user text-warning"></i>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">{{ note.user.get_full_name }}</h6>
+                                            <h6 class="mb-0 font-weight-bold" style="text-transform: uppercase;">{{ note.customer }}</h6>
                                             <small class="text-muted">
                                                 <i class="fas fa-clock me-1"></i>
                                                 {{ note.created_at|date:"Y-m-d H:i" }}
@@ -402,6 +410,16 @@
                                 <!-- Note Content -->
                                 <div class="note-content {% if note.completed %}text-muted{% endif %}">
                                     <div class="p-3 bg-light rounded-3 {% if note.completed %}bg-opacity-50{% endif %}">
+                                        <strong>Call Type:</strong> {{ note.call_type }} <br>
+                                        <strong>Priority:</strong>
+                                        <span class="badge {% if note.priority == 'high' %}bg-danger{% elif note.priority == 'medium' %}bg-warning{% else %}bg-success{% endif %}">
+                                            {{ note.priority|capfirst }}
+                                        </span><br>
+                                        {% if note.followup %}
+                                            <i class="fas fa-exclamation-circle text-warning"></i> Follow-up Required
+                                        {% endif %}
+                                    </div>
+                                    <div class="mt-3">
                                         {{ note.note }}
                                     </div>
                                     {% if note.tags %}
@@ -428,6 +446,7 @@
         </div>
     </div>
 </div>
+
 
 <!-- Add FAQ Modal -->
 <div class="modal fade" id="addFAQModal" tabindex="-1" role="dialog" aria-labelledby="addFAQModalLabel" aria-hidden="true">
@@ -596,13 +615,13 @@
             <form method="POST" action="{% url 'add_call_note' %}" class="needs-validation" novalidate>
                 {% csrf_token %}
                 <div class="modal-body p-4">
-                    <!-- Call Details -->
+                    <!-- Customer Name -->
                     <div class="form-group mb-4">
                         <label class="form-label d-flex align-items-center">
                             <i class="fas fa-user text-warning me-2"></i>
                             Customer Name
                         </label>
-                        <input type="text" class="form-control" name="customer_name" placeholder="Enter customer name" required>
+                        <input type="text" class="form-control" name="customer" placeholder="Enter customer name" required>
                         <div class="invalid-feedback">
                             Please enter the customer's name.
                         </div>
@@ -616,10 +635,10 @@
                         </label>
                         <select class="form-select" name="call_type" required>
                             <option value="">Select call type</option>
-                            <option value="inquiry">General Inquiry</option>
+                            <option value="general">General Inquiry</option>
                             <option value="support">Technical Support</option>
-                            <option value="complaint">Complaint</option>
-                            <option value="follow_up">Follow-up</option>
+                            <option value="inquiry">Complaint</option>
+                            <option value="followup">Follow-up</option>
                         </select>
                         <div class="invalid-feedback">
                             Please select a call type.
@@ -682,20 +701,20 @@
                             Follow-up Required
                         </label>
                         <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="followupRequired" name="needs_followup">
+                            <input class="form-check-input" type="checkbox" id="followupRequired" name="followup">
                             <label class="form-check-label" for="followupRequired">Schedule follow-up</label>
                         </div>
                     </div>
 
                     <!-- Follow-up Date (Initially Hidden) -->
-                    <div class="form-group mb-4 d-none" id="followupDateGroup">
-                        <label class="form-label d-flex align-items-center">
-                            <i class="fas fa-calendar text-warning me-2"></i>
-                            Follow-up Date
-                        </label>
-                        <input type="datetime-local" class="form-control" name="followup_date">
-                    </div>
-                </div>
+<!--                    <div class="form-group mb-4 d-none" id="followupDateGroup">-->
+<!--                        <label class="form-label d-flex align-items-center">-->
+<!--                            <i class="fas fa-calendar text-warning me-2"></i>-->
+<!--                            Follow-up Date-->
+<!--                        </label>-->
+<!--                        <input type="datetime-local" class="form-control" name="followup_date">-->
+<!--                    </div>-->
+<!--                </div>-->
 
                 <div class="modal-footer bg-light">
                     <div class="d-flex justify-content-between w-100">

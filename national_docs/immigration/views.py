@@ -1556,18 +1556,47 @@ def search_faqs(request):
         }, status=500)
 
 
-
 @login_required
 @user_passes_test(is_staff_or_superuser)
 def add_call_note(request):
     if request.method == 'POST':
         note = request.POST.get('note')
+        customer = request.POST.get('customer')
+        call_type = request.POST.get('call_type')
+        priority = request.POST.get('priority')
+        followup = request.POST.get('followup') == 'on'  # Handle checkbox input for followup
+        # followup_date = request.POST.get('followup_date')
 
-        if note:
-            CallNote.objects.create(user=request.user, note=note)
-            messages.success(request, "Call note added successfully!")
-        else:
+        # Validate required fields
+        if not note:
             messages.error(request, "Please provide a call note.")
+            return redirect('support_desk')
+
+        # # If follow-up is checked, ensure followup_date is provided
+        # if followup and not followup_date:
+        #     messages.error(request, "Please provide a follow-up date.")
+        #     return redirect('support_desk')
+
+        # Convert followup_date to DateTime if provided
+        # if followup_date:
+        #     try:
+        #         followup_date = timezone.make_aware(timezone.datetime.strptime(followup_date, "%Y-%m-%d %H:%M"))
+        #     except ValueError:
+        #         messages.error(request, "Invalid follow-up date format. Use YYYY-MM-DD HH:MM format.")
+        #         return redirect('support_desk')
+
+        # Create the CallNote object
+        CallNote.objects.create(
+            user=request.user,
+            customer=customer,
+            call_type=call_type,
+            priority=priority,
+            note=note,
+            followup=followup,
+            # followup_date=followup_date,
+        )
+
+        messages.success(request, "Call note added successfully!")
 
     return redirect('support_desk')
 
