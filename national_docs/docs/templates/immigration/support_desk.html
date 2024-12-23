@@ -1269,7 +1269,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                         <p><strong>${note.created_by} ${note.title}</strong>: ${note.note}</p>
                                         <small class="text-muted">${note.created_at}</small>
                                     </div>
-                                    <span class="badge ${noteTitleColor}">${note.title}</span>
+                                    <span class="badge ${noteTitleColor}">${note.title.toUpperCase()}</span>
                                 </div>
                             </div>
                         `;
