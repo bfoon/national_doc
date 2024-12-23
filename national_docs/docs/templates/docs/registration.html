@@ -180,6 +180,148 @@
                 padding: 1.5rem;
             }
         }
+        .support-icon {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: var(--secondary-color);
+        color: var(--white);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        z-index: 1000;
+    }
+
+    .support-icon:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        background-color: #2980b9;
+    }
+
+    .support-icon i {
+        font-size: 24px;
+        color: white !important; /* Ensures the icon stays white */
+    }
+              /* Chat Popup */
+.chat-popup {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 300px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+.hidden {
+    display: none;
+}
+
+.chat-header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h4 {
+    margin: 0;
+}
+
+.close-chat {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.chat-body {
+    padding: 10px;
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+
+.message {
+    margin-bottom: 10px;
+}
+
+.message p {
+    margin: 0;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.message.received p {
+    background-color: #e9ecef;
+    color: #333;
+}
+
+.message.sent p {
+    background-color: #007bff;
+    color: white;
+    text-align: right;
+}
+
+.time {
+    font-size: 12px;
+    color: #aaa;
+    margin-top: 5px;
+    display: block;
+    text-align: right;
+}
+
+.chat-footer {
+    display: flex;
+    border-top: 1px solid #ddd;
+    padding: 10px;
+    background-color: #ffffff;
+}
+
+#chat-input {
+    flex-grow: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.send-message {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.send-message:hover {
+    background-color: #0056b3;
+}
+
+.send-message i {
+    font-size: 18px;
+}
     </style>
 </head>
 <body>
@@ -290,6 +432,32 @@
             </div>
         </form>
     </div>
+    <div id="support-icon" class="support-icon">
+     <i class="fas fa-comment-dots"></i>
+    </div>
+
+    <div id="chat-popup" class="chat-popup hidden">
+    <div class="chat-header">
+        <h4>Support Chat</h4>
+        <button id="close-chat" class="close-chat">&times;</button>
+    </div>
+    <div class="chat-body">
+        <div class="message received">
+            <p>Hello! How can we assist you?</p>
+            <span class="time">10:00 AM</span>
+        </div>
+        <div class="message sent">
+            <p>Hi, I need some help.</p>
+            <span class="time">10:01 AM</span>
+        </div>
+    </div>
+    <div class="chat-footer">
+        <input type="text" id="chat-input" placeholder="Type a message..." />
+        <button id="send-message" class="send-message">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </div>
+</div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -377,5 +545,30 @@
             });
         });
     </script>
+<script>
+    document.getElementById("support-icon").addEventListener("click", () => {
+    document.getElementById("chat-popup").classList.toggle("hidden");
+});
+
+document.getElementById("close-chat").addEventListener("click", () => {
+    document.getElementById("chat-popup").classList.add("hidden");
+});
+
+document.getElementById("send-message").addEventListener("click", () => {
+    const input = document.getElementById("chat-input");
+    const message = input.value.trim();
+    if (message) {
+        const chatBody = document.querySelector(".chat-body");
+        const newMessage = document.createElement("div");
+        newMessage.classList.add("message", "sent");
+        newMessage.innerHTML = `<p>${message}</p><span class="time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
+        chatBody.appendChild(newMessage);
+        input.value = "";
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+});
+
+</script>
+
 </body>
 </html>
