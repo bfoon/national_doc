@@ -3,311 +3,375 @@
 
 <style>
 :root {
-    --primary-color: #4f46e5;
-    --primary-hover: #4338ca;
-    --success-color: #10b981;
-    --danger-color: #ef4444;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --bg-gray: #f3f4f6;
+  /* Color system */
+  --color-primary: #0f172a;
+  --color-primary-light: #1e293b;
+  --color-secondary: #64748b;
+  --color-success: #059669;
+  --color-danger: #dc2626;
+  --color-warning: #d97706;
+  --color-info: #0284c7;
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+
+  /* Typography */
+  --font-primary: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-signature: 'Inter', sans-serif;
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+
+  /* Transitions */
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Modern Card Styling */
+/* Base styles */
+/* Modern Card Design */
 .card {
-    background: white;
-    border: none;
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    border-radius: 1rem;
-    padding-top: 85px;
-    margin-bottom: 2rem;
-    position: relative;
-    transition: all 0.3s ease;
+  background: var(--color-surface);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  transition: box-shadow var(--transition-base);
+  padding-top: 100px;
+  margin-bottom: var(--space-xl);
+  position: relative;
 }
 
 .card:hover {
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
-/* Enhanced Passport Photo */
-.passport-photo-container {
-    position: absolute;
-    top: 0.5px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
+/* Enhanced Profile Photo */
+.profile-photo-wrapper {
+  position: absolute;
+  top: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
 }
 
-.passport-photo {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border: 4px solid white;
-    border-radius: 50%;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    transition: transform 0.3s ease;
+.profile-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 4px solid var(--color-surface);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  object-fit: cover;
+  transition: transform var(--transition-base);
 }
 
-.passport-photo:hover {
-    transform: scale(1.05);
+.profile-photo:hover {
+  transform: scale(1.05);
 }
 
-/* Modern Card Header */
+/* Modern Header */
 .card-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-    color: white;
-    border-radius: 1rem 1rem 0 0;
-    padding: 1.25rem;
-    border: none;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: var(--color-surface);
+  border-radius: 1rem 1rem 0 0;
+  padding: var(--space-lg);
+  text-align: center;
 }
 
-/* Improved Breadcrumb */
-.breadcrumb {
-    background-color: transparent;
-    padding: 1rem 0;
-    margin-bottom: 2rem;
+/* Typography Enhancements */
+h2.page-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  text-align: center;
+  margin-bottom: var(--space-xl);
 }
 
-.breadcrumb-item a {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.breadcrumb-item a:hover {
-    color: var(--primary-hover);
-}
-
-/* Enhanced Form Elements */
+/* Form Elements */
 .form-control {
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    padding: 0.75rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  transition: all var(--transition-base);
+  font-size: 1rem;
 }
 
 .form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
 }
 
-.form-control:disabled {
-    background-color: var(--bg-gray);
-    cursor: not-allowed;
+.form-control[readonly] {
+  background-color: var(--color-background);
 }
 
-/* Modern Signature */
-.signature {
-    font-family: 'Pacifico', cursive;
-    font-size: 1.1rem;
-    color: var(--text-primary);
-    text-align: right;
-    margin-top: 1rem;
-    opacity: 0.8;
-}
-
-/* Enhanced Badges */
-.badge-app {
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    font-weight: 500;
-    font-size: 0.875rem;
+/* Enhanced Status Badges */
+.badgeapp {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  font-size: 0.875rem;
 }
 
 .badge-success {
-    background-color: var(--success-color);
-    color: white;
+  background-color: var(--color-success);
+  color: white;
 }
 
 .badge-danger {
-    background-color: var(--danger-color);
-    color: white;
+  background-color: var(--color-danger);
+  color: white;
 }
 
 .badge-warning {
-    background-color: #f59e0b;
-    color: white;
+  background-color: var(--color-warning);
+  color: white;
 }
 
-/* Improved Buttons */
+/* Button Improvements */
 .btn {
-    padding: 0.625rem 1.25rem;
-    border-radius: 0.5rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
 }
 
 .btn-success {
-    background-color: var(--success-color);
-    border-color: var(--success-color);
+  background-color: var(--color-success);
+  color: white;
 }
 
 .btn-danger {
-    background-color: var(--danger-color);
-    border-color: var(--danger-color);
+  background-color: var(--color-danger);
+  color: white;
 }
 
-.btn-success:hover, .btn-danger:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-/* Enhanced Modal */
+/* Modal Improvements */
 .modal-content {
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
 }
 
 .modal-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
-    color: white;
-    border-radius: 1rem 1rem 0 0;
-    padding: 1.5rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  color: white;
+  border-radius: 1rem 1rem 0 0;
+  padding: var(--space-lg);
 }
 
 .modal-body {
-    padding: 1.5rem;
+  padding: var(--space-lg);
 }
 
 .modal-footer {
-    border-top: 1px solid #e5e7eb;
-    padding: 1.25rem;
+  padding: var(--space-lg);
+  border-top: 1px solid var(--color-border);
 }
 
-/* Enhanced Alert */
+/* Alert Styling */
+.alert {
+  border-radius: 0.75rem;
+  padding: var(--space-lg);
+  margin: var(--space-md) 0;
+}
+
 .alert-danger {
-    background-color: #fef2f2;
-    border: 1px solid #fee2e2;
-    color: #991b1b;
-    border-radius: 0.75rem;
-    padding: 1rem;
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: var(--color-danger);
 }
 
-/* Responsive Design Improvements */
+/* Signature Enhancement */
+.signature {
+  font-family: var(--font-signature);
+  font-size: 1.125rem;
+  color: var(--color-primary);
+  text-align: right;
+  margin-top: var(--space-lg);
+  opacity: 0.9;
+}
+
+/* Responsive Improvements */
 @media (max-width: 768px) {
-    .card {
-        margin: 1rem;
-        padding-top: 70px;
-    }
+  .card {
+    margin: var(--space-md);
+    padding-top: 80px;
+  }
 
-    .passport-photo {
-        width: 80px;
-        height: 80px;
-    }
+  .profile-photo {
+    width: 80px;
+    height: 80px;
+  }
 
-    .btn {
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
+  .btn {
+    width: 100%;
+    margin-bottom: var(--space-xs);
+  }
+
+  .modal-dialog {
+    margin: var(--space-sm);
+  }
 }
+
 </style>
 
-<!-- Link to Google Fonts for the signature font -->
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<!-- Modern Google Font for enhanced typography -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-<div class="container my-5">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'todo_list' %}">ToDo List</a></li>
-            <li class="breadcrumb-item active">ToDo Details</li>
-        </ol>
-    </nav>
+<div class="container py-8">
+    <nav aria-label="breadcrumb navigation" class="breadcrumb-nav">
+    <ol class="breadcrumb-list">
+        <li class="breadcrumb-item">
+            <a href="{% url 'immigration_dashboard' %}" class="breadcrumb-link">
+                <svg class="breadcrumb-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span class="breadcrumb-text">Dashboard</span>
+            </a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="{% url 'todo_list' %}" class="breadcrumb-link">
+                <svg class="breadcrumb-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <span class="breadcrumb-text">ToDo List</span>
+            </a>
+        </li>
+        <li class="breadcrumb-item" aria-current="page">
+            <span class="breadcrumb-current">
+                <svg class="breadcrumb-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="breadcrumb-text">ToDo Details</span>
+            </span>
+        </li>
+    </ol>
+</nav>
 
-    <h2 class="text-2xl font-bold text-center mb-6">ToDo Details</h2>
+    <h2 class="page-title">Application Review Details</h2>
 
-<div class="card shadow mb-4 position-relative">
-    <!-- Circular Passport Photo -->
-    <div class="passport-photo-container">
-        {% if todo.application.national_id_applications.first %}
-            <img src="{{ todo.application.national_id_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
-        {% elif todo.application.resident_permit_applications.first %}
-            <img src="{{ todo.application.resident_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
-        {% elif todo.application.work_permit_applications.first %}
-            <img src="{{ todo.application.work_permit_applications.first.passport_photo.url }}" alt="Passport Photo" class="passport-photo">
-        {% endif %}
-    </div>
-
-    <div class="card-header text-center">
-        <h5 class="mb-0">Details for ToDo #{{ todo.id }}</h5>
-    </div>
-
-    <div class="card-body">
-        <p><strong>Application:</strong> {{ todo.application.get_service_type }}</p>
-        <p><strong>Interviewee:</strong> {{ todo.interview.application.user.get_full_name }}</p>
-        <p><strong>Interviewer:</strong> {{ todo.user.get_full_name }}</p>
-        <p><strong>Interview Duration:</strong> {{ todo.interview.duration }} Min</p>
-
-        <!-- Notes as a read-only textarea -->
-        <div class="form-group">
-            <label for="notes"><strong>Notes:</strong></label>
-            <textarea id="notes" class="form-control" rows="5" readonly>{{ todo.interview.notes }}</textarea>
-            <div class="signature">{{ todo.user.get_full_name }}</div>
+    <div class="card">
+        <div class="profile-photo-wrapper">
+            {% if todo.application.national_id_applications.first %}
+                <img src="{{ todo.application.national_id_applications.first.passport_photo.url }}" alt="Applicant Photo" class="profile-photo">
+            {% elif todo.application.resident_permit_applications.first %}
+                <img src="{{ todo.application.resident_permit_applications.first.passport_photo.url }}" alt="Applicant Photo" class="profile-photo">
+            {% elif todo.application.work_permit_applications.first %}
+                <img src="{{ todo.application.work_permit_applications.first.passport_photo.url }}" alt="Applicant Photo" class="profile-photo">
+            {% endif %}
         </div>
 
-        <p><strong>Approver:</strong>
-            {% if todo.approver %}
-                {{ todo.approver.get_full_name }}
-            {% else %}
-                N/A
-            {% endif %}
-        </p>
-        <p><strong>Status:</strong>
-            {% if todo.status == 1 %}
-                <span class="badge badge-app badge-success">Approved</span>
-            {% elif todo.status == 2 %}
-                <span class="badge badge-app badge-danger">Rejected</span>
-            {% else %}
-                <span class="badge badge-app badge-warning">Pending</span>
-            {% endif %}
-        </p>
+        <div class="card-header">
+            <h5 class="text-xl font-semibold mb-0">Application #{{ todo.id }}</h5>
+        </div>
 
-        {% if todo.status == 2 %}
-            <div class="alert alert-danger mt-3">
-                <strong>Rejection Reason:</strong>
-                <p>{{ todo.rejection_reason }}</p>
+        <div class="card-body p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <p class="mb-4"><strong>Application Type:</strong> {{ todo.application.get_service_type }}</p>
+                    <p class="mb-4"><strong>Applicant:</strong> {{ todo.interview.application.user.get_full_name }}</p>
+                    <p class="mb-4"><strong>Interviewer:</strong> {{ todo.user.get_full_name }}</p>
+                    <p class="mb-4"><strong>Interview Duration:</strong> {{ todo.interview.duration }} Minutes</p>
+                </div>
+
+                <div>
+                    <p class="mb-4"><strong>Reviewing Officer:</strong>
+                        {% if todo.approver %}
+                            {{ todo.approver.get_full_name }}
+                        {% else %}
+                            Pending Assignment
+                        {% endif %}
+                    </p>
+                    <p class="mb-4"><strong>Current Status:</strong>
+                        {% if todo.status == 1 %}
+                            <span class="badge badgeapp  badge-success">Approved</span>
+                        {% elif todo.status == 2 %}
+                            <span class="badge badgeapp  badge-danger">Rejected</span>
+                        {% else %}
+                            <span class="badge badgeapp  badge-warning">Under Review</span>
+                        {% endif %}
+                    </p>
+                </div>
             </div>
-        {% endif %}
 
-        {% if todo.status == 0 %}
-            <div class="d-flex mt-3">
-                <button type="button" class="btn btn-success mr-2" data-toggle="modal" data-target="#approveModal">
-                    <i class="fas fa-check"></i> Approve
-                </button>
-                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal">
-                    <i class="fas fa-times"></i> Reject
-                </button>
+            <div class="mt-6">
+                <label for="notes" class="block text-sm font-medium mb-2">Interview Notes:</label>
+                <textarea id="notes" class="form-control" rows="5" readonly>{{ todo.interview.notes }}</textarea>
+                <div class="signature">Verified by: {{ todo.user.get_full_name }}</div>
             </div>
-        {% endif %}
 
-        {% if todo.status == 1 %}
-            <!-- Print Receipt Button -->
-            <a href="{% url 'todo_receipt_pdf' todo.id %}" class="btn btn-info float-right">
-                <i class="fas fa-print"></i> Print Receipt
-            </a>
-        {% endif %}
+            {% if todo.status == 2 %}
+                <div class="alert alert-danger mt-6">
+                    <h6 class="font-semibold mb-2">Rejection Details:</h6>
+                    <p>{{ todo.rejection_reason }}</p>
+                </div>
+            {% endif %}
+
+            <div class="mt-6 flex flex-wrap gap-4">
+                {% if todo.status == 0 %}
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#approveModal">
+                        <i class="fas fa-check-circle"></i>
+                        Approve Application
+                    </button>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#rejectModal">
+                        <i class="fas fa-times-circle"></i>
+                        Reject Application
+                    </button>
+                {% endif %}
+
+                {% if todo.status == 1 %}
+                    <a href="{% url 'todo_receipt_pdf' todo.id %}" class="btn btn-primary">
+                        <i class="fas fa-file-pdf"></i>
+                        Download Receipt
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
-</div>
-
-<a href="{% url 'todo_list' %}" class="btn btn-secondary">Back to ToDo List</a>
+    <br>
 
 
-<!-- Approve Modal -->
+<!-- Approval Confirmation Modal -->
 <div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="approveModalLabel">Approval Confirmation</h5>
+                <h5 class="modal-title" id="approveModalLabel">Confirm Application Approval</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <p>I, <strong>{{ user.get_full_name }}</strong>, affirm that all documents and interview notes have been reviewed and verified.</p>
-                <p>This action is irreversible. Do you confirm approval?</p>
+                <div class="mb-4">
+                    <p class="font-medium">Officer Confirmation</p>
+                    <p>I, <strong>{{ user.get_full_name }}</strong>, hereby confirm that:</p>
+                    <ul class="list-disc ml-6 mt-2">
+                        <li>All required documents have been thoroughly reviewed</li>
+                        <li>The interview notes have been verified</li>
+                        <li>The application meets all necessary criteria</li>
+                    </ul>
+                </div>
+                <p class="text-sm text-secondary mt-4">This action cannot be undone. Please ensure all details are correct before proceeding.</p>
             </div>
             <div class="modal-footer">
                 <form method="POST" action="{% url 'approve_todo' todo.id %}">
@@ -320,12 +384,12 @@
     </div>
 </div>
 
-<!-- Reject Modal -->
+<!-- Rejection Modal -->
 <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="rejectModalLabel">Reject ToDo Item</h5>
+                <h5 class="modal-title" id="rejectModalLabel">Application Rejection</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -334,12 +398,25 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="form-group">
-                        <label for="rejection_reason">Rejection Reason</label>
-                        <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="5" required></textarea>
+                        <label for="rejection_reason" class="block text-sm font-medium mb-2">Please provide detailed reason for rejection:</label>
+                        <textarea
+                            class="form-control"
+                            id="rejection_reason"
+                            name="rejection_reason"
+                            rows="5"
+                            placeholder="Enter comprehensive rejection reasons..."
+                            required
+                        ></textarea>
+                        <small class="text-secondary block mt-2">
+                            Please include specific details and reference any relevant policies or requirements that were not met.
+                        </small>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-danger">Reject ToDo</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-times-circle"></i>
+                        Confirm Rejection
+                    </button>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 </div>
             </form>
@@ -347,10 +424,37 @@
     </div>
 </div>
 
+<!-- Enhanced Print Functionality -->
 <script>
-    document.getElementById('confirmPrint').addEventListener('click', function() {
-        window.print();
-    });
+document.addEventListener('DOMContentLoaded', function() {
+    // Print functionality
+    const printButton = document.getElementById('confirmPrint');
+    if (printButton) {
+        printButton.addEventListener('click', function() {
+            window.print();
+        });
+    }
+
+    // Form validation
+    const rejectForm = document.querySelector('#rejectModal form');
+    if (rejectForm) {
+        rejectForm.addEventListener('submit', function(e) {
+            const reason = document.getElementById('rejection_reason').value.trim();
+            if (reason.length < 10) {
+                e.preventDefault();
+                alert('Please provide a detailed rejection reason (minimum 10 characters).');
+            }
+        });
+    }
+
+    // Responsive image handling
+    const profilePhoto = document.querySelector('.profile-photo');
+    if (profilePhoto) {
+        profilePhoto.addEventListener('error', function() {
+            this.src = '/static/images/default-profile.png';
+        });
+    }
+});
 </script>
 
 {% endblock %}

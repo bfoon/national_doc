@@ -2,78 +2,291 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --color-primary: #1a365d;
+            --color-secondary: #2d3748;
+            --color-accent: #c53030;
+            --color-gray: #718096;
+            --color-light: #edf2f7;
+            --color-background: #ffffff;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--color-secondary);
+            background-color: var(--color-light);
+            padding: 2rem;
         }
-        .receipt {
-            width: 100%;
-            max-width: 600px;
+
+        .receipt-container {
+            background: var(--color-background);
+            max-width: 800px;
             margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #000;
-            position: relative; /* Set position to relative to allow the logo to be placed absolutely inside */
+            padding: 3rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            position: relative;
+            overflow: hidden;
         }
-        .logo {
+
+        .watermark {
             position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px; /* Adjust as needed */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 8rem;
+            color: rgba(0, 0, 0, 0.03);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 3rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 2rem;
+        }
+
+        .logo {
+            width: 120px;
             height: auto;
-            padding: 10px;
         }
+
+        .receipt-title {
+            font-family: 'Libre Baskerville', serif;
+            color: var(--color-primary);
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
         .receipt-number {
-            color: red;
-            font-size: 1.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin: 10px 0;
-        }
-        .signature {
-            font-family: 'Pacifico', cursive;
-            font-size: 1rem;
+            color: var(--color-accent);
+            font-size: 1.25rem;
+            font-weight: 600;
             text-align: right;
-            margin-top: 40px;
+            letter-spacing: 1px;
         }
+
+        .receipt-meta {
+            background: var(--color-light);
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin-bottom: 2rem;
+        }
+
+        .receipt-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 0.75rem;
+        }
+
+        .receipt-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .label {
+            font-weight: 600;
+            color: var(--color-primary);
+            min-width: 150px;
+        }
+
+        .value {
+            flex: 1;
+            text-align: right;
+        }
+
+        .certification {
+            background: var(--color-light);
+            padding: 1.5rem;
+            border-radius: 6px;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 2px solid var(--border-color);
+        }
+
+        .signature {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 1.25rem;
+            color: var(--color-primary);
+            border-bottom: 2px solid var(--color-primary);
+            padding-bottom: 0.5rem;
+        }
+
+        .date {
+            font-size: 0.875rem;
+            color: var(--color-gray);
+        }
+
+        .verification {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
         .qr-code {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .qr-code img {
             width: 150px;
             height: 150px;
         }
+
+        .verification-text {
+            font-size: 0.875rem;
+            color: var(--color-gray);
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .security-features {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--color-gray);
+            text-align: center;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .receipt-container {
+                box-shadow: none;
+                padding: 2rem;
+            }
+
+            .security-features {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .receipt-container {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .receipt-number {
+                text-align: center;
+            }
+
+            .receipt-row {
+                flex-direction: column;
+            }
+
+            .value {
+                text-align: left;
+            }
+
+            .signature-section {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+        }
     </style>
-    <title>ToDo Receipt</title>
+    <title>Official Document Receipt</title>
 </head>
 <body>
-    <div class="receipt">
-        <!-- Logo Image at Top Right Corner -->
-        <img src="{{ logo_url }}" alt="National Document Logo" class="logo">
+    <div class="receipt-container">
+        <div class="watermark">OFFICIAL DOCUMENT</div>
 
-        <!-- Receipt Title -->
-        <h2 class="text-center">National Document</h2>
+        <header class="header">
+            <img src="{{ logo_url }}" alt="National Document Authority" class="logo">
+            <div class="receipt-number">Receipt #{{ todo.application.id }}</div>
+        </header>
 
-        <!-- Receipt Number -->
-        <p class="receipt-number">Receipt #{{ todo.application.id }}</p>
+        <h1 class="receipt-title">Official Document Receipt</h1>
 
-        <!-- Receipt Details -->
-        <p><strong>Application:</strong> {{ todo.application.get_service_type }}</p>
-        <p><strong>Interviewee:</strong> {{ todo.interview.application.user.get_full_name }}</p>
-        <p><strong>Interviewer:</strong> {{ todo.user.get_full_name }}</p>
-        <p><strong>Interview Date:</strong> {{ todo.interview.date_created }}</p>
-        <p><strong>Approver:</strong> {{ todo.approver.get_full_name }}</p>
-        <p>I, <strong>{{ todo.approver.get_full_name }}</strong>, certify that all documents and interview notes have been thoroughly reviewed and verified. I affirm that the interview was conducted in a fair and unbiased manner.</p>
-        <br>
-        <p>Based on this verification, I authorize the printing of the <strong>{{ todo.application.get_service_type }}</strong> for the interviewee, with reference document number <strong>#{{ todo.id }}</strong>.</p>
+        <div class="receipt-meta">
+            <div class="receipt-row">
+                <span class="label">Application Type:</span>
+                <span class="value">{{ todo.application.get_service_type }}</span>
+            </div>
+            <div class="receipt-row">
+                <span class="label">Document Number:</span>
+                <span class="value">#{{ todo.id }}</span>
+            </div>
+            <div class="receipt-row">
+                <span class="label">Issue Date:</span>
+                <span class="value">{{ todo.interview.date_created|date:"F j, Y" }}</span>
+            </div>
+        </div>
 
-        <div class="signature">{{ todo.approver.get_full_name }}</div>
+        <div class="receipt-meta">
+            <div class="receipt-row">
+                <span class="label">Applicant Name:</span>
+                <span class="value">{{ todo.interview.application.user.get_full_name }}</span>
+            </div>
+            <div class="receipt-row">
+                <span class="label">Interviewer:</span>
+                <span class="value">{{ todo.user.get_full_name }}</span>
+            </div>
+            <div class="receipt-row">
+                <span class="label">Approving Officer:</span>
+                <span class="value">{{ todo.approver.get_full_name }}</span>
+            </div>
+        </div>
 
-        <!-- QR Code Section -->
-        <div class="qr-code">
-            <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="QR Code">
+        <div class="certification">
+            <p>This is to certify that I, <strong>{{ todo.approver.get_full_name }}</strong>, in my capacity as an authorized officer, have thoroughly reviewed and verified all submitted documents and interview records. The interview was conducted in accordance with standard procedures, ensuring fairness and impartiality.</p>
+            <p>Based on comprehensive verification, I hereby authorize the issuance of <strong>{{ todo.application.get_service_type }}</strong> for the above-named applicant.</p>
+        </div>
+
+        <div class="signature-section">
+            <div class="signature">{{ todo.approver.get_full_name }}</div>
+            <div class="date">{{ todo.interview.date_created|date:"F j, Y" }}</div>
+        </div>
+
+        <div class="verification">
+            <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="Verification QR Code" class="qr-code">
+            <p class="verification-text">
+                Scan this QR code to verify the authenticity of this document. This receipt is void if altered or tampered with.
+            </p>
+        </div>
+
+        <div class="security-features">
+            This document includes security features: microprint, watermark, and digital verification
         </div>
     </div>
 </body>

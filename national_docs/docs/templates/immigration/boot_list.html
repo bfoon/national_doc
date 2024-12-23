@@ -1,232 +1,360 @@
 {% extends 'docs/header.html' %}
 {% block content %}
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 
 <style>
     :root {
-        --primary-color: #007bff;
-        --secondary-color: #6c757d;
-        --success-color: #28a745;
-        --danger-color: #dc3545;
+        --primary-color: #1a73e8;
+        --secondary-color: #5f6368;
+        --success-color: #1e8e3e;
+        --warning-color: #f9ab00;
+        --danger-color: #d93025;
+        --background-color: #f8f9fa;
+        --card-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        --hover-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        --transition-speed: 0.2s;
     }
 
     body {
-        background-color: #f4f6f9;
+        background-color: var(--background-color);
+        color: #202124;
+        line-height: 1.6;
     }
 
     .boot-list-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+    }
+
+    .page-header {
+        margin-bottom: 2rem;
     }
 
     .breadcrumb {
-        background-color: #f8f9fa !important;
-        border: 1px solid #e9ecef;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: var(--card-shadow);
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: "›";
+        color: var(--secondary-color);
     }
 
     .boot-list-card {
-        border-radius: 10px;
-        overflow: hidden;
-        transition: all 0.3s ease;
-    }
-
-    .boot-list-card:hover {
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        transform: translateY(-5px);
+        background: white;
+        border: none;
+        border-radius: 12px;
+        box-shadow: var(--card-shadow);
+        transition: all var(--transition-speed) ease-in-out;
     }
 
     .list-group-item {
-        transition: background-color 0.3s ease;
+        border: none;
+        border-bottom: 1px solid #e8eaed;
+        padding: 1.5rem;
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
     }
 
-    .list-group-item:hover {
-        background-color: #f8f9fa;
+    .list-group-item:last-child {
+        border-bottom: none;
     }
 
     .boot-details {
-        flex-grow: 1;
+        flex: 1;
+    }
+
+    .boot-title {
+        font-size: 1.25rem;
+        font-weight: 500;
+        color: #202124;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 500;
+    }
+
+    .badge-warning {
+        background-color: #fef7e0;
+        color: #b06000;
+    }
+
+    .boot-metadata {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .metadata-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--secondary-color);
     }
 
     .assignment-selects {
-        min-width: 200px;
+        min-width: 250px;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
     }
 
-    .assignment-selects .form-control {
-        margin-bottom: 0.5rem;
-        transition: all 0.3s ease;
+    .form-control {
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+        padding: 0.75rem;
+        font-size: 0.9rem;
+        transition: all var(--transition-speed) ease;
     }
 
-    .assignment-selects .form-control:focus {
-        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-        border-color: #007bff;
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all var(--transition-speed) ease;
+    }
+
+    .btn-primary {
+        background-color: var(--primary-color);
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #1557b0;
+        transform: translateY(-1px);
     }
 
     .empty-state {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        background-color: #f8f9fa;
-        border-radius: 10px;
+        padding: 4rem 2rem;
+        text-align: center;
     }
 
     .empty-state i {
-        font-size: 3rem;
-        color: #6c757d;
-        margin-bottom: 1rem;
+        font-size: 4rem;
+        color: var(--secondary-color);
+        margin-bottom: 1.5rem;
     }
 
-    @media (max-width: 768px) {
+    .alert {
+        border: none;
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1.5rem;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @media (max-width: 992px) {
         .list-group-item {
             flex-direction: column;
-            align-items: flex-start !important;
         }
 
         .assignment-selects {
             width: 100%;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
+
+        .boot-metadata {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 </style>
 
 <div class="boot-list-container">
     {% if messages %}
-        <div class="messages mb-4">
+        <div class="messages">
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="alert alert-{{ message.tags|default:'info' }} animate__animated animate__fadeIn" role="alert">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <span>{{ message }}</span>
+                        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{% url 'immigration_dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'list_officer_users' %}">Officer List</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Boot List</li>
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+                <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">
+                    <i class="fas fa-home me-1"></i>Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{% url 'list_officer_users' %}" class="text-decoration-none">Officer List</a>
+            </li>
+            <li class="breadcrumb-item active">Boot List</li>
         </ol>
     </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">
-            <i class="fas fa-shoe-prints mr-2"></i>Boot List
-        </h2>
-        <a href="{% url 'add_boot' %}" class="btn btn-primary shadow-sm">
-            <i class="fas fa-plus"></i> Add Boot
+    <div class="page-header d-flex justify-content-between align-items-center">
+        <h1 class="h3 mb-0 text-primary">
+            <i class="fas fa-shoe-prints me-2"></i>Boot Management
+        </h1>
+        <a href="{% url 'add_boot' %}" class="btn btn-primary bt-sm m-2">
+            <i class="fas fa-plus me-2"></i>Add New Boot
         </a>
     </div>
 
-    <div class="card boot-list-card">
-        <div class="card-body p-0">
-            {% if boots %}
-                <ul class="list-group list-group-flush">
-                    {% for boot in boots %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <div class="boot-details">
-                                <div class="d-flex align-items-center mb-2">
-                                    <h5 class="mb-0 mr-3">{{ boot.name }}</h5>
-                                    {% if not boot.assigned_to %}
-                                        <span class="badge badge-warning">Unassigned</span>
-                                    {% endif %}
-                                </div>
-
-                                <p class="text-muted mb-1">
-                                    <i class="fas fa-info-circle mr-2"></i>{{ boot.description|default:'No description' }}
-                                </p>
-
-                                <div class="boot-metadata">
-                                    <small>
-                                        <strong><i class="fas fa-user mr-2"></i>Assigned to:</strong>
-                                        {{ boot.assigned_to.get_full_name|default:'<span class="text-danger">Not assigned</span>'|safe }}
-                                    </small>
-                                    <br>
-                                    <small>
-                                        <strong><i class="fas fa-users mr-2"></i>Group:</strong>
-                                        {{ boot.group.name|default:'<span class="text-danger">Not assigned</span>'|safe }}
-                                    </small>
-                                    <br>
-                                    <small>
-                                        <strong><i class="fas fa-map-marker-alt mr-2"></i>Post Location:</strong>
-                                        {{ boot.post_location.name|default:'<span class="text-danger">Not assigned</span>'|safe }}
-                                    </small>
-                                </div>
+    <div class="boot-list-card">
+        {% if boots %}
+            <div class="list-group list-group-flush">
+                {% for boot in boots %}
+                    <div class="list-group-item animate__animated animate__fadeIn">
+                        <div class="boot-details">
+                            <div class="boot-title">
+                                {{ boot.name }}
+                                {% if not boot.assigned_to %}
+                                    <span class="badge badge-warning">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>Unassigned
+                                    </span>
+                                {% endif %}
                             </div>
 
-                            <div class="assignment-selects ml-3">
-                                <form method="POST" action="{% url 'change_assignment' boot.id %}" class="mb-0">
-                                    {% csrf_token %}
-                                    <select name="assigned_to" class="form-control form-control-sm" onchange="this.form.submit()">
-                                        <option value="">
-                                            {{ boot.assigned_to.get_full_name|default:"Assign User" }}
-                                        </option>
-                                        {% for user in users %}
-                                            {% if user != boot.assigned_to %}
-                                                <option value="{{ user.id }}">{{ user.get_full_name }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                    <select name="group" class="form-control form-control-sm" onchange="this.form.submit()">
-                                        <option value="">
-                                            {{ boot.group.name|default:"Assign Group" }}
-                                        </option>
-                                        {% for group in groups %}
-                                            {% if group != boot.group %}
-                                                <option value="{{ group.id }}">{{ group.name }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                    <select name="post_location" class="form-control form-control-sm" onchange="this.form.submit()">
-                                        <option value="">
-                                            {{ boot.post_location.name|default:"Assign Post Location" }}
-                                        </option>
-                                        {% for post_location in post_locations %}
-                                            {% if post_location != boot.post_location %}
-                                                <option value="{{ post_location.id }}">{{ post_location.name }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </form>
+                            <p class="text-secondary mb-3">
+                                {{ boot.description|default:'No description provided' }}
+                            </p>
+
+                            <div class="boot-metadata">
+                                <div class="metadata-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>
+                                        <strong>Assigned to:</strong>
+                                        {{ boot.assigned_to.get_full_name|default:'Not assigned' }}
+                                    </span>
+                                </div>
+                                <div class="metadata-item">
+                                    <i class="fas fa-users"></i>
+                                    <span>
+                                        <strong>Group:</strong>
+                                        {{ boot.group.name|default:'Not assigned' }}
+                                    </span>
+                                </div>
+                                <div class="metadata-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>
+                                        <strong>Location:</strong>
+                                        {{ boot.post_location.name|default:'Not assigned' }}
+                                    </span>
+                                </div>
                             </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <div class="empty-state text-center">
-                    <i class="fas fa-shoe-prints"></i>
-                    <h4 class="text-muted">No Boots Found</h4>
-                    <p class="text-muted">There are currently no boots in the system.</p>
-                    <a href="{% url 'add_boot' %}" class="btn btn-primary">
-                        <i class="fas fa-plus"></i> Add Your First Boot
-                    </a>
-                </div>
-            {% endif %}
-        </div>
+                        </div>
+
+                        <div class="assignment-selects">
+                            <form method="POST" action="{% url 'change_assignment' boot.id %}" class="d-flex flex-column gap-3">
+                                {% csrf_token %}
+                                <select name="assigned_to" class="form-control" onchange="this.form.submit()">
+                                    <option value="">{{ boot.assigned_to.get_full_name|default:"Select User" }}</option>
+                                    {% for user in users %}
+                                        {% if user != boot.assigned_to %}
+                                            <option value="{{ user.id }}">{{ user.get_full_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <select name="group" class="form-control" onchange="this.form.submit()">
+                                    <option value="">{{ boot.group.name|default:"Select Group" }}</option>
+                                    {% for group in groups %}
+                                        {% if group != boot.group %}
+                                            <option value="{{ group.id }}">{{ group.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <select name="post_location" class="form-control" onchange="this.form.submit()">
+                                    <option value="">{{ boot.post_location.name|default:"Select Location" }}</option>
+                                    {% for post_location in post_locations %}
+                                        {% if post_location != boot.post_location %}
+                                            <option value="{{ post_location.id }}">{{ post_location.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-shoe-prints mb-3"></i>
+                <h3 class="h4 mb-3">No Boots Available</h3>
+                <p class="text-secondary mb-4">There are currently no boots in the system. Add your first boot to get started.</p>
+                <a href="{% url 'add_boot' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add Your First Boot
+                </a>
+            </div>
+        {% endif %}
     </div>
 
     <div class="mt-4">
-        <a href="{% url 'list_officer_users' %}" class="btn btn-secondary shadow-sm">
-            <i class="fas fa-arrow-left"></i> Back to Officer List
+        <a href="{% url 'list_officer_users' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Officer List
         </a>
     </div>
 </div>
+<br>
 
 <script>
-    // Optional: Add some client-side interactivity
-    document.addEventListener('DOMContentLoaded', function() {
-        const assignmentSelects = document.querySelectorAll('.assignment-selects select');
-
-        assignmentSelects.forEach(select => {
-            select.addEventListener('change', function() {
-                this.closest('form').classList.add('was-validated');
-            });
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle form submissions
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function() {
+            const button = this.querySelector('button[type="submit"]');
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Updating...';
+            }
         });
     });
+
+    // Handle alert dismissal
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        const closeButton = alert.querySelector('.btn-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                alert.classList.add('animate__fadeOut');
+                setTimeout(() => {
+                    alert.remove();
+                }, 300);
+            });
+        }
+    });
+
+    // Enhance select inputs with better UX
+    const selects = document.querySelectorAll('select');
+    selects.forEach(select => {
+        select.addEventListener('change', function() {
+            this.classList.add('is-changed');
+            const form = this.closest('form');
+            if (form) {
+                form.classList.add('was-validated');
+            }
+        });
+    });
+});
 </script>
 {% endblock %}
