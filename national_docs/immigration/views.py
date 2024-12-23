@@ -877,6 +877,9 @@ def todo_list(request):
         status=1,  # Approved status
         updated_at__date=today
     ).count()
+    pending = base_queryset.filter(
+        status=0,  # Approved status
+    ).count()
 
     # Get unique application types for the filter dropdown
     application_types = ToDo.objects.values_list(
@@ -888,6 +891,7 @@ def todo_list(request):
     context = {
         'todos': todos_page,  # Now using paginated queryset
         'completed_today': completed_today,
+        'pending': pending,
         'application_types': application_types,
         'current_filters': {
             'application_type': application_type,
