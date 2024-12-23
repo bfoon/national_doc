@@ -124,6 +124,34 @@
                 margin: 0 1rem;
             }
         }
+     .support-icon {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: var(--secondary-color);
+        color: var(--white);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        cursor: pointer;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        z-index: 1000;
+    }
+
+    .support-icon:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        background-color: #2980b9;
+    }
+
+    .support-icon i {
+        font-size: 24px;
+    }
+
     </style>
 </head>
 <body>
@@ -297,6 +325,9 @@
             </div>
         </div>
     </section>
+     <div id="support-icon" class="support-icon">
+     <i class="fas fa-comment-dots"></i>
+</div>
 
     <!-- Footer -->
     <footer>
@@ -451,5 +482,12 @@ document.addEventListener('DOMContentLoaded', function() {
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.getElementById('support-icon').addEventListener('click', function() {
+        alert('Support icon clicked!');
+        // You can integrate chat functionality or open a support modal here.
+    });
+</script>
+
 </body>
 </html>

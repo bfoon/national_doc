@@ -38,6 +38,7 @@ from django.http import HttpResponseForbidden
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
 from django.db.models import Prefetch
+from django.db.models import Exists, OuterRef
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -1325,7 +1326,15 @@ def support_desk(request):
     chats = (
         ChatMessage.objects.filter(parent__isnull=True, is_read=False)
         .order_by('-timestamp')
-        .prefetch_related(Prefetch('replies', queryset=ChatMessage.objects.all()))
+        .annotate(
+            has_note=Exists(MessageNote.objects.filter(chat_id=OuterRef('id')))
+        )
+        .prefetch_related(
+            Prefetch(
+                'replies',
+                queryset=ChatMessage.objects.all()
+            )
+        )
     )
 
     # Fetch call notes for the logged-in user

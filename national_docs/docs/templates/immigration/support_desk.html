@@ -247,6 +247,11 @@
                                             {{ chat.sender.get_full_name }}
                                         </a>
                                         <span class="badge bg-info ms-2 fs-xs">New User</span>
+                                        {% if chat.has_note %}
+                                            <span class="ms-2 align-middle">
+                                                <i class="fas fa-sticky-note text-success"></i>
+                                            </span>
+                                        {% endif %}
                                     </h6>
                                     <div class="text-muted fs-sm">
                                         <i class="fas fa-clock me-1"></i>
