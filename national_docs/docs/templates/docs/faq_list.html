@@ -2,97 +2,201 @@
 {% block content %}
 
 <style>
-    .list-group-item h5 {
-        font-weight: bold;
-        color: #007bff;
+    /* Modern styling with CSS custom properties */
+    :root {
+        --primary-color: #2563eb;
+        --secondary-color: #1e40af;
+        --text-color: #1f2937;
+        --light-gray: #f3f4f6;
+        --border-radius: 0.5rem;
+        --transition: all 0.3s ease;
     }
 
-    .list-group-item p {
-        margin: 0;
-        color: #555;
+    .faq-container {
+        max-width: 1200px;
+        margin: 0 auto;
     }
 
-    .input-group .form-control {
-        border-radius: 0.25rem 0 0 0.25rem;
+    .faq-header {
+        color: var(--text-color);
+        font-size: 2.25rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
     }
 
-    .input-group-append .btn {
-        border-radius: 0 0.25rem 0.25rem 0;
+    .search-container {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: var(--border-radius);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
-    .pagination .page-link {
-        color: #007bff;
+    .search-input {
+        border: none;
+        padding: 1rem;
+        font-size: 1rem;
+        width: 100%;
+        transition: var(--transition);
     }
 
-    .pagination .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
+    .search-input:focus {
+        outline: 2px solid var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .search-button {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+
+    .search-button:hover {
+        background: var(--secondary-color);
+    }
+
+    .faq-list {
+        border-radius: var(--border-radius);
+        overflow: hidden;
+    }
+
+    .faq-item {
+        border-bottom: 1px solid #e5e7eb;
+        transition: var(--transition);
+    }
+
+    .faq-item:last-child {
+        border-bottom: none;
+    }
+
+    .faq-question {
+        color: var(--text-color);
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+    }
+
+    .faq-answer {
+        color: #4b5563;
+        line-height: 1.625;
+    }
+
+    .pagination {
+        gap: 0.25rem;
+    }
+
+    .page-link {
+        color: var(--text-color);
+        border: 1px solid #e5e7eb;
+        padding: 0.5rem 1rem;
+        transition: var(--transition);
+    }
+
+    .page-link:hover {
+        background: var(--light-gray);
+        color: var(--primary-color);
+    }
+
+    .page-item.active .page-link {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
     }
 </style>
 
-<div class="container my-5">
+<main class="container-fluid py-5 faq-container">
     <!-- Breadcrumb Navigation -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light p-3 rounded-lg shadow-sm">
             <li class="breadcrumb-item">
-                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'dashboard' %}" class="text-decoration-none">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">Frequently Asked Questions</li>
+            <li class="breadcrumb-item active" aria-current="page">FAQ</li>
         </ol>
     </nav>
 
-    <h2 class="mb-4 text-center">Frequently Asked Questions</h2>
+    <header class="text-center mb-5">
+        <h1 class="faq-header">Frequently Asked Questions</h1>
+        <p class="text-muted">Find answers to common questions about our services</p>
+    </header>
 
     <!-- Search Form -->
-    <form method="GET" class="mb-4">
-        <div class="input-group">
-            <input type="text" name="q" class="form-control" placeholder="Search FAQs..." value="{{ query }}">
-            <div class="input-group-append">
-                <button class="btn btn-primary" type="submit">
-                    <i class="fas fa-search"></i> Search
-                </button>
-            </div>
+    <form method="GET" class="mb-5" role="search">
+        <div class="search-container d-flex">
+            <input
+                type="search"
+                name="q"
+                class="search-input"
+                placeholder="Search FAQs..."
+                value="{{ query }}"
+                aria-label="Search frequently asked questions"
+            >
+            <button type="submit" class="search-button d-flex align-items-center">
+                <i class="fas fa-search me-2"></i>
+                <span>Search</span>
+            </button>
         </div>
     </form>
 
     <!-- FAQ List -->
-    <div class="card shadow">
-        <div class="card-body">
-            <ul class="list-group">
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="faq-list">
                 {% for faq in faqs %}
-                    <li class="list-group-item">
-                        <h5>{{ faq.question }}</h5>
-                        <p>{{ faq.answer }}</p>
-                    </li>
+                    <article class="faq-item p-4">
+                        <h2 class="faq-question">{{ faq.question }}</h2>
+                        <div class="faq-answer">{{ faq.answer }}</div>
+                    </article>
                 {% empty %}
-                    <li class="list-group-item text-muted">No FAQs found.</li>
+                    <div class="p-4 text-center text-muted">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <p>No FAQs found matching your search criteria.</p>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
 
-            <!-- Pagination Controls -->
-            <nav aria-label="Page navigation">
-                <ul class="pagination justify-content-center mt-4">
-                    {% if faqs.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ faqs.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">&laquo; Previous</a>
-                        </li>
-                    {% endif %}
+            <!-- Pagination -->
+            {% if faqs.paginator.num_pages > 1 %}
+                <nav aria-label="FAQ pagination" class="p-4 border-top">
+                    <ul class="pagination justify-content-center mb-0">
+                        {% if faqs.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ faqs.previous_page_number }}{% if query %}&q={{ query }}{% endif %}" aria-label="Previous page">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="d-none d-sm-inline">Previous</span>
+                                </a>
+                            </li>
+                        {% endif %}
 
-                    {% for num in faqs.paginator.page_range %}
-                        <li class="page-item {% if num == faqs.number %}active{% endif %}">
-                            <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
-                        </li>
-                    {% endfor %}
+                        {% for num in faqs.paginator.page_range %}
+                            {% if num == faqs.number %}
+                                <li class="page-item active" aria-current="page">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% else %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
 
-                    {% if faqs.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ faqs.next_page_number }}{% if query %}&q={{ query }}{% endif %}">Next &raquo;</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </nav>
+                        {% if faqs.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ faqs.next_page_number }}{% if query %}&q={{ query }}{% endif %}" aria-label="Next page">
+                                    <span class="d-none d-sm-inline">Next</span>
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
         </div>
     </div>
-</div>
+</main>
 
 {% endblock %}

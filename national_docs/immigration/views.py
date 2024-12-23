@@ -1330,6 +1330,7 @@ def support_desk(request):
 
     # Fetch call notes for the logged-in user
     call_notes = CallNote.objects.filter(user=request.user)
+    incomplete_notes = call_notes.filter(completed=False)
 
     # Define open and closed application statuses
     open_statuses = ['pending', 'processing', 'waiting', 'interview']
@@ -1346,8 +1347,22 @@ def support_desk(request):
     # Fetch FAQ categories for the form
     faq_categories = FAQCategory.objects.all()
 
+    faq_data = []
+    for faq in faqs:
+        faq_data.append({
+            'view_count': faq.view_count,
+            'created_by': faq.created_by.get_full_name() if faq.created_by else 'N/A',
+            'updated_by': faq.updated_by.get_full_name() if faq.updated_by else 'N/A',
+            'priority': faq.get_priority_display(),
+            'created_at': faq.created_at,
+            'updated_at': faq.updated_at,
+        })
+
+
+
     # Context data for the template
     context = {
+        'meta': faq_data,
         'faqs': faqs,
         'chats': chats,
         'call_notes': call_notes,
@@ -1356,6 +1371,7 @@ def support_desk(request):
         'open_chats': open_chats,
         'closed_chats': closed_chats,
         'categories': faq_categories,
+        'incomplete_notes': incomplete_notes,
     }
     return render(request, 'immigration/support_desk.html', context)
 
@@ -1503,6 +1519,9 @@ def add_faq_ajax(request):
                 'answer': faq.answer,
                 'category': faq.category.name if faq.category else None,
                 'priority': faq.priority,
+                'view_count': faq.view_count,
+                'updated_at': faq.updated_at,
+                'created_by': faq.created_by,
                 'tags': faq.tags,
                 'created_at': faq.created_at.strftime('%Y-%m-%d %H:%M:%S'),
             }

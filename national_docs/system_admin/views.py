@@ -42,7 +42,7 @@ def officer_profile_list(request):
         })
 
     # Paginate profiles list
-    paginator = Paginator(combined_profiles, 10)  # Show 10 profiles per page
+    paginator = Paginator(combined_profiles, 5)  # Show 10 profiles per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 

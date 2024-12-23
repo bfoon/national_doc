@@ -148,8 +148,6 @@ h2, h4 {
         </div>
     {% endif %}
 
-
-
     <h2 class="mb-4 text-center">Edit Fulfiller Details</h2>
    <div class="position-relative">
     <!-- Circular Passport Photo -->
@@ -255,13 +253,13 @@ h2, h4 {
 
                 <!-- Submit Button -->
                  <div class="form-group text-right">
-                <button type="submit" class="btn btn-primary" {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
+                    <button type="submit" class="btn btn-primary" {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
             </div>
-        </form>
-    </div>
-</div>
+            </div>
 
             <h4 class="mb-3">Uploaded Documents</h4>
             <ul class="list-group mb-4">
@@ -437,11 +435,11 @@ h2, h4 {
                             <div class="status-grid">
                                 <div class="status-item">
                                     <span class="label">Type</span>
-                                    <span class="badge bg-primary">{{ fulfiller.application.application_type|capfirst }}</span>
+                                    <span class="badge badge-fulfill bg-primary">{{ fulfiller.application.application_type|capfirst }}</span>
                                 </div>
                                 <div class="status-item">
                                     <span class="label">Status</span>
-                                    <span class="badge bg-info">{{ fulfiller.application.status|capfirst }}</span>
+                                    <span class="badge badge-fulfill bg-info">{{ fulfiller.application.status|capfirst }}</span>
                                 </div>
                                 <div class="status-item">
                                     <span class="label">Progress</span>
@@ -579,7 +577,7 @@ h2, h4 {
 }
 
 /* Badge Styles */
-.badge {
+.badge-fulfill {
     padding: 0.5rem 1rem;
     font-weight: 500;
     font-size: 0.875rem;
