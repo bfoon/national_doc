@@ -278,7 +278,7 @@ class CallNote(models.Model):
     CALL_TYPE_CHOICES = [
         ('general', 'General Inquiry'),
         ('support', 'Technical Support'),
-        ('inquiry', 'Compliant'),
+        ('inquiry', 'Complaint'),
         ('followup', 'Follow Up')
     ]
     call_type = models.CharField(max_length=255, choices=CALL_TYPE_CHOICES, blank=True)
