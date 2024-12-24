@@ -1719,15 +1719,11 @@ def close_chat(request):
 def birth_certificate_request(request):
     return render(request, 'immigration/birth_certificate_request.html')
 
-
 @login_required
 def get_user_application(request, user_id):
     try:
         # Fetch the latest application for the user
         application = Application.objects.filter(user_id=user_id).latest('application_date')
-
-        # Get the related fulfiller and its progress (assuming 1:1 relationship between Application and Fulfiller)
-        fulfiller = application.fulfiller  # Adjust if the relationship is different
 
         # Prepare the response data
         response_data = {
@@ -1737,15 +1733,25 @@ def get_user_application(request, user_id):
             'application_location': application.post_location.name if application.post_location else 'N/A',
         }
 
-        # Add the progress percentage if a fulfiller exists
-        if fulfiller:
-            response_data['progress'] = fulfiller.progress  # Using the method from Fulfiller model
+        # Check if the application has a fulfiller and add progress if it exists
+        if hasattr(application, 'fulfiller') and application.fulfiller is not None:
+            response_data['progress'] = application.fulfiller.progress  # Adjust as per your Fulfiller model's field/method
 
         return JsonResponse(response_data)
 
     except Application.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'No application found for this user'})
 
+    except Application.fulfiller.RelatedObjectDoesNotExist:
+        # Handle missing fulfiller explicitly
+        response_data = {
+            'success': True,
+            'application_id': application.get_service_type(),
+            'application_date': application.application_date.strftime('%Y-%m-%d'),
+            'application_location': application.post_location.name if application.post_location else 'N/A',
+            'progress': 'N/A',  # No progress available
+        }
+        return JsonResponse(response_data)
 
 # Take not for chat
 @login_required
