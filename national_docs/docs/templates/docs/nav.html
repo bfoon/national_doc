@@ -1,4 +1,64 @@
 {% load static %}
+<style>
+/* Notification Dropdown Styling */
+.nav-item.dropdown .nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    color: #6c757d;
+    transition: color 0.2s ease;
+}
+
+.nav-item.dropdown .nav-link:hover {
+    color: #495057;
+}
+
+.nav-item.dropdown .nav-link i {
+    font-size: 1rem;
+    margin-right: 0.5rem;
+}
+
+/* Badge Styling */
+.nav-item.dropdown .badge-danger {
+    position: absolute;
+    top: -45;
+    right: -45;
+    transform: translate(25%, -25%);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #dc3545;
+    color: #fff;
+    border-radius: 0.75rem;
+    min-width: 1.5rem;
+    text-align: center;
+}
+
+/* Dropdown Toggle Arrow */
+.nav-item.dropdown .dropdown-toggle::after {
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    border-top: 0.3em solid;
+    border-right: 0.3em solid transparent;
+    border-left: 0.3em solid transparent;
+}
+
+/* Active State */
+.nav-item.dropdown .nav-link[aria-expanded="true"] {
+    color: #495057;
+}
+
+/* Keep Original Spacing */
+.nav-item.dropdown .mr-1 {
+    margin-right: 0.25rem !important;
+}
+
+/* Ensure Consistent Font */
+.nav-item.dropdown {
+    font-size: inherit;
+}
+</style>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
