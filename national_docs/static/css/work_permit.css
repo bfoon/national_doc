@@ -1,0 +1,108 @@
+    /* Variables */
+:root {
+    --primary-color: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --light-bg: #f8f9fa;
+    --border-color: #dee2e6;
+    --text-muted: #6c757d;
+    --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.075);
+    --shadow-md: 0 .5rem 1rem rgba(0,0,0,.15);
+    --transition: all 0.3s ease;
+}
+
+/* Form Section Styles */
+.form-section-title {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    transition: var(--transition);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+}
+
+.form-floating > .form-control,
+.form-floating > .form-select {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+}
+
+.form-floating > textarea.form-control {
+    height: 100px;
+    resize: none;
+}
+
+.form-floating > label {
+    padding: 1rem 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Upload Area Styles */
+.upload-card {
+    border: 2px dashed var(--border-color);
+    border-radius: 0.5rem;
+    transition: var(--transition);
+    background-color: var(--light-bg);
+}
+
+.upload-card:hover {
+    border-color: var(--primary-color);
+    background-color: #fff;
+}
+
+.upload-area {
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.upload-icon {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.upload-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.file-name {
+    margin: 0;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+/* Progress Bar */
+.progress {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    transition: width 0.3s ease;
+}
+
+/* Alert Styles */
+.alert {

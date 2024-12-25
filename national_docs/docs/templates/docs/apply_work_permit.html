@@ -1,166 +1,262 @@
 {% extends 'docs/header.html' %}
 {% block content %}
 {% load static %}
-<link href="{% static 'css/work-permit.css' %}" rel="stylesheet">
 
-<div class="container my-5">
+ <link rel="stylesheet" href="{% static 'css/work_permit.css' %}">
+<div class="container py-4">
+    <!-- Alert Messages -->
     {% if messages %}
-        <div class="messages">
+        <div class="messages mb-4">
             {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
                     {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-light p-2 rounded">
-            <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Work Permit</li>
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb p-3 bg-light rounded-3 shadow-sm">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard' %}" class="text-decoration-none">
+                    <i class="fas fa-home me-1"></i>Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">Work Permit Application</li>
         </ol>
     </nav>
 
-    <div class="application-form">
-        <h2>Work Permit Application</h2>
-        <div class="progress-bar">
-            <span class="progress" id="progress"></span>
+    <!-- Main Application Card -->
+    <div class="card shadow-sm mb-4">
+        <!-- Card Header with Progress -->
+        <div class="card-header bg-primary bg-gradient text-white py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="card-title h4 mb-0">
+                    <i class="fas fa-briefcase me-2"></i>Work Permit Application
+                </h3>
+                <div class="progress bg-white bg-opacity-25" style="width: 200px; height: 10px;">
+                    <div id="progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                </div>
+            </div>
         </div>
 
-        <form id="work-permit-form" method="post" action="{% url 'apply_resident_permit' %}" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="full-name">Full Name</label>
-                <input type="text" id="full-name" name="full_name" required>
+        <div class="card-body p-4">
+            <div class="alert alert-info mb-4">
+                <i class="fas fa-info-circle me-2"></i>
+                All fields marked with <span class="text-danger">*</span> are required
             </div>
 
-            <div class="form-group">
-                <label for="date-of-birth">Date of Birth</label>
-                <input type="date" id="date-of-birth" name="date_of_birth" required>
-            </div>
+            <form id="work-permit-form" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                {% csrf_token %}
 
-            <div class="form-group">
-                <label for="nationality">Nationality</label>
-                <input type="text" id="nationality" name="nationality" required>
-            </div>
+                <!-- Personal Information Section -->
+                <div class="row g-3 mb-4">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-user me-2"></i>Personal Information
+                    </h5>
 
-            <div class="form-group">
-                <label for="passport-number">Passport Number</label>
-                <input type="text" id="passport-number" name="passport_number" required>
-            </div>
-            <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="text" id="phone" name="phone" required>
-            </div>
+                    <!-- Full Name -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="full-name" name="full_name" placeholder="Enter your full name" required>
+                            <label for="full-name">Full Name <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please enter your full name (at least two names)</div>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label for="job-title">Job Title</label>
-                <input type="text" id="job-title" name="job_title" required>
-            </div>
+                    <!-- Date of Birth -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="date-of-birth" name="date_of_birth" required>
+                            <label for="date-of-birth">Date of Birth <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">You must be at least 18 years old</div>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label for="employer-name">Employer Name</label>
-                <input type="text" id="employer-name" name="employer_name" required>
-            </div>
+                    <!-- Nationality -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="nationality" name="nationality" required>
+                            <label for="nationality">Nationality <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please enter a valid nationality</div>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label for="work-start-date">Work Start Date</label>
-                <input type="date" id="work-start-date" name="work_start_date" required>
-            </div>
+                    <!-- Passport Number -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="passport-number" name="passport_number" required>
+                            <label for="passport-number">Passport Number <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please enter a valid passport number</div>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label for="contract-duration">Contract Duration (in months)</label>
-                <input type="number" id="contract-duration" name="contract_duration" min="1" required>
-            </div>
-
-            <div class="form-group">
-                <label for="education-level">Highest Education Level</label>
-                <select id="education-level" name="education_level" required>
-                    <option value="">Select Education Level</option>
-                    <option value="high-school">High School</option>
-                    <option value="bachelor">Bachelor's Degree</option>
-                    <option value="master">Master's Degree</option>
-                    <option value="phd">PhD</option>
-                    <option value="other">Other</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="skills">Relevant Skills</label>
-                <textarea id="skills" name="skills" rows="3" required></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="post-location">Select Post Location</label>
-                <select id="post-location" name="post_location" required>
-                    <option value="">Choose Location</option>
-                    {% for location in post_locations %}
-                        <option value="{{ location.id }}">{{ location.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="resume">Upload Resume (PDF only)</label>
-                <div class="file-upload">
-                    <label for="resume">Choose File</label>
-                    <input type="file" id="resume" name="resume" accept=".pdf" required>
-                    <span class="file-name" id="resume-file-name">No file chosen</span>
+                    <!-- Phone Number -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="tel" class="form-control" id="phone" name="phone" required>
+                            <label for="phone">Phone Number <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please enter a valid phone number</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label for="employment-letter">Upload Employment Letter (PDF only)</label>
-                <div class="file-upload">
-                    <label for="employment-letter">Choose File</label>
-                    <input type="file" id="employment-letter" name="employment_letter" accept=".pdf" required>
-                    <span class="file-name" id="employment-letter-file-name">No file chosen</span>
+                <!-- Employment Information Section -->
+                <div class="row g-3 mb-4">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-building me-2"></i>Employment Information
+                    </h5>
+
+                    <!-- Job Title -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="job-title" name="job_title" required>
+                            <label for="job-title">Job Title <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please enter your job title</div>
+                        </div>
+                    </div>
+
+                    <!-- Employer Name -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="employer-name" name="employer_name" required>
+                            <label for="employer-name">Employer Name <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please enter your employer's name</div>
+                        </div>
+                    </div>
+
+                    <!-- Work Start Date -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="date" class="form-control" id="work-start-date" name="work_start_date" required>
+                            <label for="work-start-date">Work Start Date <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please select a valid start date</div>
+                        </div>
+                    </div>
+
+                    <!-- Contract Duration -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="number" class="form-control" id="contract-duration" name="contract_duration" min="1" required>
+                            <label for="contract-duration">Contract Duration (months) <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please enter a valid duration (minimum 1 month)</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <button type="submit" class="submit-button">Submit Application</button>
-        </form>
+                <!-- Qualifications Section -->
+                <div class="row g-3 mb-4">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-graduation-cap me-2"></i>Qualifications
+                    </h5>
+
+                    <!-- Education Level -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select class="form-select" id="education-level" name="education_level" required>
+                                <option value="">Select Education Level</option>
+                                <option value="high-school">High School</option>
+                                <option value="bachelor">Bachelor's Degree</option>
+                                <option value="master">Master's Degree</option>
+                                <option value="phd">PhD</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <label for="education-level">Highest Education Level <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please select your education level</div>
+                        </div>
+                    </div>
+
+                    <!-- Post Location -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select class="form-select" id="post-location" name="post_location" required>
+                                <option value="">Select Post Location</option>
+                                {% for location in post_locations %}
+                                    <option value="{{ location.id }}">{{ location.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="post-location">Post Location <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please select a post location</div>
+                        </div>
+                    </div>
+
+                    <!-- Skills -->
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <textarea class="form-control" id="skills" name="skills" style="height: 100px" required></textarea>
+                            <label for="skills">Relevant Skills <span class="text-danger">*</span></label>
+                            <div class="invalid-feedback">Please enter your relevant skills</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Upload Section -->
+                <div class="row g-3 mb-4">
+                    <h5 class="form-section-title">
+                        <i class="fas fa-file-upload me-2"></i>Required Documents
+                    </h5>
+
+                    <!-- Resume Upload -->
+                    <div class="col-md-6">
+                        <div class="upload-card">
+                            <div class="upload-area" id="resume-upload">
+                                <i class="fas fa-file-pdf upload-icon"></i>
+                                <h6>Resume <span class="text-danger">*</span></h6>
+                                <p class="text-muted small">Click or drag to upload (PDF only)</p>
+                                <input type="file" id="resume" name="resume" accept=".pdf" class="upload-input" required>
+                            </div>
+                            <p id="resume-file-name" class="file-name mt-2"></p>
+                            <div class="invalid-feedback">Please upload your resume (PDF format)</div>
+                        </div>
+                    </div>
+
+                    <!-- Employment Letter Upload -->
+                    <div class="col-md-6">
+                        <div class="upload-card">
+                            <div class="upload-area" id="employment-letter-upload">
+                                <i class="fas fa-file-pdf upload-icon"></i>
+                                <h6>Employment Letter <span class="text-danger">*</span></h6>
+                                <p class="text-muted small">Click or drag to upload (PDF only)</p>
+                                <input type="file" id="employment-letter" name="employment_letter" accept=".pdf" class="upload-input" required>
+                            </div>
+                            <p id="employment-letter-file-name" class="file-name mt-2"></p>
+                            <div class="invalid-feedback">Please upload your employment letter (PDF format)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disclaimer Section -->
+                <div class="alert alert-warning mb-4">
+                    <h6 class="alert-heading mb-2">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Declaration
+                    </h6>
+                    <p class="mb-2">By submitting this application, I declare that:</p>
+                    <ul class="mb-0">
+                        <li>All information provided is accurate and true</li>
+                        <li>I have legal authorization to work in The Gambia</li>
+                        <li>I understand that false information may result in rejection</li>
+                    </ul>
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-lg px-5">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Application
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-
-    <a href="{% url 'dashboard' %}" class="back-to-dashboard">← Back to Dashboard</a>
 </div>
-
+<br>
+<script src="{% static 'js/work_permit.js' %}"></script>
 <script>
-    const form = document.getElementById('work-permit-form');
-    const progressBar = document.getElementById('progress');
-    const formFields = form.elements;
-    const resumeInput = document.getElementById('resume');
-    const resumeFileName = document.getElementById('resume-file-name');
-    const employmentLetterInput = document.getElementById('employment-letter');
-    const employmentLetterFileName = document.getElementById('employment-letter-file-name');
 
-    form.addEventListener('input', updateProgress);
 
-    function updateProgress() {
-        const totalFields = formFields.length - 1;
-        let filledFields = 0;
-
-        for (let i = 0; i < totalFields; i++) {
-            if (formFields[i].type === 'file') {
-                if (formFields[i].files.length > 0) filledFields++;
-            } else if (formFields[i].value.trim() !== '') {
-                filledFields++;
-            }
-        }
-
-        const progress = (filledFields / totalFields) * 100;
-        progressBar.style.width = `${progress}%`;
-    }
-
-    resumeInput.addEventListener('change', function() {
-        resumeFileName.textContent = this.files.length ? this.files[0].name : 'No file chosen';
-        updateProgress();
-    });
-
-    employmentLetterInput.addEventListener('change', function() {
-        employmentLetterFileName.textContent = this.files.length ? this.files[0].name : 'No file chosen';
-        updateProgress();
-    });
 </script>
 {% endblock %}
