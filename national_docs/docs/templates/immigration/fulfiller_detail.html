@@ -2,655 +2,506 @@
 {% block content %}
 {% load static %}
 
-<style>
-    /* Container Styling */
-/* Ensure form has padding-top to avoid overlap */
-.form-container {
-    padding-top: 80px; /* Space for the image to avoid overlap */
-    background-color: #fff;
-    border-radius: 10px;
-    padding: 25px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 60px; /* Adds space so the form doesn't stick to the top */
-}
-
-
-/* Header Styling */
-h2, h4 {
-    color: #2c3e50;                          /* Dark blue-gray for professional look */
-    margin-bottom: 15px;                     /* Space below headers for readability */
-}
-
-/* Form Row Spacing */
-.form-row {
-    margin-bottom: 15px;                     /* Consistent spacing between form rows */
-}
-
-/* Links within List Groups */
-.list-group-item a, .btn-link {
-    color: #3498db;                          /* Vibrant blue for links */
-    text-decoration: none;                   /* No underline by default */
-    transition: color 0.3s ease;             /* Smooth transition for hover effects */
-}
-
-.list-group-item a:hover, .btn-link:hover {
-    text-decoration: underline;              /* Underline on hover for clarity */
-    color: #2980b9;                          /* Darker blue on hover */
-}
-
-/* Form Labels */
-.form-group label {
-    font-weight: 600;                        /* Bold labels for emphasis */
-    margin-bottom: 5px;                      /* Space below labels for readability */
-}
-
-/* Textarea Styling */
-.form-group textarea {
-    resize: vertical;                        /* Allow vertical resizing */
-    min-height: 100px;                       /* Minimum height for better usability */
-    padding: 10px;                           /* Inner padding for comfort */
-}
-
-/* Primary Button Styling */
-.btn-primary {
-    background-color: #3498db;               /* Blue background */
-    border-color: #3498db;                   /* Matching border color */
-    transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth hover transition */
-}
-
-.btn-primary:hover {
-    background-color: #2980b9;               /* Darker blue on hover */
-    border-color: #2980b9;                   /* Matching border on hover */
-}
-
-/* Alert Positioned to the Right */
-.alert-right {
-    position: absolute;
-    top: 350px;                              /* Aligns with progress field */
-    right: 0;
-    width: 300px;                            /* Fixed width for consistency */
-    z-index: 10;                             /* Ensures alert stays above other elements */
-}
-/* Message List Styling */
-.list-group-item {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    padding: 15px;
-    transition: box-shadow 0.3s ease;
-}
-
-.list-group-item:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Text Styling */
-.list-group-item strong {
-    color: #007bff;
-    font-size: 1.1rem;
-}
-
-.list-group-item small {
-    font-size: 0.9rem;
-}
-
-.list-group-item p {
-    color: #495057;
-    line-height: 1.4;
-}
-
-/* Icon Styling for Empty State */
-.text-center i {
-    color: #ced4da;
-}
-
-/* Container for the profile picture */
-.profile-picture-container {
-    position: absolute;
-    top: -60px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10;
-}
-
-/* Circular Profile Picture */
-.profile-picture {
-    width: 75px;
-    height: 75px;
-    border-radius: 50%; /* Makes it a perfect circle */
-    object-fit: cover;  /* Ensures the image covers the area without distortion */
-    border: 3px solid #fff; /* Adds a white border for better contrast */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow */
-}
-
-
-
-
-</style>
-
+<link rel="stylesheet" href="{% static 'css/fulfiller.css' %}">
 <div class="container my-5">
     <!-- Breadcrumbs -->
-    <div class="breadcrumb-wrapper">
-   <nav aria-label="breadcrumb navigation" class="breadcrumb-nav">
-       <ol class="breadcrumb-list">
-           <li class="breadcrumb-item">
-               <a href="{% url 'fulfiller' %}" class="breadcrumb-link">
-                   <svg class="breadcrumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                       <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                       <circle cx="9" cy="7" r="4"/>
-                       <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                       <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                   </svg>
-                   <span>Fulfiller List</span>
-               </a>
-           </li>
-           <li class="breadcrumb-item">
-               <span class="breadcrumb-active">
-                   <svg class="breadcrumb-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                       <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
-                   </svg>
-                   <span>Edit Fulfiller Details</span>
-               </span>
-           </li>
-       </ol>
-   </nav>
-</div>
+    <nav aria-label="breadcrumb" class="breadcrumb-wrapper">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'fulfiller' %}" class="d-flex align-items-center">
+                    <svg class="me-2" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Fulfiller List
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <div class="d-flex align-items-center">
+                    <svg class="me-2" width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>
+                    </svg>
+                    Edit Fulfiller Details
+                </div>
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Alert Messages -->
     {% if messages %}
-        <div class="messages">
+        <div class="messages mb-4">
             {% for message in messages %}
-                <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}">
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show">
                     {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <h2 class="mb-4 text-center">Edit Fulfiller Details</h2>
-   <div class="position-relative">
-    <!-- Circular Passport Photo -->
-    <div class="profile-picture-container">
-        {% if application.national_id_applications.exists %}
-            <img src="{{ application.national_id_applications.first.passport_photo.url }}" alt="Profile Picture" class="profile-picture">
-        {% elif application.resident_permit_applications.exists %}
-            <img src="{{ application.resident_permit_applications.first.passport_photo.url }}" alt="Profile Picture" class="profile-picture">
-        {% elif application.work_permit_applications.exists %}
-            <img src="{{ application.work_permit_applications.first.passport_photo.url }}" alt="Profile Picture" class="profile-picture">
-        {% else %}
-            <img src="{% static 'img/default_profile.png' %}" alt="Default Profile Picture" class="profile-picture">
-        {% endif %}
-    </div>
-    <div class="form-container position-relative">
-        <form method="POST">
-            {% csrf_token %}
+    <div class="edit-fulfiller-container">
+        <h2 class="page-title mb-4">Edit Fulfiller Details</h2>
 
-            <!-- First Row: Location and Action User -->
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="location">Location</label>
-                    <select class="form-control" id="location" name="location" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                        <option value="{{ application.post_location.id }}">{{ application.post_location }}</option>
-                        {% for location in post_locations %}
-                            {% if location != application.post_location %}
-                                <option value="{{ location.id }}" {% if fulfiller.location.id == location.id %}selected{% endif %}>{{ location.name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="form-group col-md-6">
-                    <label for="action">Action (User)</label>
-                    <select class="form-control" id="action" name="action" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                        <option value="">Select User</option>
-                        {% for user in users %}
-                            <option value="{{ user.id }}" {% if fulfiller.action.id == user.id %}selected{% endif %}>{{ user.get_full_name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-
-                <!-- Second Row: Schedule and Priority -->
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="schedule">Schedule</label>
-                        <input type="date" class="form-control" id="schedule" name="schedule" value="{{ fulfiller.schedule|date:'Y-m-d' }}" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                    </div>
-
-                    <div class="form-group col-md-6">
-                        <label for="priority">Priority</label>
-                        <select class="form-control" id="priority" name="priority" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                            <option value="high" {% if fulfiller.priority == 'high' %}selected{% endif %}>High</option>
-                            <option value="medium" {% if fulfiller.priority == 'medium' %}selected{% endif %}>Medium</option>
-                            <option value="low" {% if fulfiller.priority == 'low' %}selected{% endif %}>Low</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Third Row: Status and State -->
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="status">Status</label>
-                        <select class="form-control" id="status" name="status" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                            <option value="open" {% if fulfiller.status == 'open' %}selected{% endif %}>Open</option>
-                            <option value="closed" {% if fulfiller.status == 'closed' %}selected{% endif %}>Closed</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group col-md-6">
-                        <label for="state">State</label>
-                        <select class="form-control" id="state" name="state" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                            <option value="pending" {% if fulfiller.application.status == 'pending' %}selected{% endif %}>Pending</option>
-                            <option value="processing" {% if fulfiller.application.status == 'processing' %}selected{% endif %}>Processing</option>
-                            <option value="waiting" {% if fulfiller.application.status == 'waiting' %}selected{% endif %}>Waiting</option>
-                            <option value="interview" {% if fulfiller.application.status == 'interview' %}selected{% endif %}>Interview</option>
-                            <option value="completed" {% if fulfiller.application.status == 'completed' %}selected{% endif %}>Completed</option>
-                            <option value="rejected" {% if fulfiller.application.status == 'rejected' %}selected{% endif %}>Rejected</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Fourth Row: Progress -->
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="progress">Progress (%)</label>
-                        <div class="input-group">
-                            <input type="number" class="form-control" id="progress" name="progress" value="{{ fulfiller.progress }}" min="0" max="100" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                            <div class="input-group-append">
-                                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#progressDetailsModal" {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>More Details</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Rejection Note Alert -->
-                    {% if application.todos.first.status == 2 %}
-                    <div class="alert alert-danger alert-right" role="alert">
-                        <strong>Rejection Note:</strong> {{ application.todos.first.rejection_reason }}
-                    </div>
+        <div class="row">
+            <!-- Profile Picture Column -->
+            <div class="col-md-3 mb-4">
+                <div class="profile-picture-container text-center">
+                    {% if application.national_id_applications.exists %}
+                        <img src="{{ application.national_id_applications.first.passport_photo.url }}" alt="Profile Picture" class="img-fluid rounded-circle profile-picture">
+                    {% elif application.resident_permit_applications.exists %}
+                        <img src="{{ application.resident_permit_applications.first.passport_photo.url }}" alt="Profile Picture" class="img-fluid rounded-circle profile-picture">
+                    {% elif application.work_permit_applications.exists %}
+                        <img src="{{ application.work_permit_applications.first.passport_photo.url }}" alt="Profile Picture" class="img-fluid rounded-circle profile-picture">
+                    {% else %}
+                        <img src="{% static 'img/default_profile.png' %}" alt="Default Profile Picture" class="img-fluid rounded-circle profile-picture">
                     {% endif %}
                 </div>
-
-                <!-- Submit Button -->
-                 <div class="form-group text-right">
-                    <button type="submit" class="btn btn-primary" {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                        <i class="fas fa-save"></i> Save Changes
-                    </button>
-                </div>
-            </form>
-            </div>
             </div>
 
+            <!-- Form Column -->
+            <div class="col-md-9">
+                <form method="POST" class="needs-validation" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <!-- Location and Action User -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="location" name="location" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                    <option value="{{ application.post_location.id }}">{{ application.post_location }}</option>
+                                    {% for location in post_locations %}
+                                        {% if location != application.post_location %}
+                                            <option value="{{ location.id }}" {% if fulfiller.location.id == location.id %}selected{% endif %}>{{ location.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <label for="location">Location</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="action" name="action" required {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                    <option value="">Select User</option>
+                                    {% for user in users %}
+                                        <option value="{{ user.id }}" {% if fulfiller.action.id == user.id %}selected{% endif %}>{{ user.get_full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <label for="action">Action (User)</label>
+                            </div>
+                        </div>
+
+                        <!-- Schedule and Priority -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <input type="date" class="form-control" id="schedule" name="schedule"
+                                    value="{{ fulfiller.schedule|date:'Y-m-d' }}" required
+                                    {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                <label for="schedule">Schedule</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="priority" name="priority" required
+                                    {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                    <option value="high" {% if fulfiller.priority == 'high' %}selected{% endif %}>High</option>
+                                    <option value="medium" {% if fulfiller.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                    <option value="low" {% if fulfiller.priority == 'low' %}selected{% endif %}>Low</option>
+                                </select>
+                                <label for="priority">Priority</label>
+                            </div>
+                        </div>
+
+                        <!-- Status and State -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="status" name="status" required
+                                    {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                    <option value="open" {% if fulfiller.status == 'open' %}selected{% endif %}>Open</option>
+                                    <option value="closed" {% if fulfiller.status == 'closed' %}selected{% endif %}>Closed</option>
+                                </select>
+                                <label for="status">Status</label>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select class="form-select" id="state" name="state" required
+                                    {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                    <option value="pending" {% if fulfiller.application.status == 'pending' %}selected{% endif %}>Pending</option>
+                                    <option value="processing" {% if fulfiller.application.status == 'processing' %}selected{% endif %}>Processing</option>
+                                    <option value="waiting" {% if fulfiller.application.status == 'waiting' %}selected{% endif %}>Waiting</option>
+                                    <option value="interview" {% if fulfiller.application.status == 'interview' %}selected{% endif %}>Interview</option>
+                                    <option value="completed" {% if fulfiller.application.status == 'completed' %}selected{% endif %}>Completed</option>
+                                    <option value="rejected" {% if fulfiller.application.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                                </select>
+                                <label for="state">State</label>
+                            </div>
+                        </div>
+
+                        <!-- Progress -->
+                        <div class="col-12">
+                            <label for="progress" class="form-label">Progress (%)</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="progress" name="progress"
+                                    value="{{ fulfiller.progress }}" min="0" max="100" required
+                                    {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#progressDetailsModal"
+                                    {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                    More Details
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Rejection Note Alert -->
+                        {% if application.todos.first.status == 2 %}
+                            <div class="col-12">
+                                <div class="alert alert-danger" role="alert">
+                                    <strong>Rejection Note:</strong> {{ application.todos.first.rejection_reason }}
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <!-- Submit Button -->
+                        <div class="col-12 text-end mt-4">
+                            <button type="submit" class="btn btn-primary"
+                                {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Documents Section -->
+        <div class="mt-5">
             <h4 class="mb-3">Uploaded Documents</h4>
-            <ul class="list-group mb-4">
+            <div class="list-group">
                 {% if application.national_id_applications.first %}
-                    <li class="list-group-item">
-                        <a href="{{ application.national_id_applications.first.birth_certificate.url }}" target="_blank">
-                            <i class="fas fa-file-alt text-primary"></i> Birth Certificate
-                        </a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="{{ application.national_id_applications.first.passport_photo.url }}" target="_blank">
-                            <i class="fas fa-image text-success"></i> Passport Photo
-                        </a>
-                    </li>
+                    <a href="{{ application.national_id_applications.first.birth_certificate.url }}" class="list-group-item list-group-item-action d-flex align-items-center" target="_blank">
+                        <i class="fas fa-file-alt text-primary me-2"></i> Birth Certificate
+                    </a>
+                    <a href="{{ application.national_id_applications.first.passport_photo.url }}" class="list-group-item list-group-item-action d-flex align-items-center" target="_blank">
+                        <i class="fas fa-image text-success me-2"></i> Passport Photo
+                    </a>
                 {% endif %}
 
                 {% if application.resident_permit_applications.first %}
-                    <li class="list-group-item">
-                        <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}" target="_blank">
-                            <i class="fas fa-file-pdf text-danger"></i> Resident Permit Document
-                        </a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="{{ application.resident_permit_applications.first.passport_photo.url }}" target="_blank">
-                            <i class="fas fa-image text-success"></i> Passport Photo
-                        </a>
-                    </li>
+                    <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}" class="list-group-item list-group-item-action d-flex align-items-center" target="_blank">
+                        <i class="fas fa-file-pdf text-danger me-2"></i> Resident Permit Document
+                    </a>
+                    <a href="{{ application.resident_permit_applications.first.passport_photo.url }}" class="list-group-item list-group-item-action d-flex align-items-center" target="_blank">
+                        <i class="fas fa-image text-success me-2"></i> Passport Photo
+                    </a>
                 {% endif %}
 
                 {% if application.work_permit_applications.first %}
-                    <li class="list-group-item">
-                        <a href="{{ application.work_permit_applications.first.work_contract.url }}" target="_blank">
-                            <i class="fas fa-file-contract text-warning"></i> Work Contract
-                        </a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="{{ application.work_permit_applications.first.passport_photo.url }}" target="_blank">
-                            <i class="fas fa-image text-success"></i> Passport Photo
-                        </a>
-                    </li>
+                    <a href="{{ application.work_permit_applications.first.work_contract.url }}" class="list-group-item list-group-item-action d-flex align-items-center" target="_blank">
+                        <i class="fas fa-file-contract text-warning me-2"></i> Work Contract
+                    </a>
+                    <a href="{{ application.work_permit_applications.first.passport_photo.url }}" class="list-group-item list-group-item-action d-flex align-items-center" target="_blank">
+                        <i class="fas fa-image text-success me-2"></i> Passport Photo
+                    </a>
                 {% endif %}
 
                 {% for document in doc_uploads %}
-                    <li class="list-group-item">
-                        <a href="{{ document.document_file.url }}" target="_blank">
-                            <i class="fas fa-file text-secondary"></i> {{ document.document_type }}
-                        </a>
-                    </li>
+                    <a href="{{ document.document_file.url }}" class="list-group-item list-group-item-action d-flex align-items-center" target="_blank">
+                        <i class="fas fa-file text-secondary me-2"></i> {{ document.document_type }}
+                    </a>
                 {% empty %}
-                    <li class="list-group-item text-muted">No additional documents uploaded</li>
+                    {% if not application.national_id_applications.first and not application.resident_permit_applications.first and not application.work_permit_applications.first %}
+                        <div class="list-group-item text-muted text-center">
+                            <i class="fas fa-file-alt fa-2x mb-2"></i>
+                            <p class="mb-0">No documents uploaded</p>
+                        </div>
+                    {% endif %}
                 {% endfor %}
-            </ul>
+            </div>
+        </div>
 
+        <!-- Messages Section -->
+        <div class="mt-5">
             <h4 class="mb-3">Messages to Requester</h4>
-                <ul class="list-group mb-4">
-                    {% if notes %}
-                        {% for note in notes %}
-                            <li class="list-group-item d-flex justify-content-between align-items-start">
-                                <div class="w-100">
-                                    <div class="d-flex justify-content-between">
+            <div class="card">
+                <div class="card-body">
+                    <div class="messages-list mb-4">
+                        {% if notes %}
+                            {% for note in notes %}
+                                <div class="message-item mb-3">
+                                    <div class="d-flex justify-content-between align-items-center">
                                         <strong>{{ note.user.get_full_name }}</strong>
                                         <small class="text-muted">{{ note.created_at|date:"Y-m-d H:i" }}</small>
                                     </div>
                                     <p class="mb-0 mt-2">{{ note.message }}</p>
                                 </div>
-                            </li>
-                        {% endfor %}
-                    {% else %}
-                        <li class="list-group-item text-muted text-center">
-                            <i class="fas fa-comment-slash fa-2x mb-2"></i><br>
-                            No messages yet.
-                        </li>
-                    {% endif %}
-                </ul>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted py-4">
+                                <i class="fas fa-comment-slash fa-2x mb-2"></i>
+                                <p class="mb-0">No messages yet</p>
+                            </div>
+                        {% endif %}
+                    </div>
 
-
-           <form method="POST" action="{% url 'send_note_to_requester' fulfiller.id %}">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label for="message" class="font-weight-bold">Message to Requester</label>
-                    <textarea class="form-control" id="message" name="message" rows="3" placeholder="Type your message here..." {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}></textarea>
+                    <form method="POST" action="{% url 'send_note_to_requester' fulfiller.id %}">
+                        {% csrf_token %}
+                        <div class="form-group mb-3">
+                            <label for="message" class="form-label fw-bold">Message to Requester</label>
+                            <textarea class="form-control" id="message" name="message" rows="3"
+                                placeholder="Type your message here..."
+                                {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}
+                                required></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary"
+                                {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
+                                <i class="fas fa-paper-plane me-2"></i>Send Message
+                            </button>
+                        </div>
+                    </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary" {% if fulfiller.application.status == 'completed' or fulfiller.status == 'closed' %}disabled{% endif %}>
-                    <i class="fas fa-paper-plane"></i> Send Message
-                </button>
-            </form>
-
-
-        <!-- Application Details Modal -->
-<div class="modal fade" id="progressDetailsModal" tabindex="-1" role="dialog" aria-labelledby="progressDetailsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+<!-- Application Details Modal -->
+<div class="modal fade" id="progressDetailsModal" tabindex="-1" aria-labelledby="progressDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <!-- Modal Header -->
-            <div class="modal-header">
+            <div class="modal-header border-bottom">
                 <h5 class="modal-title" id="progressDetailsModalLabel">
                     <i class="fas fa-info-circle me-2"></i>Application Details
                 </h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <!-- Modal Body -->
             <div class="modal-body">
                 <div class="application-details">
                     <!-- Applicant Information Card -->
-                    <div class="detail-card applicant-info mb-4">
-                        <div class="card-header">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light d-flex align-items-center">
                             <i class="fas fa-user text-primary me-2"></i>
                             <h6 class="mb-0">Applicant Information</h6>
                         </div>
                         <div class="card-body">
                             {% if application.national_id_applications.first %}
-                                <div class="info-grid">
-                                    <div class="info-item">
-                                        <span class="label">Full Name</span>
-                                        <span class="value">{{ application.national_id_applications.first.full_name }}</span>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="info-item">
+                                            <label class="text-muted mb-1">Full Name</label>
+                                            <p class="mb-0 fw-medium">{{ application.national_id_applications.first.full_name }}</p>
+                                        </div>
                                     </div>
-                                    <div class="info-item">
-                                        <span class="label">Email</span>
-                                        <span class="value">{{ application.national_id_applications.first.email }}</span>
+                                    <div class="col-md-4">
+                                        <div class="info-item">
+                                            <label class="text-muted mb-1">Email</label>
+                                            <p class="mb-0 fw-medium">{{ application.national_id_applications.first.email }}</p>
+                                        </div>
                                     </div>
-                                    <div class="info-item">
-                                        <span class="label">Phone</span>
-                                        <span class="value">{{ application.national_id_applications.first.phone_number }}</span>
+                                    <div class="col-md-4">
+                                        <div class="info-item">
+                                            <label class="text-muted mb-1">Phone</label>
+                                            <p class="mb-0 fw-medium">{{ application.national_id_applications.first.phone_number }}</p>
+                                        </div>
                                     </div>
                                 </div>
                             {% elif application.resident_permit_applications.first %}
-                                <!-- Similar structure for resident permit -->
-                                <div class="info-grid">
-                                    <div class="info-item">
-                                        <span class="label">Full Name</span>
-                                        <span class="value">{{ application.resident_permit_applications.first.full_name }}</span>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="info-item">
+                                            <label class="text-muted mb-1">Full Name</label>
+                                            <p class="mb-0 fw-medium">{{ application.resident_permit_applications.first.full_name }}</p>
+                                        </div>
                                     </div>
-                                    <div class="info-item">
-                                        <span class="label">Email</span>
-                                        <span class="value">{{ application.resident_permit_applications.first.email }}</span>
+                                    <div class="col-md-4">
+                                        <div class="info-item">
+                                            <label class="text-muted mb-1">Email</label>
+                                            <p class="mb-0 fw-medium">{{ application.resident_permit_applications.first.email }}</p>
+                                        </div>
                                     </div>
-                                    <div class="info-item">
-                                        <span class="label">Phone</span>
-                                        <span class="value">{{ application.resident_permit_applications.first.phone_number }}</span>
+                                    <div class="col-md-4">
+                                        <div class="info-item">
+                                            <label class="text-muted mb-1">Phone</label>
+                                            <p class="mb-0 fw-medium">{{ application.resident_permit_applications.first.phone_number }}</p>
+                                        </div>
                                     </div>
                                 </div>
                             {% elif application.work_permit_applications.first %}
-                                <!-- Similar structure for work permit -->
-                                <div class="info-grid">
-                                    <div class="info-item">
-                                        <span class="label">Full Name</span>
-                                        <span class="value">{{ application.work_permit_applications.first.full_name }}</span>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="info-item">
+                                            <label class="text-muted mb-1">Full Name</label>
+                                            <p class="mb-0 fw-medium">{{ application.work_permit_applications.first.full_name }}</p>
+                                        </div>
                                     </div>
-                                    <div class="info-item">
-                                        <span class="label">Email</span>
-                                        <span class="value">{{ application.work_permit_applications.first.email }}</span>
+                                    <div class="col-md-4">
+                                        <div class="info-item">
+                                            <label class="text-muted mb-1">Email</label>
+                                            <p class="mb-0 fw-medium">{{ application.work_permit_applications.first.email }}</p>
+                                        </div>
                                     </div>
-                                    <div class="info-item">
-                                        <span class="label">Phone</span>
-                                        <span class="value">{{ application.work_permit_applications.first.phone_number }}</span>
+                                    <div class="col-md-4">
+                                        <div class="info-item">
+                                            <label class="text-muted mb-1">Phone</label>
+                                            <p class="mb-0 fw-medium">{{ application.work_permit_applications.first.phone_number }}</p>
+                                        </div>
                                     </div>
                                 </div>
                             {% else %}
-                                <p class="text-muted">No applicant information available.</p>
+                                <p class="text-muted text-center py-3">
+                                    <i class="fas fa-user-slash fa-2x mb-2 d-block"></i>
+                                    No applicant information available
+                                </p>
                             {% endif %}
                         </div>
                     </div>
 
                     <!-- Application Status Card -->
-                    <div class="detail-card status-info mb-4">
-                        <div class="card-header">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light d-flex align-items-center">
                             <i class="fas fa-file-alt text-primary me-2"></i>
                             <h6 class="mb-0">Application Status</h6>
                         </div>
                         <div class="card-body">
-                            <div class="status-grid">
-                                <div class="status-item">
-                                    <span class="label">Type</span>
-                                    <span class="badge badge-fulfill bg-primary">{{ fulfiller.application.application_type|capfirst }}</span>
-                                </div>
-                                <div class="status-item">
-                                    <span class="label">Status</span>
-                                    <span class="badge badge-fulfill bg-info">{{ fulfiller.application.status|capfirst }}</span>
-                                </div>
-                                <div class="status-item">
-                                    <span class="label">Progress</span>
-                                    <div class="progress">
-                                        <div class="progress-bar bg-success"
-                                             role="progressbar"
-                                             style="width: {{ fulfiller.progress }}%"
-                                             aria-valuenow="{{ fulfiller.progress }}"
-                                             aria-valuemin="0"
-                                             aria-valuemax="100">{{ fulfiller.progress }}%</div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="status-item">
+                                        <label class="text-muted mb-1">Type</label>
+                                        <div>
+                                            <span class="badge bg-primary">{{ fulfiller.application.application_type|capfirst }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="status-item">
-                                    <span class="label">Location</span>
-                                    <span class="value">{{ fulfiller.application.post_location.name }}, {{ fulfiller.application.post_location.city }}</span>
+                                <div class="col-md-6">
+                                    <div class="status-item">
+                                        <label class="text-muted mb-1">Status</label>
+                                        <div>
+                                            <span class="badge bg-info">{{ fulfiller.application.status|capfirst }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="status-item">
+                                        <label class="text-muted mb-1">Progress</label>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-success"
+                                                 role="progressbar"
+                                                 style="width: {{ fulfiller.progress }}%"
+                                                 aria-valuenow="{{ fulfiller.progress }}"
+                                                 aria-valuemin="0"
+                                                 aria-valuemax="100">
+                                                {{ fulfiller.progress }}%
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="status-item">
+                                        <label class="text-muted mb-1">Location</label>
+                                        <p class="mb-0 fw-medium">{{ fulfiller.application.post_location.name }}, {{ fulfiller.application.post_location.city }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Application Details Card -->
+                    <!-- Application Documents Card -->
                     {% if application.national_id_applications.first %}
-                        <div class="detail-card documents-info">
-                            <div class="card-header">
+                        <div class="card">
+                            <div class="card-header bg-light d-flex align-items-center">
                                 <i class="fas fa-id-card text-primary me-2"></i>
-                                <h6 class="mb-0">National ID Application Details</h6>
+                                <h6 class="mb-0">National ID Application Documents</h6>
                             </div>
                             <div class="card-body">
-                                <div class="document-grid">
+                                <div class="list-group">
                                     <a href="{{ application.national_id_applications.first.birth_certificate.url }}"
-                                       class="document-link"
+                                       class="list-group-item list-group-item-action d-flex align-items-center"
                                        target="_blank">
                                         <i class="fas fa-file-pdf text-danger me-2"></i>
                                         <span>Birth Certificate</span>
-                                        <i class="fas fa-external-link-alt ms-2"></i>
+                                        <i class="fas fa-external-link-alt ms-auto"></i>
                                     </a>
                                     <a href="{{ application.national_id_applications.first.passport_photo.url }}"
-                                       class="document-link"
+                                       class="list-group-item list-group-item-action d-flex align-items-center"
                                        target="_blank">
                                         <i class="fas fa-image text-success me-2"></i>
                                         <span>Passport Photo</span>
-                                        <i class="fas fa-external-link-alt ms-2"></i>
+                                        <i class="fas fa-external-link-alt ms-auto"></i>
                                     </a>
                                 </div>
                             </div>
                         </div>
                     {% elif application.resident_permit_applications.first %}
-                        <!-- Similar structure for resident permit documents -->
+                        <div class="card">
+                            <div class="card-header bg-light d-flex align-items-center">
+                                <i class="fas fa-id-card text-primary me-2"></i>
+                                <h6 class="mb-0">Resident Permit Documents</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group">
+                                    <a href="{{ application.resident_permit_applications.first.resident_permit_document.url }}"
+                                       class="list-group-item list-group-item-action d-flex align-items-center"
+                                       target="_blank">
+                                        <i class="fas fa-file-pdf text-danger me-2"></i>
+                                        <span>Resident Permit Document</span>
+                                        <i class="fas fa-external-link-alt ms-auto"></i>
+                                    </a>
+                                    <a href="{{ application.resident_permit_applications.first.passport_photo.url }}"
+                                       class="list-group-item list-group-item-action d-flex align-items-center"
+                                       target="_blank">
+                                        <i class="fas fa-image text-success me-2"></i>
+                                        <span>Passport Photo</span>
+                                        <i class="fas fa-external-link-alt ms-auto"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     {% elif application.work_permit_applications.first %}
-                        <!-- Similar structure for work permit documents -->
+                        <div class="card">
+                            <div class="card-header bg-light d-flex align-items-center">
+                                <i class="fas fa-id-card text-primary me-2"></i>
+                                <h6 class="mb-0">Work Permit Documents</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group">
+                                    <a href="{{ application.work_permit_applications.first.work_contract.url }}"
+                                       class="list-group-item list-group-item-action d-flex align-items-center"
+                                       target="_blank">
+                                        <i class="fas fa-file-contract text-warning me-2"></i>
+                                        <span>Work Contract</span>
+                                        <i class="fas fa-external-link-alt ms-auto"></i>
+                                    </a>
+                                    <a href="{{ application.work_permit_applications.first.passport_photo.url }}"
+                                       class="list-group-item list-group-item-action d-flex align-items-center"
+                                       target="_blank">
+                                        <i class="fas fa-image text-success me-2"></i>
+                                        <span>Passport Photo</span>
+                                        <i class="fas fa-external-link-alt ms-auto"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     {% endif %}
                 </div>
             </div>
 
             <!-- Modal Footer -->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+            <div class="modal-footer border-top">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times me-2"></i>Close
                 </button>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-/* Modal Styles */
-.modal-content {
-    border: none;
-    border-radius: 1rem;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
-
-.modal-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid #e9ecef;
-    border-radius: 1rem 1rem 0 0;
-    padding: 1.5rem;
-}
-
-.modal-title {
-    color: #2d3748;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.modal-body {
-    padding: 1.5rem;
-}
-
-/* Card Styles */
-.detail-card {
-    background: #ffffff;
-    border-radius: 0.75rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-}
-
-.card-header {
-    background-color: #f8f9fa;
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.card-body {
-    padding: 1.5rem;
-}
-
-/* Information Grid Styles */
-.info-grid, .status-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-}
-
-.info-item, .status-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.label {
-    font-size: 0.875rem;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.value {
-    color: #1f2937;
-    font-weight: 500;
-}
-
-/* Badge Styles */
-.badge-fulfill {
-    padding: 0.5rem 1rem;
-    font-weight: 500;
-    font-size: 0.875rem;
-}
-
-/* Progress Bar Styles */
-.progress {
-    height: 0.75rem;
-    border-radius: 1rem;
-    background-color: #e9ecef;
-}
-
-.progress-bar {
-    border-radius: 1rem;
-    transition: width 0.3s ease;
-}
-
-/* Document Links */
-.document-grid {
-    display: grid;
-    gap: 1rem;
-}
-
-.document-link {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-radius: 0.5rem;
-    color: #2d3748;
-    text-decoration: none;
-    transition: all 0.2s ease;
-}
-
-.document-link:hover {
-    background-color: #e9ecef;
-    transform: translateY(-2px);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .info-grid, .status-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .modal-dialog {
-        margin: 0.5rem;
-    }
-
-    .card-body {
-        padding: 1rem;
-    }
-}
-</style>
-
+<link rel="stylesheet" href="{% static 'css/fulfiller_modal.css' %}">
 
 
 
