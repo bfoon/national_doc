@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import (NationalIDApplication,
                      UploadedDocument, Application,
-                     ResidentPermitApplication, WorkPermitApplication, Profile, ChatMessage)
+                     ResidentPermitApplication,
+                     WorkPermitApplication, Profile, ChatMessage, ExtendOrPrint)
 from django.core.files.storage import FileSystemStorage
 from immigration.models import PostLocation, Fulfiller, FAQ, OfficerProfile
 from django.db import transaction
@@ -693,6 +694,33 @@ def upload_document(request, id):
 
     except NationalIDApplication.DoesNotExist:
         return render(request, 'docs/error.html', {'message': 'Application not found.'})
+
+@login_required
+def apply_extend_or_reprint(request, application_id):
+    application = get_object_or_404(Application, id=application_id, user=request.user)
+
+    if request.method == 'POST':
+        state = request.POST.get('state')
+        reason = request.POST.get('reason')
+        upload = request.FILES.get('upload')
+
+        # Validate state
+        if state not in ['reprint', 'extend']:
+            messages.error(request, "Invalid request type. Please select 'Re-Print' or 'Extend'.")
+            return redirect('apply_extend_or_reprint', application_id=application.id)
+
+        # Create ExtendOrPrint instance
+        extend_or_reprint_request = ExtendOrPrint.objects.create(
+            application=application,
+            state=state,
+            reason=reason,
+            upload=upload
+        )
+
+        messages.success(request, f"Your {state.capitalize()} request has been submitted successfully.")
+        return redirect('dashboard', application_id=application.id)
+
+    return render(request, 'docs/apply_extend_or_reprint.html', {'application': application})
 
 @login_required
 @csrf_exempt

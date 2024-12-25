@@ -166,6 +166,46 @@ class TINApplication(models.Model):
     def __str__(self):
         return f"TIN Application for {self.application.user.username}"
 
+class ExtendOrPrint(models.Model):
+    STATE_CHOICES = [
+        ('reprint', 'Re-Print'),
+        ('extend', 'Extend'),
+    ]
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        null=True,
+        related_name='extend_or_print_requests'
+    )
+    state = models.CharField(
+        max_length=10,
+        choices=STATE_CHOICES,
+        null=True,
+        blank=True,
+        help_text="Specify if this is a re-print or extension request."
+    )
+    reason = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Provide the reason for the request (e.g., lost document or expired document)."
+    )
+    upload = models.FileField(
+        upload_to='documents/extend/',
+        blank=True,
+        null=True,
+        help_text="Upload any supporting documents, if applicable."
+    )
+    created_at = models.DateTimeField(auto_now_add=True, help_text="The date and time when the request was created.")
+    updated_at = models.DateTimeField(auto_now=True, help_text="The date and time when the request was last updated.")
+
+    def __str__(self):
+        return f"{self.get_state_display()} request for {self.application}"
+
+    class Meta:
+        verbose_name = "Extend or Print Request"
+        verbose_name_plural = "Extend or Print Requests"
+        ordering = ['-created_at']
 
 class UploadedDocument(models.Model):
     application = models.ForeignKey(Application, on_delete=models.CASCADE, null=True, related_name='documents')

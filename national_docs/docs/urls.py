@@ -31,4 +31,7 @@ urlpatterns = [
     path('chat/', views.chat_with_support, name='chat_with_support'),
     path('faqs/', views.faq_list, name='faq_list'),
     path('manage_appointments/', views.manage_appointments, name='manage_appointments'),
+
+    path('application/<int:application_id>/extend-or-reprint/', views.apply_extend_or_reprint,
+         name='apply_extend_or_reprint'),
 ]

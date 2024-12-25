@@ -9,6 +9,7 @@ admin.site.register(WorkPermitApplication)
 admin.site.register(DriversLicenseApplication)
 admin.site.register(TINApplication)
 admin.site.register(Profile)
+admin.site.register(ExtendOrPrint)
 @admin.register(ChatMessage)
 class ChatMessageAdmin(admin.ModelAdmin):
     list_display = ('sender', 'recipient', 'message', 'timestamp', 'is_read')

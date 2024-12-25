@@ -1,0 +1,132 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+{% load static %}
+<!-- Link to custom CSS -->
+<link rel="stylesheet" href="{% static 'css/extend_reprint.css' %}">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="container py-5">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{% url 'dashboard' %}">
+                    <i class="fas fa-home me-2"></i>Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-file-alt me-2"></i>Extend or Reprint
+            </li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="h4 mb-0">Extension or Reprint Application For  {{application.get_service_type}}</h2>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Request Type Selection -->
+                        <div class="mb-4">
+                            <label for="request-type" class="form-label fw-bold">Request Type *</label>
+                            <select class="form-select" id="request-type" name="state" required>
+                                <option value="" disabled selected>Select request type</option>
+                                <option value="reprint">Document Reprint</option>
+                                <option value="extend">Validity Extension</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a request type.</div>
+                        </div>
+
+                        <!-- Reason for Request -->
+                        <div class="mb-4">
+                            <label for="reason" class="form-label fw-bold">Reason for Request *</label>
+                            <textarea
+                                class="form-control"
+                                id="reason"
+                                name="reason"
+                                rows="4"
+                                placeholder="Provide a detailed explanation for your request..."
+                                required minlength="20"
+                            ></textarea>
+                            <div class="invalid-feedback">
+                                Please provide a reason with at least 20 characters.
+                            </div>
+                            <small class="text-muted">Explain clearly why you need a reprint or extension.</small>
+                        </div>
+
+                        <!-- Supporting Documents -->
+                        <div class="mb-4">
+                            <label for="supporting-documents" class="form-label fw-bold">Supporting Documents</label>
+                            <input
+                                type="file"
+                                class="form-control"
+                                id="supporting-documents"
+                                name="upload"
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                            >
+                            <small class="text-muted">
+                                Accepted formats: PDF, DOC, DOCX, JPG, JPEG, PNG (Max size: 5MB).
+                            </small>
+                        </div>
+
+                        <!-- Agreement Checkbox -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="terms" required>
+                                <label class="form-check-label" for="terms">
+                                    I confirm that all provided information is accurate and complete.
+                                </label>
+                                <div class="invalid-feedback">You must agree before submitting.</div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Submit Application</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Section -->
+            <div class="card mt-4 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Important Information</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check-circle text-success me-2"></i>Processing takes 3-5 business days.</li>
+                        <li><i class="fas fa-envelope text-info me-2"></i>Updates will be sent via email.</li>
+                        <li><i class="fas fa-exclamation-triangle text-warning me-2"></i>For urgent requests, contact support.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+
+<!-- Form Validation Script -->
+<script>
+(function () {
+    'use strict';
+    // Fetch all forms that need validation
+    var forms = document.querySelectorAll('.needs-validation');
+    // Prevent form submission if validation fails
+    Array.prototype.slice.call(forms).forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+</script>
+{% endblock %}
