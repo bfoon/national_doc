@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from docs.models import Application, UploadedDocument, ChatMessage
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile, Notification,
-                     FAQ, FAQCategory, CallNote, MessageNote)
+                     FAQ, FAQCategory, CallNote, MessageNote, FollowUpNote)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.dateparse import parse_date
@@ -1868,3 +1868,26 @@ def search_call_notes(request):
     ]
 
     return JsonResponse({'notes': notes_data})
+
+# In your view (manage_follow_up_note)
+@login_required
+def manage_follow_up_note(request, call_note_id):
+    call_note = get_object_or_404(CallNote, id=call_note_id)
+
+    if request.method == "POST":
+        note_id = request.POST.get('note_id', None)
+        note_content = request.POST.get('note', '').strip()
+
+      # Add new note
+        FollowUpNote.objects.create(
+                call_note=call_note,
+                note=note_content,
+                created_by=request.user
+            )
+
+        # Correct redirect with app namespace if used
+        return redirect('manage_follow_up_note', call_note_id=call_note.id)
+
+    messages.success(request, "The follow note was created")
+    return redirect('support_desk')
+

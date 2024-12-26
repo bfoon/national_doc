@@ -451,9 +451,13 @@
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#followUpNoteModal"
+                                                    data-note-id="{{ note.id }}"
+                                                    onclick="editFollowUpNote({{ note.id }}, '{{ note.note|escapejs }}')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
                                         <button class="btn btn-sm {% if note.completed %}btn-success disabled{% else %}btn-outline-success{% endif %} close-note-btn"
                                                 data-note-id="{{ note.id }}"
                                                 {% if not note.completed %}
@@ -464,32 +468,47 @@
                                     </div>
                                 </div>
 
-                                <!-- Note Content -->
-                                <div class="note-content {% if note.completed %}text-muted{% endif %}">
-                                    <div class="p-3 bg-light rounded-3 {% if note.completed %}bg-opacity-50{% endif %}">
-                                        <strong>Call Type:</strong> {{ note.get_call_type_display }} <br>
-                                        <strong>Priority:</strong>
-                                        <span class="badge {% if note.priority == 'high' %}bg-danger{% elif note.priority == 'medium' %}bg-warning{% else %}bg-success{% endif %}">
-                                            {{ note.priority|capfirst }}
-                                        </span><br>
-                                        {% if note.followup %}
-                                            <i class="fas fa-exclamation-circle text-warning"></i> Follow-up Required
-                                        {% endif %}
-                                    </div>
-                                   <div class="mt-3 p-3 bg-light border rounded-3 shadow-sm">
-                                        <p class="mb-0 text-dark" style="font-style: italic; font-size: 1.1rem;">
-                                            {{ note.note }}
-                                        </p>
-                                    </div>
-
-                                    {% if note.tags %}
-                                    <div class="mt-2">
-                                        {% for tag in note.tags %}
-                                            <span class="badge bg-info bg-opacity-10 text-info me-1">{{ tag }}</span>
-                                        {% endfor %}
-                                    </div>
+                            <!-- Note Content -->
+                            <div class="note-content {% if note.completed %}text-muted{% endif %}">
+                                <div class="p-3 bg-light rounded-3 {% if note.completed %}bg-opacity-50{% endif %}">
+                                    <strong>Call Type:</strong> {{ note.get_call_type_display }} <br>
+                                    <strong>Priority:</strong>
+                                    <span class="badge {% if note.priority == 'high' %}bg-danger{% elif note.priority == 'medium' %}bg-warning{% else %}bg-success{% endif %}">
+                                        {{ note.priority|capfirst }}
+                                    </span><br>
+                                    {% if note.follow_up_notes.count %}
+                                        <i class="fas fa-exclamation-circle text-warning"></i> Follow-up Required
                                     {% endif %}
                                 </div>
+
+                                <!-- Note Content -->
+                                <div class="mt-3 p-3 bg-light border rounded-3 shadow-sm">
+                                    <p class="mb-0 text-dark" style="font-style: italic; font-size: 1.1rem;">
+                                        {{ note.note }}
+                                    </p>
+                                </div>
+
+                                <!-- Display Follow-up Notes -->
+                                {% if note.follow_up_notes.count %}
+                                    {% for follow_up_note in note.follow_up_notes.all %}
+                                        <div class="mt-3 p-3 bg-warning bg-opacity-10 border rounded-3 shadow-sm"> <!-- Added bg-warning for yellow background -->
+                                            <p class="mb-0 text-dark" style="font-style: italic; font-size: 1.1rem;">
+                                                {{ follow_up_note.note }}
+                                            </p>
+                                            <small class="text-muted">Follow-up Note by {{ follow_up_note.created_by }} on {{ follow_up_note.created_at|date:"Y-m-d" }}</small>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if note.tags %}
+                                <div class="mt-2">
+                                    {% for tag in note.tags %}
+                                        <span class="badge bg-info bg-opacity-10 text-info me-1">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
                             </div>
                         </div>
                     </div>
@@ -797,6 +816,33 @@
     </div>
 </div>
 </div>
+
+<!-- Add/Edit Follow-Up Note Modal -->
+<div class="modal fade" id="followUpNoteModal" tabindex="-1" aria-labelledby="followUpNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="followUpNoteForm" action="">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="followUpNoteModalLabel">Add/Edit Follow-Up Note</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="noteId" name="note_id">
+                    <div class="form-group">
+                        <label for="noteContent">Note</label>
+                        <textarea id="noteContent" name="note" class="form-control" rows="4" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 
 <!-- Respond to Chat Modal -->
 <div class="modal fade" id="respondChatModal" tabindex="-1" role="dialog" aria-labelledby="respondChatModalLabel" aria-hidden="true">
@@ -1202,6 +1248,37 @@
         </div>
     </div>
 </div>
+
+
+<script>
+    function editFollowUpNote(id, content) {
+        document.getElementById('noteId').value = id;
+        document.getElementById('noteContent').value = content;
+        document.getElementById('followUpNoteModalLabel').innerText = "Edit Follow-Up Note";
+    }
+</script>
+<script>
+    const followUpNoteModal = document.getElementById('followUpNoteModal');
+    followUpNoteModal.addEventListener('show.bs.modal', function (event) {
+        // Button that triggered the modal
+        const button = event.relatedTarget;
+        const noteId = button.getAttribute('data-note-id');
+        console.log('noteId:', noteId); // Log to check if noteId is correct
+
+        // Update the form action with the URL name and noteId
+        const form = followUpNoteModal.querySelector('#followUpNoteForm');
+
+        // Construct URL using the URL name and the noteId
+        const url = "{% url 'manage_follow_up_note' 0 %}".replace('0', noteId);
+        form.action = url;
+
+        console.log('Form action updated to:', form.action); // Log the updated action
+
+        // Optionally populate other fields (e.g., noteId input)
+        document.getElementById('noteId').value = noteId;
+    });
+</script>
+
 
 
 

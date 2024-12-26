@@ -367,3 +367,34 @@ class MessageNote(models.Model):
     @property
     def is_important(self):
         return self.important
+
+# For taking follow up notes on call notes.
+class FollowUpNote(models.Model):
+    call_note = models.ForeignKey(
+        'CallNote',
+        on_delete=models.CASCADE,
+        related_name='follow_up_notes',  # Updated related_name for clarity
+        help_text="The call note this follow-up note is related to."
+    )
+    note = models.TextField(
+        help_text="Detailed content of the follow-up note."
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follow_up_notes',  # Updated related_name to reflect user-created notes
+        help_text="The user who created this follow-up note."
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Timestamp when this follow-up note was created."
+    )
+
+    class Meta:
+        ordering = ['-created_at']  # Ensures notes are ordered by the latest first
+        verbose_name = "Follow-Up Note"
+        verbose_name_plural = "Follow-Up Notes"
+
+    def __str__(self):
+        return f"Follow-Up Note by {self.created_by} on {self.created_at:%Y-%m-%d}"
+
