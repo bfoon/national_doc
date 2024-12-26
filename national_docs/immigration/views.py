@@ -1723,7 +1723,9 @@ def birth_certificate_request(request):
 def get_user_application(request, user_id):
     try:
         # Fetch the latest application for the user
-        application = Application.objects.filter(user_id=user_id).latest('application_date')
+        application = Application.objects.exclude(
+            Q(status='completed') | Q(status='cancelled')
+        ).filter(user_id=user_id).latest('application_date')
 
         # Prepare the response data
         response_data = {

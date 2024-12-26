@@ -3,6 +3,7 @@
 {% load static %}
 
 <link rel="stylesheet" href="{% static 'css/fulfiller.css' %}">
+
 <div class="container my-5">
     <!-- Breadcrumbs -->
     <nav aria-label="breadcrumb" class="breadcrumb-wrapper">
@@ -46,19 +47,33 @@
 
         <div class="row">
             <!-- Profile Picture Column -->
-            <div class="col-md-3 mb-4">
-                <div class="profile-picture-container text-center">
-                    {% if application.national_id_applications.exists %}
-                        <img src="{{ application.national_id_applications.first.passport_photo.url }}" alt="Profile Picture" class="img-fluid rounded-circle profile-picture">
-                    {% elif application.resident_permit_applications.exists %}
-                        <img src="{{ application.resident_permit_applications.first.passport_photo.url }}" alt="Profile Picture" class="img-fluid rounded-circle profile-picture">
-                    {% elif application.work_permit_applications.exists %}
-                        <img src="{{ application.work_permit_applications.first.passport_photo.url }}" alt="Profile Picture" class="img-fluid rounded-circle profile-picture">
-                    {% else %}
-                        <img src="{% static 'img/default_profile.png' %}" alt="Default Profile Picture" class="img-fluid rounded-circle profile-picture">
-                    {% endif %}
-                </div>
-            </div>
+          <div class="col-md-3 mb-4">
+        <div class="profile-picture-container text-center mb-3">
+            {% if application.national_id_applications.exists %}
+                <img src="{{ application.national_id_applications.first.passport_photo.url }}"
+                     alt="Profile Picture"
+                     class="img-fluid rounded-circle profile-picture mb-3">
+                <h5 class="user-name fw-bold mb-2">{{ application.national_id_applications.first.full_name }}</h5>
+                <span class="badge bg-primary px-3 py-2 service-type">National ID</span>
+            {% elif application.resident_permit_applications.exists %}
+                <img src="{{ application.resident_permit_applications.first.passport_photo.url }}"
+                     alt="Profile Picture"
+                     class="img-fluid rounded-circle profile-picture mb-3">
+                <h5 class="user-name fw-bold mb-2">{{ application.resident_permit_applications.first.full_name }}</h5>
+                <span class="badge bg-success px-3 py-2 service-type">Resident Permit</span>
+            {% elif application.work_permit_applications.exists %}
+                <img src="{{ application.work_permit_applications.first.passport_photo.url }}"
+                     alt="Profile Picture"
+                     class="img-fluid rounded-circle profile-picture mb-3">
+                <h5 class="user-name fw-bold mb-2">{{ application.work_permit_applications.first.full_name }}</h5>
+                <span class="badge bg-info px-3 py-2 service-type">Work Permit</span>
+            {% else %}
+                <img src="{% static 'img/default_profile.png' %}"
+                     alt="Default Profile Picture"
+                     class="img-fluid rounded-circle profile-picture mb-3">
+            {% endif %}
+        </div>
+    </div>
 
             <!-- Form Column -->
             <div class="col-md-9">

@@ -240,3 +240,13 @@ textarea.form-control {
         height: 100px;
     }
 }
+.user-name {
+    color: #2c3e50;
+    font-size: 1.1rem;
+}
+
+.service-type {
+    font-size: 0.85rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}

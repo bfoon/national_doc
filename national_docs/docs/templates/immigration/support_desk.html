@@ -3,139 +3,8 @@
 {% block content %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/support_desk.css' %}">
-<style>
-/* Custom Tab Styling */
-.nav-tabs {
-    border-bottom: 2px solid #e9ecef;
-    background-color: #fff;
-    border-radius: 8px 8px 0 0;
-    padding: 0.5rem 0.5rem 0 0.5rem;
-}
+<link rel="stylesheet" href="{% static 'css/support_desk2.css' %}">
 
-.nav-tabs .nav-item {
-    margin-bottom: -2px;
-    position: relative;
-}
-
-.nav-tabs .nav-link {
-    border: none;
-    color: #6c757d;
-    font-weight: 500;
-    padding: 1rem 1.5rem;
-    transition: all 0.3s ease;
-    position: relative;
-    background-color: transparent;
-}
-
-.nav-tabs .nav-link:hover {
-    color: #0d6efd;
-    border: none;
-    background-color: rgba(13, 110, 253, 0.05);
-}
-
-.nav-tabs .nav-link.active {
-    color: #0d6efd;
-    border: none;
-    background-color: transparent;
-}
-
-.nav-tabs .nav-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: #0d6efd;
-    border-radius: 2px 2px 0 0;
-}
-
-/* Tab Content Animation */
-.tab-content {
-    background-color: #fff;
-    border-radius: 0 0 8px 8px;
-}
-
-.tab-pane {
-    padding: 1rem 0;
-}
-
-.fade {
-    transition: opacity 0.2s linear;
-}
-
-/* Tab Icons Styling */
-.nav-tabs .nav-link i {
-    font-size: 1.1rem;
-    margin-right: 0.5rem;
-    vertical-align: middle;
-}
-
-/* Active Tab Indicator Animation */
-@keyframes tabFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.tab-pane.active {
-    animation: tabFadeIn 0.3s ease-in-out;
-}
-
-/* Tab Counter Badges */
-.nav-link .badge {
-    margin-left: 0.5rem;
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 12px;
-    background-color: #e9ecef;
-    color: #6c757d;
-    transition: all 0.3s ease;
-}
-
-.nav-link.active .badge {
-    background-color: #0d6efd;
-    color: #fff;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .nav-tabs .nav-link {
-        padding: 0.75rem 1rem;
-        font-size: 0.9rem;
-    }
-
-    .nav-tabs .nav-link i {
-        font-size: 1rem;
-    }
-}
-
-/* Tab Hover Effect */
-.nav-tabs .nav-link::before {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: #0d6efd;
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-}
-
-.nav-tabs .nav-link:hover::before {
-    transform: scaleX(0.5);
-}
-
-.nav-tabs .nav-link.active::before {
-    transform: scaleX(1);
-}
-</style>
 <div class="container my-5">
     <!-- Display Messages -->
     {% if messages %}
@@ -169,6 +38,21 @@
 
     <!-- Enhanced Statistics Cards -->
     <div class="row g-4 mb-4">
+        <div class="row g-4 mb-4">
+        <div class="welcome-banner">
+            <div class="welcome-content">
+                <div class="welcome-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                </div>
+                <div class="welcome-text">
+                    <h1>Welcome, {{user.get_full_name}}</h1>
+                    <p>We're glad to see you back. Here's an overview of your latest activity and key metrics.</p>
+                </div>
+            </div>
+        </div>
         <!-- Open Applications Card -->
         <div class="col-md-3 col-sm-6">
             <div class="card border-0 shadow-sm h-100 bg-gradient">
