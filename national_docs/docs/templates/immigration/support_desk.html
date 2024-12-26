@@ -4,6 +4,7 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/support_desk.css' %}">
 <link rel="stylesheet" href="{% static 'css/support_desk2.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
 <div class="container my-5">
     <!-- Display Messages -->
@@ -488,17 +489,29 @@
                                     </p>
                                 </div>
 
-                                <!-- Display Follow-up Notes -->
-                                {% if note.follow_up_notes.count %}
-                                    {% for follow_up_note in note.follow_up_notes.all %}
-                                        <div class="mt-3 p-3 bg-warning bg-opacity-10 border rounded-3 shadow-sm"> <!-- Added bg-warning for yellow background -->
-                                            <p class="mb-0 text-dark" style="font-style: italic; font-size: 1.1rem;">
-                                                {{ follow_up_note.note }}
-                                            </p>
-                                            <small class="text-muted">Follow-up Note by {{ follow_up_note.created_by }} on {{ follow_up_note.created_at|date:"Y-m-d" }}</small>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
+                              <!-- Display Follow-up Notes -->
+                                <div id="followUpNotesContainer" data-call-note-id="{{ note.id }}">
+                                    {% if note.follow_up_notes.count %}
+                                        {% for follow_up_note in note.follow_up_notes.all %}
+                                            <div class="follow-up-note d-flex align-items-center" data-note-id="{{ follow_up_note.id }}" data-order="{{ forloop.counter }}">
+                                                <!-- Number Display -->
+                                                <div class="note-number bg-warning bg-opacity-25 rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px;">
+                                                    <span>{{ forloop.counter }}</span>
+                                                </div>
+
+                                                <!-- Note Content -->
+                                                <div class="note-content w-100 mt-3 p-3 bg-warning bg-opacity-10 border rounded-3 shadow-sm">
+                                                    <p class="mb-0 text-dark" style="font-style: italic; font-size: 1.1rem;">
+                                                        {{ follow_up_note.note }}
+                                                    </p>
+                                                    <small class="text-muted">
+                                                        Follow-up Note by {{ follow_up_note.created_by }} on {{ follow_up_note.created_at|date:"Y-m-d" }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
 
                                 {% if note.tags %}
                                 <div class="mt-2">
@@ -1248,6 +1261,48 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('followUpNotesContainer');
+    const callNoteId = container.getAttribute('data-call-note-id');
+
+    // Initialize Sortable.js
+    const sortable = new Sortable(container, {
+        animation: 150,
+        onEnd: function () {
+            const followUpNotes = [...container.children];
+
+            // Recalculate and update the numbers
+            followUpNotes.forEach((note, index) => {
+                const numberElement = note.querySelector('.note-number');
+                note.setAttribute('data-order', index + 1);
+                numberElement.textContent = index + 1;
+            });
+
+            // Send the updated order to the server
+            const sortedIds = followUpNotes.map(note => note.getAttribute('data-note-id'));
+            fetch(`/immigration/sort_follow_up_notes/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({
+                    call_note_id: callNoteId,
+                    sorted_ids: sortedIds
+                })
+            }).then(response => {
+                if (response.ok) {
+                    console.log('Follow-up notes reordered successfully');
+                } else {
+                    console.error('Failed to reorder follow-up notes');
+                }
+            });
+        }
+    });
+});
+</script>
 
 
 <script>

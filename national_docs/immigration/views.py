@@ -39,6 +39,7 @@ from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
 from django.db.models import Prefetch
 from django.db.models import Exists, OuterRef
+from django.db import models
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -1878,16 +1879,46 @@ def manage_follow_up_note(request, call_note_id):
         note_id = request.POST.get('note_id', None)
         note_content = request.POST.get('note', '').strip()
 
-      # Add new note
-        FollowUpNote.objects.create(
+        if note_id:  # Editing an existing note
+            follow_up_note = get_object_or_404(FollowUpNote, id=note_id, call_note=call_note)
+            follow_up_note.note = note_content
+            follow_up_note.save()
+            messages.success(request, "The follow-up note was updated successfully.")
+        else:  # Adding a new note
+            # Calculate the next sort order
+            max_sort_order = call_note.follow_up_notes.aggregate(
+                max_order=models.Max('sort_order')
+            )['max_order'] or 0
+            sort_order = max_sort_order + 1
+
+            FollowUpNote.objects.create(
                 call_note=call_note,
                 note=note_content,
-                created_by=request.user
+                created_by=request.user,
+                sort_order=sort_order
             )
+            messages.success(request, "The follow-up note was created successfully.")
 
-        # Correct redirect with app namespace if used
+        # Redirect back to the manage notes page
         return redirect('manage_follow_up_note', call_note_id=call_note.id)
 
-    messages.success(request, "The follow note was created")
+    messages.error(request, "Failed to process the request. Please try again.")
     return redirect('support_desk')
+
+@login_required
+@csrf_exempt
+def sort_follow_up_notes(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        call_note_id = data.get('call_note_id')
+        sorted_ids = data.get('sorted_ids', [])
+
+        # Update sort_order for each note
+        for order, note_id in enumerate(sorted_ids):
+            FollowUpNote.objects.filter(id=note_id, call_note_id=call_note_id).update(sort_order=order)
+
+        return JsonResponse({'status': 'success'})
+
+    return JsonResponse({'status': 'error'}, status=400)
+
 

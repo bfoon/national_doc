@@ -97,6 +97,7 @@ urlpatterns = [
     path('save_note/', views.save_note, name='save_note'),
     path('search_call_notes/', views.search_call_notes, name='search_call_notes'),
     path('manage_follow_up_note/<int:call_note_id>/', views.manage_follow_up_note, name='manage_follow_up_note'),
+    path('sort_follow_up_notes/', views.sort_follow_up_notes, name='sort_follow_up_notes'),
     path('close_chat/', views.close_chat, name='close_chat'),
 
     # ===========================

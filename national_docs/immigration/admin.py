@@ -12,7 +12,12 @@ admin.site.register(Notification)
 admin.site.register(Boot)
 admin.site.register(MessageNote)
 admin.site.register(CallNote)
-admin.site.register(FollowUpNote)
+
+@admin.register(FollowUpNote)
+class FollowUpNoteAdmin(admin.ModelAdmin):
+    list_display = ('call_note', 'note', 'created_by', 'created_at', 'sort_order')
+    list_editable = ('sort_order',)  # Allow inline editing of sort_order
+    ordering = ('sort_order', '-created_at')
 
 @admin.register(FAQCategory)
 class FAQCategoryAdmin(admin.ModelAdmin):

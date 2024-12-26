@@ -382,19 +382,22 @@ class FollowUpNote(models.Model):
     created_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='follow_up_notes',  # Updated related_name to reflect user-created notes
+        related_name='note_creator',  # Updated related_name to reflect user-created notes
         help_text="The user who created this follow-up note."
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
         help_text="Timestamp when this follow-up note was created."
     )
+    sort_order = models.PositiveIntegerField(
+        default=0,
+        help_text="Defines the order of follow-up notes for sorting."
+    )
 
     class Meta:
-        ordering = ['-created_at']  # Ensures notes are ordered by the latest first
+        ordering = ['sort_order', '-created_at']  # Default sort by order, then by creation time
         verbose_name = "Follow-Up Note"
         verbose_name_plural = "Follow-Up Notes"
 
     def __str__(self):
         return f"Follow-Up Note by {self.created_by} on {self.created_at:%Y-%m-%d}"
-
