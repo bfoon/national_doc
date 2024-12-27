@@ -236,3 +236,67 @@
     text-decoration: line-through;
     color: grey; /* Optional: makes the completed note look visually distinct */
 }
+<style>
+.message-container {
+    margin-bottom: 1rem;
+}
+
+.message-wrapper {
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.message-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.sender-info .badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    margin-left: 0.5rem;
+}
+
+.message-content {
+    padding: 1rem;
+    color: #212529;
+    line-height: 1.5;
+    word-wrap: break-word;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+/* Badge colors with better contrast */
+.badge.bg-primary {
+    background-color: #0d6efd;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.badge.bg-info {
+    background-color: #0dcaf0;
+    color: #000;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545;
+}
+
+/* Hover effect for better interactivity */
+.message-wrapper:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    transition: box-shadow 0.2s ease-in-out;
+}
+.border-danger {
+    border-color: #dc3545 !important;
+}
+
+.border-2 {
+    border-width: 2px !important;
+}

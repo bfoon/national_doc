@@ -343,20 +343,24 @@
                                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                                     <h6 class="mb-0 fw-semibold">
                                                         {{ reply.sender.get_full_name }}
-                                                        <span class="badge
-                                                            {% if reply.response_type == 'general' %}text-primary{% elif reply.response_type == 'technical' %}text-warning{% elif reply.response_type == 'inquiry' %}text-info{% elif reply.response_type == 'urgent' %}text-danger{% endif %}
-                                                            fw-semibold">
-                                                            {{ reply.get_response_type_display|title }}
-                                                        </span>
-                                                        <span> {{ reply.is_urgent }} </span>
-                                                        <span> {{ reply.requires_follow_up }} </span>
+                                                        <span class="badge {% if reply.response_type == 'general' %}bg-primary
+                                                          {% elif reply.response_type == 'technical' %}bg-warning
+                                                          {% elif reply.response_type == 'inquiry' %}bg-info
+                                                          {% elif reply.response_type == 'urgent' %}bg-danger
+                                                          {% endif %}">
+                                                        {{ reply.get_response_type_display|title }}
+                                                    </span>
+
                                                     </h6>
 
                                                     <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
                                                 </div>
-                                                <div class="message-content p-2 bg-white rounded-3 border">
+                                                <div class="message-content p-2 bg-white rounded-3 border {% if reply.is_urgent %}border-danger border-2{% endif %}">
                                                     {{ reply.message }}
                                                 </div>
+                                                    {% if reply.requires_follow_up %}
+                                                    <span class="badge text-warning float-right">Follow Up Required</span>
+                                                    {% endif %}
                                             </div>
                                         </div>
                                     </div>
