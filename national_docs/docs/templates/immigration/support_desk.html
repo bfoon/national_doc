@@ -243,7 +243,7 @@
 </div>
 </div>
 
-    <!-- Chat Messages Tab -->
+<!-- Chat Messages Tab -->
 <div class="tab-pane fade" id="chat" role="tabpanel">
 <div class="card border-0 shadow-sm">
 <!-- Chat Messages Section -->
@@ -348,6 +348,8 @@
                                                             fw-semibold">
                                                             {{ reply.get_response_type_display|title }}
                                                         </span>
+                                                        <span> {{ reply.is_urgent }} </span>
+                                                        <span> {{ reply.requires_follow_up }} </span>
                                                     </h6>
 
                                                     <small class="text-muted">{{ reply.timestamp|date:"Y-m-d H:i" }}</small>
@@ -490,39 +492,38 @@
                                 </div>
 
                               <!-- Display Follow-up Notes -->
-<div id="followUpNotesContainer" data-call-note-id="{{ note.id }}">
-    {% if note.follow_up_notes.count %}
-        {% for follow_up_note in note.follow_up_notes.all %}
-            <div class="follow-up-note d-flex align-items-center" data-note-id="{{ follow_up_note.id }}" data-order="{{ forloop.counter }}">
+                                <div id="followUpNotesContainer" data-call-note-id="{{ note.id }}">
+                                    {% if note.follow_up_notes.count %}
+                                        {% for follow_up_note in note.follow_up_notes.all %}
+                                            <div class="follow-up-note d-flex align-items-center" data-note-id="{{ follow_up_note.id }}" data-order="{{ forloop.counter }}">
 
-                <!-- Number Display -->
-                <div class="note-number bg-warning bg-opacity-25 rounded-circle d-flex justify-content-center align-items-center me-3 shadow" style="width: 40px; height: 40px;">
-                    <span>{{ forloop.counter }}</span>
-                </div>
+                                                <!-- Number Display -->
+                                                <div class="note-number bg-warning bg-opacity-25 rounded-circle d-flex justify-content-center align-items-center me-3 shadow" style="width: 40px; height: 40px;">
+                                                    <span>{{ forloop.counter }}</span>
+                                                </div>
 
-                <!-- Note Content -->
-                <div class="note-content w-100 mt-3 p-3 bg-warning bg-opacity-10 border rounded-3 shadow-sm {% if follow_up_note.completed %}text-decoration-line-through{% endif %}">
-                    <p class="mb-0 text-dark" style="font-style: italic; font-size: 1.1rem;">
-                        {{ follow_up_note.note }}
-                    </p>
-                    <small class="text-muted">
-                        Follow-up Note by {{ follow_up_note.created_by }} on {{ follow_up_note.created_at|date:"Y-m-d" }}
-                    </small>
+                                                <!-- Note Content -->
+                                                <div class="note-content w-100 mt-3 p-3 bg-warning bg-opacity-10 border rounded-3 shadow-sm {% if follow_up_note.completed %}text-decoration-line-through{% endif %}">
+                                                    <p class="mb-0 text-dark" style="font-style: italic; font-size: 1.1rem;">
+                                                        {{ follow_up_note.note }}
+                                                    </p>
+                                                    <small class="text-muted">
+                                                        Follow-up Note by {{ follow_up_note.created_by }} on {{ follow_up_note.created_at|date:"Y-m-d" }}
+                                                    </small>
 
-                    <!-- Mark as Complete Icon Button (Aligned to the right) -->
-                    <button class="btn btn-sm btn-outline-success mt-2 toggle-complete-btn ms-auto" data-note-id="{{ follow_up_note.id }}">
-                        {% if follow_up_note.completed %}
-                            <i class="fas fa-check-circle"></i>
-                        {% else %}
-                            <i class="fas fa-circle"></i>
-                        {% endif %}
-                    </button>
-                </div>
-            </div>
-        {% endfor %}
-    {% endif %}
-</div>
-
+                                                    <!-- Mark as Complete Icon Button (Aligned to the right) -->
+                                                    <button class="btn btn-sm btn-outline-success mt-2 toggle-complete-btn ms-auto" data-note-id="{{ follow_up_note.id }}">
+                                                        {% if follow_up_note.completed %}
+                                                            <i class="fas fa-check-circle"></i>
+                                                        {% else %}
+                                                            <i class="fas fa-circle"></i>
+                                                        {% endif %}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
 
                                 {% if note.tags %}
                                 <div class="mt-2">

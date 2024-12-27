@@ -1645,8 +1645,8 @@ def respond_chat(request):
             messages.error(request, "Response type is required.")
             return redirect('support_desk')
 
-        is_urgent = 'markUrgent' in request.POST  # Checkbox, True if checked
-        requires_follow_up = 'requireFollowup' in request.POST  # Checkbox, True if checked
+        is_urgent = 'mark_urgent' in request.POST  # Checkbox, True if checked
+        requires_follow_up = 'require_followup' in request.POST  # Checkbox, True if checked
 
         # Fetch the original chat message
         original_chat = get_object_or_404(ChatMessage, id=chat_id)
