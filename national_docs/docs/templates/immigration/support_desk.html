@@ -359,7 +359,7 @@
                                                     {{ reply.message }}
                                                 </div>
                                                     {% if reply.requires_follow_up %}
-                                                    <span class="badge text-warning float-right">Follow Up Required</span>
+                                                    <span class="badge text-warning float-right"><i class="fa fa-info-circle"></i> Follow Up Required</span>
                                                     {% endif %}
                                             </div>
                                         </div>
@@ -458,7 +458,7 @@
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <button class="btn btn-outline-primary btn-sm"
+                                        <button class="btn btn-sm {% if note.completed %}btn-outline-primary disabled{% else %} btn-outline-primary {% endif %}"
                                                     data-bs-toggle="modal"
                                                     data-bs-target="#followUpNoteModal"
                                                     data-note-id="{{ note.id }}"
