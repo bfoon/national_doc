@@ -191,15 +191,48 @@
                 font-size: 1.25rem;
             }
         }
+/* Number column styling */
+.number-column {
+    position: relative;
+    width: 60px; /* Fixed width for the number column */
+    margin-right: 10px; /* Space between the number column and the notes */
+}
+
+/* Number circle styling */
 .note-number {
     background-color: rgba(255, 193, 7, 0.25); /* Light yellow background */
-    color: #856404; /* Slightly darker yellow text for contrast */
+    color: #856404; /* Dark yellow for contrast */
     font-weight: bold;
     font-size: 1.2rem;
-    border-radius: 50%; /* Make it circular */
+    border-radius: 50%; /* Circular shape */
     display: flex;
     justify-content: center;
     align-items: center;
     width: 40px;
-    height: 40px; /* Ensure uniform circular size */
+    height: 40px;
+    z-index: 1; /* Ensure circles are above the line */
+    position: relative;
+}
+
+/* Note content column styling */
+.note-content-column {
+    flex-grow: 1;
+}
+/* Align the icon button to the far right */
+.toggle-complete-btn {
+    float: right;
+    background-color: transparent;
+    border: none;
+}
+
+/* Change icon style on hover */
+.toggle-complete-btn:hover {
+    cursor: pointer;
+    color: green;
+}
+
+/* Style for completed notes */
+.text-decoration-line-through {
+    text-decoration: line-through;
+    color: grey; /* Optional: makes the completed note look visually distinct */
 }

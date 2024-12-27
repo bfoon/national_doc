@@ -490,28 +490,39 @@
                                 </div>
 
                               <!-- Display Follow-up Notes -->
-                                <div id="followUpNotesContainer" data-call-note-id="{{ note.id }}">
-                                    {% if note.follow_up_notes.count %}
-                                        {% for follow_up_note in note.follow_up_notes.all %}
-                                            <div class="follow-up-note d-flex align-items-center" data-note-id="{{ follow_up_note.id }}" data-order="{{ forloop.counter }}">
-                                                <!-- Number Display -->
-                                                <div class="note-number bg-warning bg-opacity-25 rounded-circle d-flex justify-content-center align-items-center me-3" style="width: 40px; height: 40px;">
-                                                    <span>{{ forloop.counter }}</span>
-                                                </div>
+<div id="followUpNotesContainer" data-call-note-id="{{ note.id }}">
+    {% if note.follow_up_notes.count %}
+        {% for follow_up_note in note.follow_up_notes.all %}
+            <div class="follow-up-note d-flex align-items-center" data-note-id="{{ follow_up_note.id }}" data-order="{{ forloop.counter }}">
 
-                                                <!-- Note Content -->
-                                                <div class="note-content w-100 mt-3 p-3 bg-warning bg-opacity-10 border rounded-3 shadow-sm">
-                                                    <p class="mb-0 text-dark" style="font-style: italic; font-size: 1.1rem;">
-                                                        {{ follow_up_note.note }}
-                                                    </p>
-                                                    <small class="text-muted">
-                                                        Follow-up Note by {{ follow_up_note.created_by }} on {{ follow_up_note.created_at|date:"Y-m-d" }}
-                                                    </small>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    {% endif %}
-                                </div>
+                <!-- Number Display -->
+                <div class="note-number bg-warning bg-opacity-25 rounded-circle d-flex justify-content-center align-items-center me-3 shadow" style="width: 40px; height: 40px;">
+                    <span>{{ forloop.counter }}</span>
+                </div>
+
+                <!-- Note Content -->
+                <div class="note-content w-100 mt-3 p-3 bg-warning bg-opacity-10 border rounded-3 shadow-sm {% if follow_up_note.completed %}text-decoration-line-through{% endif %}">
+                    <p class="mb-0 text-dark" style="font-style: italic; font-size: 1.1rem;">
+                        {{ follow_up_note.note }}
+                    </p>
+                    <small class="text-muted">
+                        Follow-up Note by {{ follow_up_note.created_by }} on {{ follow_up_note.created_at|date:"Y-m-d" }}
+                    </small>
+
+                    <!-- Mark as Complete Icon Button (Aligned to the right) -->
+                    <button class="btn btn-sm btn-outline-success mt-2 toggle-complete-btn ms-auto" data-note-id="{{ follow_up_note.id }}">
+                        {% if follow_up_note.completed %}
+                            <i class="fas fa-check-circle"></i>
+                        {% else %}
+                            <i class="fas fa-circle"></i>
+                        {% endif %}
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+
 
                                 {% if note.tags %}
                                 <div class="mt-2">
@@ -1261,6 +1272,41 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.getElementById('followUpNotesContainer');
+
+        container.addEventListener('click', function (event) {
+            if (event.target.closest('.toggle-complete-btn')) {
+                const button = event.target.closest('.toggle-complete-btn');
+                const noteId = button.getAttribute('data-note-id');
+
+                fetch(`/immigration/toggle_follow_up_completion/${noteId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const noteDiv = button.closest('.note-content');
+                        if (data.completed) {
+                            button.innerHTML = '<i class="fas fa-check-circle"></i>'; // Change to checked circle icon
+                            noteDiv.classList.add('text-decoration-line-through');
+                        } else {
+                            button.innerHTML = '<i class="fas fa-circle"></i>'; // Change to empty circle icon
+                            noteDiv.classList.remove('text-decoration-line-through');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    });
+</script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {

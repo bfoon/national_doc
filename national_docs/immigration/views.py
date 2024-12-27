@@ -1879,31 +1879,21 @@ def manage_follow_up_note(request, call_note_id):
         note_id = request.POST.get('note_id', None)
         note_content = request.POST.get('note', '').strip()
 
-        if note_id:  # Editing an existing note
-            follow_up_note = get_object_or_404(FollowUpNote, id=note_id, call_note=call_note)
-            follow_up_note.note = note_content
-            follow_up_note.save()
-            messages.success(request, "The follow-up note was updated successfully.")
-        else:  # Adding a new note
-            # Calculate the next sort order
-            max_sort_order = call_note.follow_up_notes.aggregate(
+
+        # Calculate the next sort order
+        max_sort_order = call_note.follow_up_notes.aggregate(
                 max_order=models.Max('sort_order')
             )['max_order'] or 0
-            sort_order = max_sort_order + 1
+        sort_order = max_sort_order + 1
 
-            FollowUpNote.objects.create(
+        FollowUpNote.objects.create(
                 call_note=call_note,
                 note=note_content,
                 created_by=request.user,
                 sort_order=sort_order
             )
-            messages.success(request, "The follow-up note was created successfully.")
-
-        # Redirect back to the manage notes page
-        return redirect('manage_follow_up_note', call_note_id=call_note.id)
-
-    messages.error(request, "Failed to process the request. Please try again.")
-    return redirect('support_desk')
+        messages.success(request, "The follow-up note was created successfully.")
+        return redirect('support_desk')
 
 @login_required
 @csrf_exempt
@@ -1921,4 +1911,12 @@ def sort_follow_up_notes(request):
 
     return JsonResponse({'status': 'error'}, status=400)
 
+@login_required
+def toggle_follow_up_completion(request, note_id):
+    if request.method == 'POST':
+        follow_up_note = get_object_or_404(FollowUpNote, id=note_id)
+        follow_up_note.completed = not follow_up_note.completed
+        follow_up_note.save()
+        return JsonResponse({'success': True, 'completed': follow_up_note.completed})
+    return JsonResponse({'success': False}, status=400)
 

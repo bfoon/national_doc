@@ -373,7 +373,7 @@ class FollowUpNote(models.Model):
     call_note = models.ForeignKey(
         'CallNote',
         on_delete=models.CASCADE,
-        related_name='follow_up_notes',  # Updated related_name for clarity
+        related_name='follow_up_notes',
         help_text="The call note this follow-up note is related to."
     )
     note = models.TextField(
@@ -382,7 +382,7 @@ class FollowUpNote(models.Model):
     created_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='note_creator',  # Updated related_name to reflect user-created notes
+        related_name='note_creator',
         help_text="The user who created this follow-up note."
     )
     created_at = models.DateTimeField(
@@ -393,9 +393,13 @@ class FollowUpNote(models.Model):
         default=0,
         help_text="Defines the order of follow-up notes for sorting."
     )
+    completed = models.BooleanField(
+        default=False,
+        help_text="Indicates whether the follow-up task is completed."
+    )
 
     class Meta:
-        ordering = ['sort_order', '-created_at']  # Default sort by order, then by creation time
+        ordering = ['sort_order', '-created_at']
         verbose_name = "Follow-Up Note"
         verbose_name_plural = "Follow-Up Notes"
 
