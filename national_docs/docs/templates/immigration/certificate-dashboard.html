@@ -1,0 +1,282 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+{% load static %}
+ <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+       :root {
+            --primary-color: #4f46e5;
+            --secondary-color: #818cf8;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --light-gray: #f9fafb;
+            --dark-text: #111827;
+        }
+
+         .card {
+            border: none;
+            border-radius: 1rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .shadow-hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .shadow-hover:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .breadcrumb {
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .table {
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .table thead th {
+            background-color: var(--light-gray);
+            border-bottom: none;
+            padding: 1rem;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+
+        .stat-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+            z-index: 1;
+        }
+
+        .stat-icon {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+            font-size: 3rem;
+            opacity: 0.1;
+        }
+
+        .recent-activity {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+    </style>
+
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb px-3 py-2 mb-4">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Certificate Dashboard</li>
+                    </ol>
+                </nav>
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">Certificate Dashboard Overview</h2>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Generate Report
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4">
+                        <div class="card shadow-hover stat-card">
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-secondary mb-3">Pending Requests</h5>
+                                <h2 class="text-warning fw-bold mb-2">12</h2>
+                                <p class="text-muted mb-0">
+                                    <i class="fas fa-arrow-up text-warning me-2"></i>
+                                    <span>4% from last week</span>
+                                </p>
+                                <i class="fas fa-clock stat-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card shadow-hover stat-card">
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-secondary mb-3">Approved Certificates</h5>
+                                <h2 class="text-success fw-bold mb-2">45</h2>
+                                <p class="text-muted mb-0">
+                                    <i class="fas fa-arrow-up text-success me-2"></i>
+                                    <span>12% from last month</span>
+                                </p>
+                                <i class="fas fa-check-circle stat-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card shadow-hover stat-card">
+                            <div class="card-body p-4">
+                                <h5 class="card-title text-secondary mb-3">Rejected Requests</h5>
+                                <h2 class="text-danger fw-bold mb-2">3</h2>
+                                <p class="text-muted mb-0">
+                                    <i class="fas fa-arrow-down text-danger me-2"></i>
+                                    <span>2% from last month</span>
+                                </p>
+                                <i class="fas fa-times-circle stat-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card shadow-hover">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="card-title mb-0">Recent Certificate Requests</h5>
+                            <button class="btn btn-light">
+                                <i class="fas fa-filter me-2"></i>Filter
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Request ID</th>
+                                        <th>Type</th>
+                                        <th>Applicant</th>
+                                        <th>Submission Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>#2351</td>
+                                        <td>
+                                            <i class="fas fa-file-certificate me-2 text-primary"></i>
+                                            Birth Certificate
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{% static 'img/default_profile.png' %}"
+                                                     class="rounded-circle me-2 img-thumbnail"
+                                                     alt="avatar" style="width: 40px; height: 40px;">
+                                                John Doe
+                                            </div>
+                                        </td>
+                                        <td>Dec 26, 2024</td>
+                                        <td>
+                                            <span class="badge bg-warning">Pending</span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-primary">Review</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>#2350</td>
+                                        <td>
+                                            <i class="fas fa-file-certificate me-2 text-primary"></i>
+                                            Good Character
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                               <img src="{% static 'img/default_profile.png' %}"
+                                                    class="rounded-circle me-2 img-thumbnail"
+                                                    alt="avatar" style="width: 40px; height: 40px;">
+                                                Jane Smith
+                                            </div>
+                                        </td>
+                                        <td>Dec 26, 2024</td>
+                                        <td>
+                                            <span class="badge bg-success">Approved</span>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-secondary">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity Timeline -->
+                <div class="recent-activity mt-4">
+                    <h5 class="mb-4">Recent Activity</h5>
+                    <div class="activity-item">
+                        <div class="activity-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0"><strong>New Request</strong> - Birth Certificate request submitted by John Doe</p>
+                            <small class="text-muted">2 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div>
+                            <p class="mb-0"><strong>Certificate Approved</strong> - Good Character Certificate for Jane Smith</p>
+                            <small class="text-muted">4 hours ago</small>
+                        </div>
+                    </div>
+                </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<br>
+<br>
+<br>
+{% endblock %}

@@ -405,3 +405,11 @@ class FollowUpNote(models.Model):
 
     def __str__(self):
         return f"Follow-Up Note by {self.created_by} on {self.created_at:%Y-%m-%d}"
+
+class CustomGroup(Group):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Group"
+        verbose_name_plural = "Groups"

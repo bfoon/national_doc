@@ -13,6 +13,10 @@ admin.site.register(Boot)
 admin.site.register(MessageNote)
 admin.site.register(CallNote)
 
+@admin.register(CustomGroup)
+class CustomGroupAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at', 'updated_at')
+    search_fields = ('name',)
 @admin.register(FollowUpNote)
 class FollowUpNoteAdmin(admin.ModelAdmin):
     list_display = ('call_note', 'note', 'created_by', 'created_at', 'sort_order')

@@ -1,0 +1,47 @@
+.card {
+    border: none;
+    box-shadow: 0 0 0.875rem 0 rgba(33,37,41,.05);
+    margin-bottom: 24px;
+}
+
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.card-title {
+    color: #495057;
+    font-weight: 600;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #495057;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.form-control {
+    border-left: none;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #86b7fe;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}

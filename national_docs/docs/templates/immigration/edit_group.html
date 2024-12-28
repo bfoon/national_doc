@@ -1,5 +1,6 @@
 {% extends 'docs/header.html' %}
 {% block content %}
+{% load static %}
 <div class="container-fluid py-4 px-4">
     <!-- Page Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -99,7 +100,9 @@
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                            <a href="#" class="btn btn-danger">Remove Member</a>
+                                                           <button type="button" class="btn btn-danger remove-member-btn" data-user-id="{{ user.id }}">
+                                                                Remove Member
+                                                            </button>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -200,7 +203,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form id="addMemberForm">
+                <form method="POST" id="addMemberForm">
                     <div class="mb-3">
                         <label for="newMember" class="form-label">Select User</label>
                         <select class="form-select" id="newMember" required>
@@ -221,55 +224,7 @@
 </div>
 
 <!-- Custom CSS -->
-<style>
-.card {
-    border: none;
-    box-shadow: 0 0 0.875rem 0 rgba(33,37,41,.05);
-    margin-bottom: 24px;
-}
-
-.avatar-sm {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-}
-
-.card-title {
-    color: #495057;
-    font-weight: 600;
-}
-
-.form-label {
-    font-weight: 500;
-    color: #495057;
-}
-
-.input-group-text {
-    background-color: #f8f9fa;
-    border-right: none;
-}
-
-.form-control {
-    border-left: none;
-}
-
-.form-control:focus {
-    box-shadow: none;
-    border-color: #dee2e6;
-}
-
-.input-group:focus-within .input-group-text {
-    border-color: #86b7fe;
-}
-
-.btn {
-    padding: 0.5rem 1rem;
-    font-weight: 500;
-}
-</style>
+<link rel="stylesheet" href="{% static 'css/group_management.css' %}">
 
 <!-- Form Validation Script -->
 <script>
@@ -294,4 +249,5 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<script src="{% static 'js/group_management.js' %}"></script>
 {% endblock %}

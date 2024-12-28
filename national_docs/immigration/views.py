@@ -624,6 +624,7 @@ def create_group(request):
     groups = Group.objects.all()
     return render(request, 'immigration/create_group.html', {'groups': groups})
 
+
 @login_required
 def edit_group(request, group_id):
     # Ensure that only superusers can edit groups
@@ -632,21 +633,63 @@ def edit_group(request, group_id):
         return redirect('list_officer_users')
 
     group = get_object_or_404(Group, id=group_id)
+    available_users = OfficerProfile.objects.exclude(user__groups=group).order_by('user__username')
+    group_members = OfficerProfile.objects.filter(user__groups=group).order_by('user__username')
 
     if request.method == 'POST':
-        group_name = request.POST.get('group_name')
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            action = request.POST.get('action')
+            user_id = request.POST.get('user_id')
 
+            if not user_id:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'No user specified.'
+                }, status=400)
+
+            try:
+
+
+                if action == 'remove':
+                    officer_profile = OfficerProfile.objects.get(user__id=user_id)
+                    officer_profile.user.groups.remove(group)
+                    send_notification(officer_profile.user, f"You have been removed from group {group.name}.")
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': f'{officer_profile.user.get_full_name()} was removed from the group successfully.'
+                    })
+                elif action == 'add':
+                    officer_profile = OfficerProfile.objects.get(id=user_id)
+                    officer_profile.user.groups.add(group)
+                    send_notification(officer_profile.user, f"You have been added to group {group.name}.")
+                    return JsonResponse({
+                        'status': 'success',
+                        'message': f'{officer_profile.user.get_full_name()} was added to the group successfully.'
+                    })
+
+            except OfficerProfile.DoesNotExist:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Officer profile not found.'
+                }, status=404)
+
+        # Regular form submission for group name update
+        group_name = request.POST.get('group_name')
         if Group.objects.filter(name=group_name).exclude(id=group_id).exists():
             messages.error(request, 'Group name already exists.')
         else:
             group.name = group_name
             group.save()
-            user = request.user  # Assuming the current user is the one to notify
+            user = request.user
             send_notification(user, f"Group {group_name} was updated.")
             messages.success(request, f'Group "{group_name}" updated successfully.')
             return redirect('list_officer_users')
 
-    return render(request, 'immigration/edit_group.html', {'group': group})
+    return render(request, 'immigration/edit_group.html', {
+        'group': group,
+        'available_users': available_users,
+        'group_members': group_members,
+    })
 
 @login_required
 def delete_group(request, group_id):
@@ -1718,7 +1761,7 @@ def close_chat(request):
 
 @login_required
 def birth_certificate_request(request):
-    return render(request, 'immigration/birth_certificate_request.html')
+    return render(request, 'immigration/certificate-dashboard.html')
 
 @login_required
 def get_user_application(request, user_id):
