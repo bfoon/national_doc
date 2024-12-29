@@ -498,25 +498,197 @@
 
 <!-- Payment Token Verification Modal -->
 <div class="modal fade" id="paymentTokenModal" tabindex="-1" aria-labelledby="paymentTokenModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentTokenModalLabel">Payment Token Verification</h5>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom-0 bg-light">
+                <h5 class="modal-title fw-bold" id="paymentTokenModalLabel">
+                    <i class="bi bi-shield-lock me-2"></i>
+                    Payment Verification
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
+                <div class="text-muted mb-4">
+                    Please enter the 6-character verification token sent to your registered email address.
+                </div>
+
                 <form id="tokenVerificationForm">
-                    <div class="mb-3">
-                        <label for="paymentToken" class="form-label">Enter Payment Token</label>
-                        <input type="text" class="form-control" id="paymentToken" name="paymentToken" required>
+                    <div class="token-input-group mb-4">
+                        <label for="paymentToken" class="form-label small text-muted">Verification Token</label>
+                        <div class="position-relative">
+                            <input type="text"
+                                class="form-control form-control-lg text-center letter-spacing-2 fw-bold"
+                                id="paymentToken"
+                                name="paymentToken"
+                                maxlength="6"
+                                autocomplete="off"
+                                placeholder="ENTER6"
+                                required>
+                            <div class="invalid-feedback">
+                                Please enter a valid 6-character token
+                            </div>
+                            <div id="tokenSpinner" class="position-absolute top-50 end-0 translate-middle-y me-2 d-none">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Verifying...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Verify Token</button>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg" id="verifyButton">
+                            Verify Token
+                        </button>
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+                    </div>
                 </form>
-                <div id="tokenVerificationMessage" class="mt-3"></div>
+
+                <div id="tokenVerificationMessage" class="mt-4 text-center"></div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Custom styles for the token modal */
+    .letter-spacing-2 {
+        letter-spacing: 2px;
+    }
+
+    #paymentToken {
+        font-family: 'Courier New', monospace;
+        transition: all 0.2s ease-in-out;
+    }
+
+    #paymentToken:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        border-color: #0d6efd;
+    }
+
+    .token-input-group {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    /* Custom animation for success/error messages */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-slide {
+        animation: slideIn 0.3s ease-out forwards;
+    }
+</style>
+
+<script>
+    // Handle modal show event - set application type
+    $('#paymentTokenModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const applicationType = button.data('application-type');
+        const modal = $(this);
+        modal.data('application-type', applicationType);
+
+        // Reset form and message when modal opens
+        const form = document.getElementById('tokenVerificationForm');
+        const messageDiv = document.getElementById('tokenVerificationMessage');
+        form.reset();
+        messageDiv.innerHTML = '';
+    });
+
+    // Format token input
+    document.getElementById('paymentToken').addEventListener('input', function(e) {
+        this.value = this.value.slice(0, 6).toUpperCase();
+        this.classList.remove('is-invalid');
+        document.getElementById('tokenVerificationMessage').innerHTML = '';
+    });
+
+    // Handle form submission
+    document.getElementById('tokenVerificationForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const paymentToken = document.getElementById('paymentToken').value;
+        const messageContainer = document.getElementById('tokenVerificationMessage');
+        const applicationType = $('#paymentTokenModal').data('application-type');
+        const spinner = document.getElementById('tokenSpinner');
+        const verifyButton = document.getElementById('verifyButton');
+
+        // Show loading state
+        spinner.classList.remove('d-none');
+        verifyButton.disabled = true;
+
+        // Send request to verify token
+        fetch('/verify-token/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: JSON.stringify({ token: paymentToken }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                messageContainer.innerHTML = `
+                    <div class="alert alert-success alert-slide d-flex align-items-center">
+                        <i class="bi bi-check-circle me-2"></i>
+                        Token verified successfully!
+                    </div>`;
+
+                // Handle redirect based on application type
+                setTimeout(() => {
+                    switch(applicationType) {
+                        case 'national-id':
+                            window.location.href = "{% url 'apply_national_id' %}";
+                            break;
+                        case 'resident-permit':
+                            window.location.href = "{% url 'apply_resident_permit' %}";
+                            break;
+                        case 'work-permit':
+                            window.location.href = "{% url 'apply_work_permit' %}";
+                            break;
+                    }
+                    $('#paymentTokenModal').modal('hide');
+                }, 1000);
+            } else {
+                messageContainer.innerHTML = `
+                    <div class="alert alert-danger alert-slide d-flex align-items-center">
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        ${data.error || 'Invalid token. Please try again.'}
+                    </div>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            messageContainer.innerHTML = `
+                <div class="alert alert-danger alert-slide d-flex align-items-center">
+                    <i class="bi bi-exclamation-circle me-2"></i>
+                    There was an error verifying the token.
+                </div>`;
+        })
+        .finally(() => {
+            // Hide loading state
+            spinner.classList.add('d-none');
+            verifyButton.disabled = false;
+        });
+    });
+
+    // Reset form when modal is closed
+    $('#paymentTokenModal').on('hidden.bs.modal', function() {
+        const form = document.getElementById('tokenVerificationForm');
+        const messageDiv = document.getElementById('tokenVerificationMessage');
+        form.reset();
+        messageDiv.innerHTML = '';
+    });
+</script>
 
 <!-- Modal for Viewing Application Details -->
 <div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">
@@ -788,58 +960,6 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.error("No valid token found for National ID, Resident Permit, or Work Permit.");
     }
-
-</script>
-<script>
-// When the modal is shown, set the application type
-$('#paymentTokenModal').on('show.bs.modal', function (event) {
-    const button = $(event.relatedTarget); // Button that triggered the modal
-    const applicationType = button.data('application-type'); // Extract application type
-    const modal = $(this);
-    modal.data('application-type', applicationType); // Store application type in modal data
-});
-
-// Function to verify the payment token
-document.getElementById('tokenVerificationForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const paymentToken = document.getElementById('paymentToken').value;
-    const messageContainer = document.getElementById('tokenVerificationMessage');
-    const applicationType = $('#paymentTokenModal').data('application-type'); // Get application type from modal
-
-    // Send an AJAX request to verify the payment token
-    fetch('/verify-token/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}',  // Include CSRF token
-        },
-        body: JSON.stringify({ token: paymentToken }),
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            messageContainer.innerHTML = `<div class="alert alert-success">Token verified successfully!</div>`;
-
-            // Redirect based on application type
-            if (applicationType === 'national-id') {
-                window.location.href = "{% url 'apply_national_id' %}";
-            } else if (applicationType === 'resident-permit') {
-                window.location.href = "{% url 'apply_resident_permit' %}";
-            } else if (applicationType === 'work-permit') {
-                window.location.href = "{% url 'apply_work_permit' %}";
-            }
-
-            $('#paymentTokenModal').modal('hide');  // Close modal on success
-        } else {
-            messageContainer.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        messageContainer.innerHTML = `<div class="alert alert-danger">There was an error verifying the token.</div>`;
-    });
-});
 
 </script>
 
