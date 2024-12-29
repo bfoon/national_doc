@@ -105,4 +105,5 @@ urlpatterns = [
     # Birth Certificate Requests
     # ===========================
     path('birth_certificate_request/', views.birth_certificate_request, name='birth_certificate_request'),
+    path('certificate_detail/', views.certificate_detail, name='certificate_detail'),
 ]

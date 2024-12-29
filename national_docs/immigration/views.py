@@ -1764,6 +1764,11 @@ def birth_certificate_request(request):
     return render(request, 'immigration/certificate-dashboard.html')
 
 @login_required
+def certificate_detail(request):
+    return render(request, 'immigration/certificate-detail.html')
+
+
+@login_required
 def get_user_application(request, user_id):
     try:
         # Fetch the latest application for the user

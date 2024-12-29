@@ -1,0 +1,137 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+{% load static %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/certificate-detail.css' %}">
+ <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb px-3 py-2 mb-4">
+                        <li class="breadcrumb-item">
+                            <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a>
+                           <li class="breadcrumb-item"><a href="{% url 'birth_certificate_request' %}" class="text-decoration-none">Certificate dashboard</a></li>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">Certificate Detail</li>
+                    </ol>
+                </nav>
+
+                <!-- Header with Request Info -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2>Review Certificate Request #2351</h2>
+                        <p class="text-muted">Submitted on December 26, 2024 at 14:30</p>
+                    </div>
+                    <div class="badge bg-warning fs-6">Pending Review</div>
+                </div>
+
+                <div class="row">
+                    <!-- Certificate Preview -->
+                    <div class="col-lg-8">
+                        <div class="certificate">
+                            <div class="certificate-header">
+                                <h2>Certificate of Birth</h2>
+                                <div class="certificate-seal">SEAL</div>
+                            </div>
+                            <div class="mb-3">
+                                <p class="text-center">This is to certify that</p>
+                                <p class="text-center"><strong>John Michael Doe</strong></p>
+                                <p class="text-center">was born on</p>
+                                <p class="text-center"><strong>March 15, 1990</strong></p>
+                                <p class="text-center">in</p>
+                                <p class="text-center"><strong>Central Hospital, New York City</strong></p>
+                                <p class="text-center">to</p>
+                                <p class="text-center">
+                                    <strong>Robert Doe</strong> (Father) and <strong>Sarah Doe</strong> (Mother)
+                                </p>
+                                <p class="text-center mt-3">
+                                    Sex: <strong>Male</strong><br>
+                                    Time of Birth: <strong>08:45 AM</strong><br>
+                                    Birth Registration Number: <strong>NYC-1990-03-15-4527</strong>
+                                </p>
+                            </div>
+                            <div class="signature-line">
+                                <p>Dr. James Wilson<br>Registrar of Vital Statistics</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review Panel -->
+                    <div class="col-lg-4">
+                        <div class="review-section p-4">
+                            <h4 class="mb-4">Review Details</h4>
+
+                            <!-- Applicant Information -->
+                            <div class="mb-4">
+                                <h5>Applicant Information</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>Name:</strong> John Michael Doe</li>
+                                    <li><strong>Email:</strong> john.doe@email.com</li>
+                                    <li><strong>Phone:</strong> (555) 123-4567</li>
+                                    <li><strong>Purpose:</strong> Passport Application</li>
+                                </ul>
+                            </div>
+
+                            <!-- Supporting Documents -->
+                            <div class="supporting-docs mb-4">
+                                <h5>Supporting Documents</h5>
+                                <div class="doc-preview">
+                                    <i class="fas fa-file-pdf me-2"></i>
+                                    Hospital Record.pdf
+                                    <button class="btn btn-sm btn-link">View</button>
+                                </div>
+                                <div class="doc-preview">
+                                    <i class="fas fa-file-image me-2"></i>
+                                    ID Proof.jpg
+                                    <button class="btn btn-sm btn-link">View</button>
+                                </div>
+                            </div>
+
+                            <!-- Verification Checklist -->
+                            <div class="verification-checklist mb-4">
+                                <h5>Verification Checklist</h5>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="check1">
+                                    <label class="form-check-label" for="check1">
+                                        All required documents provided
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="check2">
+                                    <label class="form-check-label" for="check2">
+                                        Information matches records
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="check3">
+                                    <label class="form-check-label" for="check3">
+                                        ID verification complete
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Review Notes -->
+                            <div class="mb-4">
+                                <h5>Review Notes</h5>
+                                <textarea class="form-control" rows="3" placeholder="Add your review notes here..."></textarea>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success">
+                                    <i class="fas fa-check me-2"></i>Approve Certificate
+                                </button>
+                                <button class="btn btn-danger">
+                                    <i class="fas fa-times me-2"></i>Reject Request
+                                </button>
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-clock me-2"></i>Request More Information
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+         <br>
+         <br>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+{% endblock %}
