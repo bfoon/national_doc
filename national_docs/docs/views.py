@@ -8,6 +8,7 @@ from .models import (NationalIDApplication,
                      WorkPermitApplication, Profile, ChatMessage, ExtendOrPrint)
 from django.core.files.storage import FileSystemStorage
 from immigration.models import PostLocation, Fulfiller, FAQ, OfficerProfile
+from finance.models import Token, TokenLog, UserRisk
 from django.db import transaction
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
@@ -26,6 +27,7 @@ from django.conf import settings
 from django.core.mail import send_mail
 from datetime import timedelta
 import datetime
+from django.http import JsonResponse, HttpResponseForbidden
 
 
 def landing_page(request):
@@ -381,10 +383,25 @@ def verify_edit_profile_otp(request):
 @transaction.atomic
 def apply_national_id(request):
     # Check if the user has an ongoing application
-    existing_application = Application.objects.filter(user=request.user, status__in=['pending', 'processing', 'waiting', 'interview']).exists()
+    existing_application = Application.objects.filter(user=request.user, status__in=['pending', 'processing', 'waiting',
+                                                                                     'interview']).exists()
 
     if existing_application:
-        messages.warning(request, "You already have an ongoing application. Please complete or cancel it before applying for another service.")
+        messages.warning(request,
+                         "You already have an ongoing application. Please complete or cancel it before applying for another service.")
+        return redirect('dashboard')
+
+    # Check if the user's account is marked as risky
+    risk, created = UserRisk.objects.get_or_create(user=request.user)
+    if risk.is_risky:
+        messages.error(request,
+                       "Your account is marked as risky due to multiple failed attempts. Please resolve this before proceeding.")
+        return redirect('dashboard')
+
+    # Check if there is a verification log for this user
+    verification_log_exists = TokenLog.objects.filter(token__user=request.user, activity='Token verified').exists()
+    if not verification_log_exists:
+        messages.error(request, "You need to verify your payment token before proceeding with the application.")
         return redirect('dashboard')
 
     # Prevent foreign nationals from applying for a National ID
@@ -440,7 +457,12 @@ def apply_national_id(request):
                 status='open',  # Default status for the fulfiller
                 progress=0  # Default progress
             )
+            # Try to retrieve the token, checking if it's not already used
+            token = Token.objects.select_for_update().get(user=request.user, is_used=False)
 
+            # Mark the token as verified
+            token.is_used = True
+            token.save()
             messages.success(request, "Your National ID application has been submitted.")
             return redirect('dashboard')
 
@@ -462,11 +484,26 @@ def apply_resident_permit(request):
         messages.warning(request, "Nationals cannot apply for a resident permit.")
         return redirect('dashboard')
 
-    # Check if the user has an ongoing application
-    existing_application = Application.objects.filter(user=request.user, status__in=['pending', 'processing', 'waiting', 'interview']).exists()
+        # Check if the user has an ongoing application
+    existing_application = Application.objects.filter(user=request.user, status__in=['pending', 'processing', 'waiting',
+                                                                                     'interview']).exists()
 
     if existing_application:
-        messages.warning(request, "You already have an ongoing application. Please complete or cancel it before applying for another service.")
+        messages.warning(request,
+                         "You already have an ongoing application. Please complete or cancel it before applying for another service.")
+        return redirect('dashboard')
+
+    # Check if the user's account is marked as risky
+    risk, created = UserRisk.objects.get_or_create(user=request.user)
+    if risk.is_risky:
+        messages.error(request,
+                       "Your account is marked as risky due to multiple failed attempts. Please resolve this before proceeding.")
+        return redirect('dashboard')
+
+    # Check if there is a verification log for this user
+    verification_log_exists = TokenLog.objects.filter(token__user=request.user, activity='Token verified').exists()
+    if not verification_log_exists:
+        messages.error(request, "You need to verify your payment token before proceeding with the application.")
         return redirect('dashboard')
 
     # Get available post locations
@@ -524,7 +561,12 @@ def apply_resident_permit(request):
                     status='open',  # Default status for the fulfiller
                     progress=0  # Default progress
                 )
+                # Try to retrieve the token, checking if it's not already used
+                token = Token.objects.select_for_update().get(user=request.user, is_used=False)
 
+                # Mark the token as verified
+                token.is_used = True
+                token.save()
                 messages.success(request, "Your Resident Permit application has been submitted.")
                 return redirect('dashboard')
 
@@ -550,6 +592,19 @@ def apply_work_permit(request):
 
     if existing_application:
         messages.warning(request, "You already have an ongoing application. Please complete or cancel it before applying for another service.")
+        return redirect('dashboard')
+
+    # Check if the user's account is marked as risky
+    risk, created = UserRisk.objects.get_or_create(user=request.user)
+    if risk.is_risky:
+        messages.error(request,
+                        "Your account is marked as risky due to multiple failed attempts. Please resolve this before proceeding.")
+        return redirect('dashboard')
+
+    # Check if there is a verification log for this user
+    verification_log_exists = TokenLog.objects.filter(token__user=request.user, activity='Token verified').exists()
+    if not verification_log_exists:
+        messages.error(request, "You need to verify your payment token before proceeding with the application.")
         return redirect('dashboard')
 
     if request.method == 'POST':
@@ -596,7 +651,12 @@ def apply_work_permit(request):
                 status='open',  # Default status for the fulfiller
                 progress=0  # Default progress
             )
+            # Try to retrieve the token, checking if it's not already used
+            token = Token.objects.select_for_update().get(user=request.user, is_used=False)
 
+            # Mark the token as verified
+            token.is_used = True
+            token.save()
             messages.success(request, "Your Work Permit application has been submitted.")
             return redirect('dashboard')
 
@@ -772,3 +832,62 @@ def faq_list(request):
 @login_required
 def manage_appointments(request):
     return render(request, 'docs/manage_appointments.html')
+
+
+@csrf_exempt
+def verify_token(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON format."}, status=400)
+
+        token_value = data.get("token")
+        ip_address = get_client_ip(request)
+
+        if not token_value:
+            return JsonResponse({"error": "Token is required"}, status=400)
+
+        # Get or create the user risk object
+        risk, created = UserRisk.objects.get_or_create(user=request.user)
+
+        # Check if account is marked as risky before proceeding
+        if risk.is_risky:
+            return JsonResponse({"error": "Account is marked as risky due to multiple failed attempts."}, status=403)
+
+        try:
+            with transaction.atomic():
+                # Try to retrieve the token, checking if it's not already used
+                token = Token.objects.select_for_update().get(token=token_value, is_used=False)
+
+                # Create a log for successful verification
+                TokenLog.objects.create(token=token, ip_address=ip_address, activity="Token verified")
+
+                # Return success response
+                return JsonResponse({"success": True, "token": token.token, "amount": token.amount})
+
+        except Token.DoesNotExist:
+            # Log failed attempt if the token is invalid or already used
+            TokenLog.objects.create(token=None, ip_address=ip_address,
+                                    activity=f"Failed attempt with token {token_value}")
+
+            # Increment failed attempts and mark account as risky if necessary
+            risk.increment_failed_attempts()
+
+            # If account reaches the threshold, mark it as risky
+            if risk.is_risky:
+                return JsonResponse({"error": "Account is marked as risky due to multiple failed attempts."},
+                                    status=403)
+
+            return JsonResponse({"error": "Invalid or already used token."}, status=404)
+
+    return HttpResponseForbidden("Invalid request method.")
+
+def get_client_ip(request):
+    """Helper function to get the client's IP address."""
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(",")[0]
+    else:
+        ip = request.META.get("REMOTE_ADDR")
+    return ip

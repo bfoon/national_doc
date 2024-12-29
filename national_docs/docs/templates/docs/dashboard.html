@@ -129,12 +129,18 @@
                         <i class="fas fa-eye"></i> View Details
                     </a>
                     {% if national_id_application.application.status == 'completed' %}
-                         <a href="{% url 'apply_extend_or_reprint' national_id_application.application.id %}" class="btn btn-sm btn-secondary mb-2">
+                         <a href="#"
+                           class="btn btn-sm btn-secondary mb-2"
+                           data-toggle="modal"
+                           data-target="#paymentTokenModal">
                             <i class="fas fa-plus-circle"></i> Extend/re-print
                         </a>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'apply_national_id' %}" class="btn btn-sm btn-primary mb-2">
+                    <a href="#"
+                       class="btn btn-sm btn-primary mb-2"
+                       data-toggle="modal"
+                       data-target="#paymentTokenModal">
                         <i class="fas fa-plus-circle"></i> Start Application
                     </a>
                 {% endif %}
@@ -144,76 +150,83 @@
         </div>
 
         <!-- Resident Permit Section -->
-        <div class="dashboard-item {% if not resident_permit_application %}dashboard-item-empty{% endif %}">
-            <div class="dashboard-item-header">
-                <i class="fas fa-home"></i>
-                <h3>Resident Permit</h3>
-            </div>
-            <div class="dashboard-item-content">
-                <div class="status-indicator">
-                    <span class="status-label">Status:</span>
-                    <span class="status
-                        {% if resident_permit_application %}
-                            {% if resident_permit_application.application.status == 'waiting' %}text-warning
-                            {% elif resident_permit_application.application.status == 'completed' %}text-success
-                            {% else %}text-info
-                            {% endif %}
-                        {% else %}text-muted{% endif %}">
-                        {% if resident_permit_application %}
-                            {{ resident_permit_application.application.status|capfirst }}
-                        {% else %}
-                            Not Applied
-                        {% endif %}
-                    </span>
-                </div>
-
-                <div class="document-requirements">
-                    <h4>Required Documents</h4>
-                    <ul>
-                        <li>
-                            <i class="fas fa-passport"></i> Passport
-                            {% if resident_permit_application and resident_permit_application.passport %}
-                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <i class="fas fa-plane-arrival"></i> Proof of Entry
-                            {% if resident_permit_application and resident_permit_application.entry_proof %}
-                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
-                            {% endif %}
-                        </li>
-                        <li>
-                            <i class="fas fa-file-contract"></i> Purpose of Stay
-                            {% if resident_permit_application and resident_permit_application.purpose_document %}
-                                <span class="text-success"><i class="fas fa-check-circle"></i></span>
-                            {% endif %}
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="dashboard-item-actions">
-                    {% if resident_permit_application %}
-                        <a href="#" class="btn btn-sm btn-info mb-2"
-                           data-toggle="modal"
-                           data-target="#applicationModal"
-                           data-application-id="{{ resident_permit_application.application.id }}"
-                           data-application-type="Resident Permit"
-                           data-fetch-url="{% url 'fetch_application_details' %}">
-                            <i class="fas fa-eye"></i> View Details
-                        </a>
-                     {% if resident_permit_application.application.status == 'completed' %}
-                     <a href="{% url 'apply_extend_or_reprint' resident_permit_application.application.id %}" class="btn btn-sm btn-secondary mb-2">
-                            <i class="fas fa-plus-circle"></i> Extend/re-print
-                        </a>
+<div class="dashboard-item {% if not resident_permit_application %}dashboard-item-empty{% endif %}">
+    <div class="dashboard-item-header">
+        <i class="fas fa-id-card"></i>
+        <h3>Resident Permit</h3>
+    </div>
+    <div class="dashboard-item-content">
+        <div class="status-indicator">
+            <span class="status-label">Status:</span>
+            <span class="status
+                {% if resident_permit_application %}
+                    {% if resident_permit_application.application.status == 'waiting' %}text-warning
+                    {% elif resident_permit_application.application.status == 'completed' %}text-success
+                    {% else %}text-info
                     {% endif %}
-                    {% else %}
-                        <a href="{% url 'apply_resident_permit' %}" class="btn btn-sm btn-primary">
-                            <i class="fas fa-plus-circle"></i> Start Application
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
+                {% else %}text-muted{% endif %}">
+                {% if resident_permit_application %}
+                    {{ resident_permit_application.application.status|capfirst }}
+                {% else %}
+                    Not Applied
+                {% endif %}
+            </span>
         </div>
+
+        <div class="document-requirements">
+            <h4>Required Documents</h4>
+            <ul>
+                <li>
+                    <i class="fas fa-file-alt"></i> Birth Certificate
+                    {% if resident_permit_application and resident_permit_application.birth_certificate %}
+                        <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                    {% endif %}
+                </li>
+                <li>
+                    <i class="fas fa-map-marker-alt"></i> Proof of Address
+                    {% if resident_permit_application and resident_permit_application.proof_of_address %}
+                        <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                    {% endif %}
+                </li>
+                <li>
+                    <i class="fas fa-camera"></i> Passport Photo
+                    {% if resident_permit_application and resident_permit_application.passport_photo %}
+                        <span class="text-success"><i class="fas fa-check-circle"></i></span>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="dashboard-item-actions">
+        {% if resident_permit_application %}
+            <a href="#" class="btn btn-sm btn-info mb-2"
+               data-toggle="modal"
+               data-target="#applicationModal"
+               data-application-id="{{ resident_permit_application.application.id }}"
+               data-application-type="Resident Permit"
+               data-fetch-url="{% url 'fetch_application_details' %}">
+                <i class="fas fa-eye"></i> View Details
+            </a>
+            {% if resident_permit_application.application.status == 'completed' %}
+                <a href="#" class="btn btn-sm btn-secondary mb-2"
+                   data-toggle="modal"
+                   data-target="#paymentTokenModal">
+                    <i class="fas fa-plus-circle"></i> Extend/re-print
+                </a>
+            {% endif %}
+        {% else %}
+            <!-- Resident Permit Section -->
+            <a href="#" class="btn btn-sm btn-primary mb-2"
+               data-toggle="modal"
+               data-target="#paymentTokenModal"
+               data-application-type="resident-permit">
+                <i class="fas fa-plus-circle"></i> Start Application
+            </a>
+        {% endif %}
+    </div>
+</div>
+
 
         <!-- Work Permit Section -->
         <div class="dashboard-item {% if not work_permit_application %}dashboard-item-empty{% endif %}">
@@ -281,7 +294,11 @@
                         {% endif %}
 
                     {% else %}
-                        <a href="{% url 'apply_work_permit' %}" class="btn btn-sm btn-primary">
+                        <!-- Work Permit Section -->
+                        <a href="#" class="btn btn-sm btn-primary mb-2"
+                           data-toggle="modal"
+                           data-target="#paymentTokenModal"
+                           data-application-type="work-permit">
                             <i class="fas fa-plus-circle"></i> Start Application
                         </a>
                     {% endif %}
@@ -478,6 +495,29 @@
     </div>
 
 <script src="{% static 'js/dashboard.js' %}"></script>
+
+<!-- Payment Token Verification Modal -->
+<div class="modal fade" id="paymentTokenModal" tabindex="-1" aria-labelledby="paymentTokenModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentTokenModalLabel">Payment Token Verification</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="tokenVerificationForm">
+                    <div class="mb-3">
+                        <label for="paymentToken" class="form-label">Enter Payment Token</label>
+                        <input type="text" class="form-control" id="paymentToken" name="paymentToken" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verify Token</button>
+                </form>
+                <div id="tokenVerificationMessage" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Modal for Viewing Application Details -->
 <div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -750,6 +790,60 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 </script>
+<script>
+// When the modal is shown, set the application type
+$('#paymentTokenModal').on('show.bs.modal', function (event) {
+    const button = $(event.relatedTarget); // Button that triggered the modal
+    const applicationType = button.data('application-type'); // Extract application type
+    const modal = $(this);
+    modal.data('application-type', applicationType); // Store application type in modal data
+});
+
+// Function to verify the payment token
+document.getElementById('tokenVerificationForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const paymentToken = document.getElementById('paymentToken').value;
+    const messageContainer = document.getElementById('tokenVerificationMessage');
+    const applicationType = $('#paymentTokenModal').data('application-type'); // Get application type from modal
+
+    // Send an AJAX request to verify the payment token
+    fetch('/verify-token/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}',  // Include CSRF token
+        },
+        body: JSON.stringify({ token: paymentToken }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            messageContainer.innerHTML = `<div class="alert alert-success">Token verified successfully!</div>`;
+
+            // Redirect based on application type
+            if (applicationType === 'national-id') {
+                window.location.href = "{% url 'apply_national_id' %}";
+            } else if (applicationType === 'resident-permit') {
+                window.location.href = "{% url 'apply_resident_permit' %}";
+            } else if (applicationType === 'work-permit') {
+                window.location.href = "{% url 'apply_work_permit' %}";
+            }
+
+            $('#paymentTokenModal').modal('hide');  // Close modal on success
+        } else {
+            messageContainer.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        messageContainer.innerHTML = `<div class="alert alert-danger">There was an error verifying the token.</div>`;
+    });
+});
+
+</script>
+
+
 
 
 <footer class="fixed-footer">

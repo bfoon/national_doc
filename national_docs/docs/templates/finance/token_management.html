@@ -1,0 +1,285 @@
+{% extends 'docs/header.html' %}
+{% block content %}
+{% load static %}
+
+<style>
+    .token-card {
+        border: none;
+        box-shadow: 0 0 20px rgba(0,0,0,0.05);
+        transition: transform 0.2s;
+    }
+
+    .token-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .log-entry {
+        border-left: 4px solid transparent;
+        transition: background-color 0.2s;
+    }
+
+    .log-entry:hover {
+        background-color: #f8f9fa;
+    }
+
+    .log-entry.generated {
+        border-left-color: #0d6efd;
+    }
+
+    .log-entry.verified {
+        border-left-color: #198754;
+    }
+
+    .token-badge {
+        font-family: monospace;
+        letter-spacing: 1px;
+    }
+
+    .alert-float {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1050;
+        min-width: 300px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-6 mb-3">Token Management</h1>
+            <p class="text-muted">Generate and verify transaction tokens</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Generate Token Card -->
+        <div class="col-md-6">
+            <div class="card token-card">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">Generate Token</h5>
+                    <form id="generateTokenForm" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="user" class="form-label">Select User</label>
+                            <select id="user" name="user" class="form-select" required>
+                                <option value="">Choose user...</option>
+                                {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-4">
+                            <label for="amount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" id="amount" name="amount"
+                                    class="form-control"
+                                    placeholder="0.00"
+                                    step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            Generate Token
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Verify Token Card -->
+        <div class="col-md-6">
+            <div class="card token-card">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">Verify Token</h5>
+                    <form id="verifyTokenForm">
+                        <div class="mb-4">
+                            <label for="token" class="form-label">Token</label>
+                            <input type="text" id="token" name="token"
+                                class="form-control form-control-lg text-center token-badge"
+                                maxlength="6"
+                                placeholder="000000" required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            Verify Token
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="row mt-4">
+        <div class="col">
+            <div class="card token-card">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4">Transaction History</h5>
+                    <div id="tokenLogs">
+                        {% if token_logs %}
+                            {% for log in token_logs %}
+                                <div class="log-entry p-3 mb-2 rounded {{ log.action|lower }}">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="fw-bold">{{ log.user.username }}</span>
+                                            <span class="text-muted mx-1">•</span>
+                                            <span class="token-badge">{{ log.token }}</span>
+                                            <span class="text-muted mx-1">•</span>
+                                            <span class="text-muted">${{ log.token.amount }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="badge {% if log.action == 'Generated' %}bg-primary{% else %}bg-success{% endif %}">
+                                                {{ log.action }}
+                                            </span>
+                                            <small class="text-muted ms-2">{{ log.created_at|date:"Y-m-d H:i" }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center py-4">No transaction history available</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const csrfToken = "{{ csrf_token }}";
+
+    // Show notification
+    function showNotification(message, type = 'success') {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-float alert-dismissible fade show`;
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+
+        setTimeout(() => {
+            alert.classList.remove('show');
+            setTimeout(() => alert.remove(), 150);
+        }, 5000);
+    }
+
+    // Generate token
+    document.getElementById('generateTokenForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch("/finance/generate-token/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": csrfToken,
+                },
+                body: new URLSearchParams({
+                    user: this.user.value,
+                    amount: this.amount.value
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification(`Token generated successfully: ${data.token}`);
+                this.reset();
+                updateTokenLog(data);
+            } else {
+                showNotification(data.error || 'Failed to generate token', 'danger');
+            }
+        } catch (error) {
+            showNotification('An unexpected error occurred', 'danger');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Verify token
+    document.getElementById('verifyTokenForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+
+        try {
+            const response = await fetch("/finance/verify-token/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfToken,
+                },
+                body: JSON.stringify({ token: this.token.value })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification(`Token verified successfully. Amount: $${data.amount}`);
+                this.reset();
+                updateTokenLog(data);
+            } else {
+                showNotification(data.error || 'Invalid token', 'danger');
+            }
+        } catch (error) {
+            showNotification('An unexpected error occurred', 'danger');
+        } finally {
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Update token log
+    function updateTokenLog(data) {
+        const tokenLogs = document.getElementById('tokenLogs');
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry p-3 mb-2 rounded ${data.action.toLowerCase()}`;
+
+        const timestamp = new Date().toLocaleString();
+        logEntry.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="fw-bold">${data.user || 'User'}</span>
+                    <span class="text-muted mx-1">•</span>
+                    <span class="token-badge">${data.token}</span>
+                    <span class="text-muted mx-1">•</span>
+                    <span class="text-muted">$${data.amount}</span>
+                </div>
+                <div>
+                    <span class="badge ${data.action === 'Generated' ? 'bg-primary' : 'bg-success'}">
+                        ${data.action}
+                    </span>
+                    <small class="text-muted ms-2">${timestamp}</small>
+                </div>
+            </div>
+        `;
+
+        if (tokenLogs.firstChild) {
+            tokenLogs.insertBefore(logEntry, tokenLogs.firstChild);
+        } else {
+            tokenLogs.appendChild(logEntry);
+        }
+    }
+
+    // Input formatting
+    document.getElementById('token').addEventListener('input', function() {
+        this.value = this.value.slice(0, 6).toUpperCase();
+    });
+
+    document.getElementById('amount').addEventListener('input', function() {
+        if (this.value.length > 0) {
+            this.value = parseFloat(this.value).toFixed(2);
+        }
+    });
+</script>
+
+{% endblock %}

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'docs',
     'immigration',
     'system_admin',
+    'finance',
 
 ]
 
