@@ -48,9 +48,103 @@
         min-width: 300px;
         box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
+    .pagination .page-link {
+    color: #0d6efd;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin: 0 2px;
+    border-radius: 4px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.pagination .page-link:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: transparent;
+}
+
+.pagination .page-item.disabled .page-link {
+    background-color: transparent;
+    border-color: transparent;
+}
 </style>
 
 <div class="container py-5">
+    <!-- Dashboard Cards -->
+<div class="row g-4 mb-4">
+    <!-- Total Tokens Card -->
+    <div class="col-md-3">
+        <div class="card token-card">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Tokens</h6>
+                        <h3 class="mb-0 fw-bold">{{ total_tokens|default:"0" }}</h3>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded">
+                        <i class="bi bi-credit-card text-primary fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Verified Tokens Card -->
+    <div class="col-md-3">
+        <div class="card token-card">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Used Tokens</h6>
+                        <h3 class="mb-0 fw-bold">{{ used_tokens|default:"0" }}</h3>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded">
+                        <i class="bi bi-check-circle text-success fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Tokens Card -->
+    <div class="col-md-3">
+        <div class="card token-card">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Pending Tokens</h6>
+                        <h3 class="mb-0 fw-bold">{{ pending_tokens|default:"0" }}</h3>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded">
+                        <i class="bi bi-hourglass-split text-warning fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Amount Card -->
+    <div class="col-md-3">
+        <div class="card token-card">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-2">Total Amount</h6>
+                        <h3 class="mb-0 fw-bold">D{{ total_amount|default:"0"|floatformat:2 }}</h3>
+                    </div>
+                    <div class="bg-info bg-opacity-10 p-3 rounded">
+                        <i class="bi bi-currency-dollar text-info fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
     <div class="row mb-4">
         <div class="col">
             <h1 class="display-6 mb-3">Token Management</h1>
@@ -115,42 +209,88 @@
         </div>
     </div>
 
-    <!-- Transaction History -->
-    <div class="row mt-4">
-        <div class="col">
-            <div class="card token-card">
-                <div class="card-body p-4">
-                    <h5 class="card-title mb-4">Transaction History</h5>
-                    <div id="tokenLogs">
-                        {% if token_logs %}
-                            {% for log in token_logs %}
-                                <div class="log-entry p-3 mb-2 rounded {{ log.action|lower }}">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="fw-bold">{{ log.user.username }}</span>
-                                            <span class="text-muted mx-1">•</span>
-                                            <span class="token-badge">{{ log.token }}</span>
-                                            <span class="text-muted mx-1">•</span>
-                                            <span class="text-muted">${{ log.token.amount }}</span>
-                                        </div>
-                                        <div>
-                                            <span class="badge {% if log.action == 'Generated' %}bg-primary{% else %}bg-success{% endif %}">
-                                                {{ log.action }}
-                                            </span>
-                                            <small class="text-muted ms-2">{{ log.created_at|date:"Y-m-d H:i" }}</small>
-                                        </div>
+   <!-- Transaction History -->
+<div class="row mt-4">
+    <div class="col">
+        <div class="card token-card">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-4">Transaction History</h5>
+                <div id="tokenLogs">
+                    {% if token_logs %}
+                        {% for log in token_logs %}
+                            <div class="log-entry p-3 mb-2 rounded {{ log.action|lower }}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="fw-bold">{{ log.user.username }}</span>
+                                        <span class="text-muted mx-1">•</span>
+                                        <span class="token-badge">{{ log.token }}</span>
+                                        <span class="text-muted mx-1">•</span>
+                                        <span class="text-muted">${{ log.token.amount }}</span>
+                                    </div>
+                                    <div>
+                                        <span class="badge {% if log.action == 'Generated' %}bg-primary{% else %}bg-success{% endif %}">
+                                            {{ log.action }}
+                                        </span>
+                                        <small class="text-muted ms-2">{{ log.created_at|date:"Y-m-d H:i" }}</small>
                                     </div>
                                 </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="text-muted text-center py-4">No transaction history available</p>
+                            </div>
+                        {% endfor %}
+
+                        <!-- Pagination -->
+                        {% if token_logs.has_other_pages %}
+                        <div class="d-flex justify-content-center mt-4">
+                            <nav aria-label="Transaction history pagination">
+                                <ul class="pagination">
+                                    {% if token_logs.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ token_logs.previous_page_number }}" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link" aria-hidden="true">&laquo;</span>
+                                        </li>
+                                    {% endif %}
+
+                                    {% for num in token_logs.paginator.page_range %}
+                                        {% if token_logs.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if token_logs.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ token_logs.next_page_number }}" aria-label="Next">
+                                                <span aria-hidden="true">&raquo;</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link" aria-hidden="true">&raquo;</span>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
                         {% endif %}
-                    </div>
+
+                    {% else %}
+                        <p class="text-muted text-center py-4">No transaction history available</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+<br>
 
 <script>
     const csrfToken = "{{ csrf_token }}";
