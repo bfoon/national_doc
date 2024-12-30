@@ -2,6 +2,7 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import User
 from django.db import IntegrityError, transaction
+from django.utils.crypto import get_random_string
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -89,6 +90,112 @@ class Application(models.Model):
         elif self.tin_applications.exists():
             return "TIN"
         return "Unknown Service"
+
+
+class Certification(models.Model):
+    CERTIFICATE_TYPES = [
+        ('birth', 'Birth Certificate'),
+        ('character', 'Certificate of Character'),
+        ('marriage', 'Marriage Certificate'),
+        ('death', 'Death Certificate'),
+        ('academic', 'Academic Certificate'),
+    ]
+
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
+    certificate_type = models.CharField(max_length=20, choices=CERTIFICATE_TYPES)
+    applicant_name = models.CharField(max_length=255)
+    applicant_email = models.EmailField()
+    applicant_phone = models.CharField(max_length=20)
+    purpose = models.TextField()
+    submission_date = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    submitted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='certifications_submitted')
+    approved_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, related_name='certifications_approved', null=True, blank=True
+    )
+
+    def __str__(self):
+        return f"{self.get_certificate_type_display()} - {self.applicant_name}"
+
+class CertificationAttachment(models.Model):
+    ATTACHMENT_TYPES = [
+            ('hospital_record', 'Hospital Record'),
+            ('id_proof', 'ID Proof'),
+            ('other', 'Other'),
+    ]
+
+    certification = models.ForeignKey(Certification, on_delete=models.CASCADE, related_name='attachments')
+    attachment_type = models.CharField(max_length=20, choices=ATTACHMENT_TYPES)
+    file = models.FileField(upload_to='documents/certification_attachments/')
+    description = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return f"{self.get_attachment_type_display()} for {self.certification}"
+
+
+class BirthRegistration(models.Model):
+    certification = models.OneToOneField(Certification, on_delete=models.CASCADE, related_name='birth_registration')
+    date_of_birth = models.DateField()
+    place_of_birth = models.CharField(max_length=255)
+    time_of_birth = models.TimeField()
+    father_name = models.CharField(max_length=255)
+    mother_name = models.CharField(max_length=255)
+    sex = models.CharField(max_length=10)
+    birth_registration_number = models.CharField(max_length=50, unique=True, editable=False)
+
+    def save(self, *args, **kwargs):
+        if not self.birth_registration_number:
+            # Generate a unique birth registration number
+            dob_str = self.date_of_birth.strftime('%Y%m%d')  # e.g., '19900315'
+            initials = ''.join([word[0].upper() for word in self.place_of_birth.split()[:2]])  # e.g., 'NY'
+            random_suffix = get_random_string(6, '0123456789')  # e.g., '4527'
+            self.birth_registration_number = f"{dob_str}-{initials}-{random_suffix}"
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Birth Registration for {self.father_name} and {self.mother_name}'s child"
+
+class MarriageDetails(models.Model):
+    certification = models.OneToOneField(Certification, on_delete=models.CASCADE, related_name='marriage_details')
+    spouse1_name = models.CharField(max_length=255)
+    spouse2_name = models.CharField(max_length=255)
+    marriage_date = models.DateField()
+    marriage_registration_number = models.CharField(max_length=50, unique=True, editable=False)
+
+    def __str__(self):
+        return f"Marriage Certificate for {self.spouse1_name} and {self.spouse2_name}"
+
+class DeathDetails(models.Model):
+    certification = models.OneToOneField(Certification, on_delete=models.CASCADE, related_name='death_details')
+    full_name = models.CharField(max_length=255)
+    date_of_death = models.DateField()
+    place_of_death = models.CharField(max_length=255)
+    cause_of_death = models.TextField()
+
+    def __str__(self):
+        return f"Death Certificate for {self.full_name}"
+
+class CharacterCertificate(models.Model):
+    certification = models.OneToOneField(Certification, on_delete=models.CASCADE, related_name='character_certificate')
+    full_name = models.CharField(max_length=255)
+    good_moral_character = models.TextField()
+
+    def __str__(self):
+        return f"Certificate of Character for {self.full_name}"
+
+class AcademicCertificate(models.Model):
+    certification = models.OneToOneField(Certification, on_delete=models.CASCADE, related_name='academic_certificate')
+    full_name = models.CharField(max_length=255)
+    course = models.CharField(max_length=255)
+    date_of_completion = models.DateField()
+
+    def __str__(self):
+        return f"Academic Certificate for {self.full_name} in {self.course}"
 
 
 class NationalIDApplication(models.Model):

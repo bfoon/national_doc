@@ -3,72 +3,280 @@
 {% load static %}
 
 <style>
-    .token-card {
-        border: none;
-        box-shadow: 0 0 20px rgba(0,0,0,0.05);
-        transition: transform 0.2s;
-    }
+:root {
+    --primary-color: #4f46e5;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --info-color: #3b82f6;
+    --border-radius: 12px;
+    --transition-speed: 0.3s;
+}
 
-    .token-card:hover {
-        transform: translateY(-2px);
-    }
-
-    .form-control:focus {
-        border-color: #0d6efd;
-        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-    }
-
-    .log-entry {
-        border-left: 4px solid transparent;
-        transition: background-color 0.2s;
-    }
-
-    .log-entry:hover {
-        background-color: #f8f9fa;
-    }
-
-    .log-entry.generated {
-        border-left-color: #0d6efd;
-    }
-
-    .log-entry.verified {
-        border-left-color: #198754;
-    }
-
-    .token-badge {
-        font-family: monospace;
-        letter-spacing: 1px;
-    }
-
-    .alert-float {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        z-index: 1050;
-        min-width: 300px;
-        box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }
-    .pagination .page-link {
-    color: #0d6efd;
+/* Card Styles */
+.token-card {
     border: none;
-    padding: 0.5rem 1rem;
-    margin: 0 2px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: all var(--transition-speed) ease-in-out;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.token-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Dashboard Cards */
+.card-body {
+    padding: 1.5rem;
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: all var(--transition-speed);
+}
+
+.card-icon i {
+    font-size: 1.5rem;
+}
+
+/* Form Controls */
+.form-control, .form-select {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all var(--transition-speed);
+    font-size: 0.95rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+}
+
+.input-group-text {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all var(--transition-speed);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #4338ca;
+    transform: translateY(-1px);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #059669;
+    transform: translateY(-1px);
+}
+
+/* Transaction History */
+.log-entry {
+    border-left: 4px solid transparent;
+    border-radius: 8px;
+    transition: all var(--transition-speed);
+    margin-bottom: 0.75rem;
+    background-color: #f9fafb;
+}
+
+.log-entry:hover {
+    background-color: #f3f4f6;
+}
+
+.log-entry.generated {
+    border-left-color: var(--primary-color);
+}
+
+.log-entry.verified {
+    border-left-color: var(--success-color);
+}
+
+.token-badge {
+    font-family: 'SF Mono', 'Roboto Mono', monospace;
+    letter-spacing: 1.5px;
+    background-color: #f3f4f6;
+    padding: 0.25rem 0.5rem;
     border-radius: 4px;
 }
 
+/* Pagination */
+.pagination {
+    gap: 0.25rem;
+}
+
+.pagination .page-link {
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    color: #4b5563;
+    font-weight: 500;
+}
+
 .pagination .page-item.active .page-link {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
+    background-color: var(--primary-color);
+    color: white;
 }
 
-.pagination .page-link:hover {
-    background-color: rgba(13, 110, 253, 0.1);
-    border-color: transparent;
+.pagination .page-link:hover:not(.active) {
+    background-color: #f3f4f6;
+    color: var(--primary-color);
 }
 
-.pagination .page-item.disabled .page-link {
-    background-color: transparent;
-    border-color: transparent;
+/* Alerts */
+.alert-float {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1050;
+    min-width: 300px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 1rem 1.5rem;
+    border: none;
+}
+
+.alert-success {
+    background-color: #ecfdf5;
+    color: #065f46;
+}
+
+.alert-danger {
+    background-color: #fef2f2;
+    color: #991b1b;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .token-card {
+        margin-bottom: 1rem;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .alert-float {
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        min-width: auto;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+
+    .token-card {
+        background-color: #374151;
+    }
+
+    .form-control, .form-select {
+        background-color: #1f2937;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+
+    .input-group-text {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+
+    .log-entry {
+        background-color: #374151;
+    }
+
+    .log-entry:hover {
+        background-color: #4b5563;
+    }
+
+    .token-badge {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+
+    .text-muted {
+        color: #9ca3af !important;
+    }
+}
+    /* Searchable Select Styles */
+.select-search-container {
+    position: relative;
+}
+
+.select-search-input {
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+.select-search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    display: none;
+}
+
+.select-search-dropdown.show {
+    display: block;
+}
+
+.select-search-option {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.select-search-option:hover {
+    background-color: #f8f9fa;
+}
+
+.select-search-option.highlighted {
+    background-color: #e9ecef;
+}
+
+.select-search-no-results {
+    padding: 0.5rem 1rem;
+    color: #6c757d;
+    text-align: center;
 }
 </style>
 
@@ -229,7 +437,7 @@
                                     </div>
                                     <div>
                                         <span class="badge {% if log.action == 'Generated' %}bg-primary{% else %}bg-success{% endif %}">
-                                            {{ log.action }}
+                                            {{ log.activity}}
                                         </span>
                                         <small class="text-muted ms-2">{{ log.created_at|date:"Y-m-d H:i" }}</small>
                                     </div>

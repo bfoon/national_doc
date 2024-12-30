@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from docs.models import Application, UploadedDocument, ChatMessage
+from docs.models import Application, UploadedDocument, ChatMessage, Certification
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile, Notification,
                      FAQ, FAQCategory, CallNote, MessageNote, FollowUpNote)
@@ -40,6 +40,10 @@ from django.views.decorators.http import require_POST
 from django.db.models import Prefetch
 from django.db.models import Exists, OuterRef
 from django.db import models
+from datetime import timedelta
+from django.utils.timezone import now
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -1760,12 +1764,134 @@ def close_chat(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 @login_required
-def birth_certificate_request(request):
-    return render(request, 'immigration/certificate-dashboard.html')
+def certificate_request(request):
+    certifications = Certification.objects.all()
+
+    # Current counts
+    pending_count = certifications.filter(status='pending').count()
+    approved_count = certifications.filter(status='approved').count()
+    rejected_count = certifications.filter(status='rejected').count()
+
+    # Calculate date ranges
+    today = now()
+    last_week = today - timedelta(weeks=1)
+    last_month = today - timedelta(days=30)
+
+    # Previous period counts for comparison
+    last_week_pending = certifications.filter(status='pending', submission_date__range=(last_week, today)).count()
+    last_week_approved = certifications.filter(status='approved', submission_date__range=(last_week, today)).count()
+    last_week_rejected = certifications.filter(status='rejected', submission_date__range=(last_week, today)).count()
+
+    last_month_pending = certifications.filter(status='pending', submission_date__range=(last_month, today)).count()
+    last_month_approved = certifications.filter(status='approved', submission_date__range=(last_month, today)).count()
+    last_month_rejected = certifications.filter(status='rejected', submission_date__range=(last_month, today)).count()
+
+    # Calculate percentage changes
+    def calculate_percentage_change(current, previous):
+        if previous == 0:
+            return 0  # Avoid division by zero
+        return round(((current - previous) / previous) * 100, 2)
+
+    pending_change_week = calculate_percentage_change(pending_count, last_week_pending)
+    approved_change_week = calculate_percentage_change(approved_count, last_week_approved)
+    rejected_change_week = calculate_percentage_change(rejected_count, last_week_rejected)
+
+    pending_change_month = calculate_percentage_change(pending_count, last_month_pending)
+    approved_change_month = calculate_percentage_change(approved_count, last_month_approved)
+    rejected_change_month = calculate_percentage_change(rejected_count, last_month_rejected)
+
+    # Determine arrow directions
+    pending_arrow_week = 'up' if pending_change_week >= 0 else 'down'
+    approved_arrow_week = 'up' if approved_change_week >= 0 else 'down'
+    rejected_arrow_week = 'up' if rejected_change_week >= 0 else 'down'
+
+    pending_arrow_month = 'up' if pending_change_month >= 0 else 'down'
+    approved_arrow_month = 'up' if approved_change_month >= 0 else 'down'
+    rejected_arrow_month = 'up' if rejected_change_month >= 0 else 'down'
+
+    # Recent activity
+    recent_activity = certifications.order_by('-submission_date')[:5]
+
+    return render(request, 'immigration/certificate-dashboard.html', {
+        'certifications': certifications,
+        'pending_count': pending_count,
+        'approved_count': approved_count,
+        'rejected_count': rejected_count,
+        'pending_change_week': pending_change_week,
+        'approved_change_week': approved_change_week,
+        'rejected_change_week': rejected_change_week,
+        'pending_change_month': pending_change_month,
+        'approved_change_month': approved_change_month,
+        'rejected_change_month': rejected_change_month,
+        'pending_arrow_week': pending_arrow_week,
+        'approved_arrow_week': approved_arrow_week,
+        'rejected_arrow_week': rejected_arrow_week,
+        'pending_arrow_month': pending_arrow_month,
+        'approved_arrow_month': approved_arrow_month,
+        'rejected_arrow_month': rejected_arrow_month,
+        'recent_activity': recent_activity,
+    })
 
 @login_required
-def certificate_detail(request):
-    return render(request, 'immigration/certificate-detail.html')
+def certificate_detail(request, cert_id):
+    # Fetch the certificate
+    certificate = get_object_or_404(Certification, id=cert_id)
+
+    # Initialize related_data and qr_url
+    related_data = None
+    qr_url = None
+
+    # Fetch related data based on certificate type
+    if certificate.certificate_type == 'birth':
+        related_data = getattr(certificate, 'birth_registration', None)
+
+        if related_data and hasattr(related_data, 'birth_registration_number'):  # Check if birth registration number exists
+            # Generate QR code for birth registration number
+            qr = qrcode.make(related_data.birth_registration_number)
+            qr_io = BytesIO()
+            qr.save(qr_io, format='PNG')
+            qr_io.seek(0)
+
+            # Save QR code to a temporary file in the media folder
+            file_name = f"birth_registration_qr_{certificate.id}.png"
+            path = default_storage.save(f"documents/{file_name}", ContentFile(qr_io.read()))
+            qr_url = default_storage.url(path)
+
+    elif certificate.certificate_type == 'marriage':
+        related_data = getattr(certificate, 'marriage_details', None)
+    elif certificate.certificate_type == 'death':
+        related_data = getattr(certificate, 'death_details', None)
+    elif certificate.certificate_type == 'character':
+        related_data = getattr(certificate, 'character_certificate', None)
+    elif certificate.certificate_type == 'academic':
+        related_data = getattr(certificate, 'academic_certificate', None)
+
+    # Fetch supporting documents for the certificate
+    supporting_documents = certificate.attachments.all()
+
+    # Add qr_url directly to the context with a fallback value if None
+    return render(request, 'immigration/certificate-detail.html', {
+        'certificate': certificate,
+        'related_data': related_data,
+        'supporting_documents': supporting_documents,
+        'qr_url': qr_url if qr_url is not None else '',  # Ensure qr_url is never None
+    })
+
+
+@login_required
+def approve_certificate(request, cert_id):
+    certification = get_object_or_404(Certification, id=cert_id)
+
+    if certification.status == 'approved':
+        messages.info(request, "This certificate is already approved.")
+        return redirect('certificate_dashboard')
+
+    certification.status = 'approved'
+    certification.approved_by = request.user
+    certification.save()
+
+    messages.success(request, f"Certificate {certification.get_certificate_type_display()} has been approved.")
+    return redirect('certificate_dashboard')
 
 
 @login_required

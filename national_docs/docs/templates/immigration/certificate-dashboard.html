@@ -1,171 +1,155 @@
 {% extends 'docs/header.html' %}
 {% block content %}
 {% load static %}
- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/certificate-dashboard.css' %}">
 
-                <!-- Breadcrumb -->
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb px-3 py-2 mb-4">
-                        <li class="breadcrumb-item">
-                            <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">Certificate Dashboard</li>
-                    </ol>
-                </nav>
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb px-3 py-2 mb-4">
+        <li class="breadcrumb-item">
+            <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Certificate Dashboard</li>
+    </ol>
+</nav>
 
-                <!-- Header -->
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 class="mb-0">Certificate Dashboard Overview</h2>
-                    <button class="btn btn-primary">
-                        <i class="fas fa-download me-2"></i>Generate Report
-                    </button>
-                </div>
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Certificate Dashboard Overview</h2>
+    <button class="btn btn-primary">
+        <i class="fas fa-download me-2"></i>Generate Report
+    </button>
+</div>
 
-                <!-- Stats Cards -->
-                <div class="row g-4 mb-4">
-                    <div class="col-md-4">
-                        <div class="card shadow-hover stat-card">
-                            <div class="card-body p-4">
-                                <h5 class="card-title text-secondary mb-3">Pending Requests</h5>
-                                <h2 class="text-warning fw-bold mb-2">12</h2>
-                                <p class="text-muted mb-0">
-                                    <i class="fas fa-arrow-up text-warning me-2"></i>
-                                    <span>4% from last week</span>
-                                </p>
-                                <i class="fas fa-clock stat-icon"></i>
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-hover stat-card">
+            <div class="card-body p-4">
+                <h5 class="card-title text-secondary mb-3">Pending Requests</h5>
+                <h2 class="text-warning fw-bold mb-2">{{ pending_count }}</h2>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-arrow-{{ pending_arrow_week }} text-warning me-2"></i>
+                    {{ pending_change_week }}% from last week
+                </p>
+                <i class="fas fa-clock stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-hover stat-card">
+            <div class="card-body p-4">
+                <h5 class="card-title text-secondary mb-3">Approved Certificates</h5>
+                <h2 class="text-success fw-bold mb-2">{{ approved_count }}</h2>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-arrow-{{ approved_arrow_month }} text-success me-2"></i>
+                    {{ approved_change_month }}% from last month
+                </p>
+                <i class="fas fa-check-circle stat-icon"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-hover stat-card">
+            <div class="card-body p-4">
+                <h5 class="card-title text-secondary mb-3">Rejected Requests</h5>
+                <h2 class="text-danger fw-bold mb-2">{{ rejected_count }}</h2>
+                <p class="text-muted mb-0">
+                    <i class="fas fa-arrow-{{ rejected_arrow_month }} text-danger me-2"></i>
+                    {{ rejected_change_month }}% from last month
+                </p>
+                <i class="fas fa-times-circle stat-icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Recent Certificate Requests Table -->
+<div class="card shadow-hover">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0">Recent Certificate Requests</h5>
+            <button class="btn btn-light">
+                <i class="fas fa-filter me-2"></i>Filter
+            </button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Type</th>
+                        <th>Applicant</th>
+                        <th>Submission Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cert in certifications %}
+                    <tr>
+                        <td>#{{ cert.id }}</td>
+                        <td>
+                            <i class="fas fa-file-certificate me-2 text-primary"></i>
+                            {{ cert.get_certificate_type_display }}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="{% static 'img/default_profile.png' %}" class="rounded-circle me-2 img-thumbnail"
+                                     alt="avatar" style="width: 40px; height: 40px;">
+                                {{ cert.applicant_name }}
                             </div>
-                        </div>
-                    </div>
+                        </td>
+                        <td>{{ cert.submission_date|date:"M d, Y" }}</td>
+                        <td>
+                            {% if cert.status == 'pending' %}
+                            <span class="badge bg-warning">Pending</span>
+                            {% elif cert.status == 'approved' %}
+                            <span class="badge bg-success">Approved</span>
+                            {% else %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'certificate_detail' cert.id %}" class="btn btn-sm btn-secondary">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No certificate requests available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
-                    <div class="col-md-4">
-                        <div class="card shadow-hover stat-card">
-                            <div class="card-body p-4">
-                                <h5 class="card-title text-secondary mb-3">Approved Certificates</h5>
-                                <h2 class="text-success fw-bold mb-2">45</h2>
-                                <p class="text-muted mb-0">
-                                    <i class="fas fa-arrow-up text-success me-2"></i>
-                                    <span>12% from last month</span>
-                                </p>
-                                <i class="fas fa-check-circle stat-icon"></i>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <div class="card shadow-hover stat-card">
-                            <div class="card-body p-4">
-                                <h5 class="card-title text-secondary mb-3">Rejected Requests</h5>
-                                <h2 class="text-danger fw-bold mb-2">3</h2>
-                                <p class="text-muted mb-0">
-                                    <i class="fas fa-arrow-down text-danger me-2"></i>
-                                    <span>2% from last month</span>
-                                </p>
-                                <i class="fas fa-times-circle stat-icon"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="card shadow-hover">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="card-title mb-0">Recent Certificate Requests</h5>
-                            <button class="btn btn-light">
-                                <i class="fas fa-filter me-2"></i>Filter
-                            </button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Request ID</th>
-                                        <th>Type</th>
-                                        <th>Applicant</th>
-                                        <th>Submission Date</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>#2351</td>
-                                        <td>
-                                            <i class="fas fa-file-certificate me-2 text-primary"></i>
-                                            Birth Certificate
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img src="{% static 'img/default_profile.png' %}"
-                                                     class="rounded-circle me-2 img-thumbnail"
-                                                     alt="avatar" style="width: 40px; height: 40px;">
-                                                John Doe
-                                            </div>
-                                        </td>
-                                        <td>Dec 26, 2024</td>
-                                        <td>
-                                            <span class="badge bg-warning">Pending</span>
-                                        </td>
-                                        <td>
-                                            <a href="/immigration/certificate_detail" class="btn btn-sm btn-primary">Review</a>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>#2350</td>
-                                        <td>
-                                            <i class="fas fa-file-certificate me-2 text-primary"></i>
-                                            Good Character
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                               <img src="{% static 'img/default_profile.png' %}"
-                                                    class="rounded-circle me-2 img-thumbnail"
-                                                    alt="avatar" style="width: 40px; height: 40px;">
-                                                Jane Smith
-                                            </div>
-                                        </td>
-                                        <td>Dec 26, 2024</td>
-                                        <td>
-                                            <span class="badge bg-success">Approved</span>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-sm btn-secondary">View</button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Activity Timeline -->
-                <div class="recent-activity mt-4">
-                    <h5 class="mb-4">Recent Activity</h5>
-                    <div class="activity-item">
-                        <div class="activity-icon bg-primary bg-opacity-10 text-primary">
-                            <i class="fas fa-plus"></i>
-                        </div>
-                        <div>
-                            <p class="mb-0"><strong>New Request</strong> - Birth Certificate request submitted by John Doe</p>
-                            <small class="text-muted">2 hours ago</small>
-                        </div>
-                    </div>
-                    <div class="activity-item">
-                        <div class="activity-icon bg-success bg-opacity-10 text-success">
-                            <i class="fas fa-check"></i>
-                        </div>
-                        <div>
-                            <p class="mb-0"><strong>Certificate Approved</strong> - Good Character Certificate for Jane Smith</p>
-                            <small class="text-muted">4 hours ago</small>
-                        </div>
-                    </div>
-                </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+<!-- Recent Activity Timeline -->
+<div class="recent-activity mt-4">
+    <h5 class="mb-4">Recent Activity</h5>
+    {% for activity in recent_activity %}
+    <div class="activity-item">
+        <div class="activity-icon bg-primary bg-opacity-10 text-primary">
+            <i class="fas fa-plus"></i>
+        </div>
+        <div>
+            <p class="mb-0">
+                <strong>{{ activity.get_certificate_type_display }}</strong> - {{ activity.applicant_name }}'s request
+            </p>
+            <small class="text-muted">{{ activity.submission_date|timesince }} ago</small>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 <br>
 <br>
 <br>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
