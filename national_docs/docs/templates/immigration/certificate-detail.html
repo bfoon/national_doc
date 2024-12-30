@@ -64,7 +64,7 @@
 <div class="row">
     <!-- Certificate Preview -->
     <div class="col-lg-8">
-        <div class="certificate">
+        <div class="certificate" id="certificateToPrint">
             <div class="certificate-header">
                 <h2>{{ certificate.get_certificate_type_display }}</h2>
                 <div class="certificate-seal">SEAL</div>
@@ -123,8 +123,13 @@
                 <img src="{{ qr_url }}" alt="QR Code" class="qr-code">
             {% endif %}
         </div>
-    </div>
 
+    <!-- Print Button -->
+       <button class="btn btn-primary" onclick="window.location.href='{% url 'print_certificate' certificate.id %}'">
+            <i class="fas fa-print me-2"></i>Print Certificate
+        </button>
+
+    </div>
     <!-- Review Panel -->
     <div class="col-lg-4">
         <div class="review-section p-4">
@@ -203,6 +208,5 @@
 </div>
 <br>
 <br>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

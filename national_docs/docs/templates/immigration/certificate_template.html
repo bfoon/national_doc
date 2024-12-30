@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate</title>
+    <style>
+        .certificate-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #000;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .certificate-header {
+            margin-bottom: 30px;
+        }
+        .certificate-seal {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-size: 2rem;
+            font-weight: bold;
+            color: red;
+            padding: 20px;
+            background: url('/media/Coat_of_arms_of_The_Gambia.svg') no-repeat center center;
+            background-size: contain;
+            margin-bottom: 20px;
+        }
+        .signature-line {
+            border-top: 1px solid #000;
+            margin-top: 2rem;
+            padding-top: 0.5rem;
+            text-align: center;
+        }
+        .certificate-seal::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .certificate-body {
+            margin-top: 20px;
+            font-size: 1.2rem;
+        }
+        .qr-code {
+            margin-top: 30px;
+            width: 100px;
+            height: 100px;
+        }
+        .signature {
+            margin-top: 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="certificate-container">
+        <div class="certificate-header">
+            <h2>{{ certificate.get_certificate_type_display }}</h2>
+            <div class="certificate-seal">SEAL</div>
+        </div>
+
+        <div class="certificate-body">
+            {% if certificate.certificate_type == 'birth' %}
+                <p>This is to certify that</p>
+                <p><strong>{{ certificate.birth_registration.full_name }}</strong></p>
+                <p>was born on</p>
+                <p><strong>{{ certificate.birth_registration.date_of_birth|date:"F d, Y" }}</strong></p>
+                <p>in</p>
+                <p><strong>{{ certificate.birth_registration.place_of_birth }}</strong></p>
+                <p>to</p>
+                <p><strong>{{ certificate.birth_registration.father_name }}</strong> (Father) and <strong>{{ certificate.birth_registration.mother_name }}</strong> (Mother)</p>
+                <p>Sex: <strong>{{ certificate.birth_registration.sex }}</strong><br>
+                    Time of Birth: <strong>{{ certificate.birth_registration.time_of_birth }}</strong><br>
+                    Birth Registration Number: <strong>{{ certificate.birth_registration.birth_registration_number }}</strong>
+                </p>
+            {% elif certificate.certificate_type == 'marriage' %}
+                <p>This is to certify the marriage of</p>
+                <p><strong>{{ certificate.marriage_registration.spouse1_name }}</strong></p>
+                <p>and</p>
+                <p><strong>{{ certificate.marriage_registration.spouse2_name }}</strong></p>
+                <p>on</p>
+                <p><strong>{{ certificate.marriage_registration.marriage_date|date:"F d, Y" }}</strong></p>
+            {% elif certificate.certificate_type == 'death' %}
+                <p>This is to certify the death of</p>
+                <p><strong>{{ certificate.death_registration.full_name }}</strong></p>
+                <p>on</p>
+                <p><strong>{{ certificate.death_registration.date_of_death|date:"F d, Y" }}</strong></p>
+                <p>at</p>
+                <p><strong>{{ certificate.death_registration.place_of_death }}</strong></p>
+            {% elif certificate.certificate_type == 'character' %}
+                <p>This is to certify that</p>
+                <p><strong>{{ certificate.character_registration.full_name }}</strong></p>
+                <p>has a record of good moral character as per our records.</p>
+            {% elif certificate.certificate_type == 'academic' %}
+                <p>This is to certify that</p>
+                <p><strong>{{ certificate.academic_registration.full_name }}</strong></p>
+                <p>has successfully completed the requirements for</p>
+                <p><strong>{{ certificate.academic_registration.course }}</strong></p>
+                <p>on</p>
+                <p><strong>{{ certificate.academic_registration.date_of_completion|date:"F d, Y" }}</strong></p>
+            {% else %}
+                <p>No details available for this certificate type.</p>
+            {% endif %}
+        </div>
+
+        <div class="signature signature-line">
+            <p>Approved by: <strong>{{ certificate.approved_by.get_full_name }}</strong><br>Registrar of Vital Statistics</p>
+        </div>
+
+        {% if qr_url %}
+            <div>
+                <img src="{{ qr_url }}" alt="QR Code" class="qr-code">
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

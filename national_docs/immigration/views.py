@@ -24,7 +24,6 @@ from io import BytesIO
 import base64
 import tempfile
 from django.template.loader import get_template
-from weasyprint import HTML
 from django.templatetags.static import static
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
@@ -34,7 +33,7 @@ from django.conf import settings
 from django.views.decorators.http import require_http_methods
 from django.utils.text import slugify
 import logging
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import require_POST
 from django.db.models import Prefetch
@@ -44,6 +43,8 @@ from datetime import timedelta
 from django.utils.timezone import now
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.template.loader import render_to_string
+from weasyprint import HTML, CSS
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -1876,6 +1877,62 @@ def certificate_detail(request, cert_id):
         'supporting_documents': supporting_documents,
         'qr_url': qr_url if qr_url is not None else '',  # Ensure qr_url is never None
     })
+
+def get_related_data(certificate):
+    if certificate.certificate_type == 'birth':
+        return certificate.birth_registration  # Assuming this is a related model
+    elif certificate.certificate_type == 'marriage':
+        return certificate.marriage_details  # Assuming this is a related model
+    elif certificate.certificate_type == 'death':
+        return certificate.death_details  # Assuming this is a related model
+    elif certificate.certificate_type == 'character':
+        return certificate.character_certificate  # Assuming this is a related model
+    elif certificate.certificate_type == 'academic':
+        return certificate.academic_certificate  # Assuming this is a related model
+    else:
+        return None
+
+def generate_qr_code(certificate):
+    if hasattr(certificate, 'birth_registration') and certificate.birth_registration:
+        birth_registration_number = certificate.birth_registration.birth_registration_number
+    else:
+        raise ValueError("No related birth registration data found for this certificate.")
+
+    qr = qrcode.make(birth_registration_number)
+    qr_image_io = BytesIO()
+    qr.save(qr_image_io)
+    qr_image_io.seek(0)
+
+    qr_filename = f"qr_code_{birth_registration_number}.png"
+    qr_file = ContentFile(qr_image_io.getvalue())
+    saved_path = default_storage.save(f"qr_codes/{qr_filename}", qr_file)
+
+    # Absolute file path
+    absolute_path = default_storage.path(saved_path)
+
+    return absolute_path
+
+
+
+def print_certificate(request, certificate_id):
+    certificate = Certification.objects.get(id=certificate_id)
+    related_data = get_related_data(certificate)
+    qr_url = generate_qr_code(certificate)
+
+    context = {
+        'certificate': certificate,
+        'related_data': related_data,
+        'qr_url': qr_url,
+    }
+
+    html_string = render_to_string('immigration/certificate_template.html', context)
+    html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="certificate_{certificate.id}.pdf"'
+    html.write_pdf(response)
+
+    return response
 
 
 @login_required
