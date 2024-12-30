@@ -45,6 +45,8 @@ from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
+import logging
+import os
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -1878,61 +1880,185 @@ def certificate_detail(request, cert_id):
         'qr_url': qr_url if qr_url is not None else '',  # Ensure qr_url is never None
     })
 
+# Set up logging
+logger = logging.getLogger(__name__)
+
+class CertificateError(Exception):
+    """Custom exception for certificate-related errors"""
+    pass
+
+
 def get_related_data(certificate):
-    if certificate.certificate_type == 'birth':
-        return certificate.birth_registration  # Assuming this is a related model
-    elif certificate.certificate_type == 'marriage':
-        return certificate.marriage_details  # Assuming this is a related model
-    elif certificate.certificate_type == 'death':
-        return certificate.death_details  # Assuming this is a related model
-    elif certificate.certificate_type == 'character':
-        return certificate.character_certificate  # Assuming this is a related model
-    elif certificate.certificate_type == 'academic':
-        return certificate.academic_certificate  # Assuming this is a related model
-    else:
-        return None
+    """
+    Get related data for a certificate based on its type.
 
-def generate_qr_code(certificate):
-    if hasattr(certificate, 'birth_registration') and certificate.birth_registration:
-        birth_registration_number = certificate.birth_registration.birth_registration_number
-    else:
-        raise ValueError("No related birth registration data found for this certificate.")
+    Args:
+        certificate: Certificate instance
 
-    qr = qrcode.make(birth_registration_number)
-    qr_image_io = BytesIO()
-    qr.save(qr_image_io)
-    qr_image_io.seek(0)
+    Returns:
+        Related model instance or None
 
-    qr_filename = f"qr_code_{birth_registration_number}.png"
-    qr_file = ContentFile(qr_image_io.getvalue())
-    saved_path = default_storage.save(f"qr_codes/{qr_filename}", qr_file)
+    Raises:
+        CertificateError: If related data is not found
+    """
+    try:
+        related_data_mapping = {
+            'birth': 'birth_registration',
+            'marriage': 'marriage_details',
+            'death': 'death_details',
+            'character': 'character_certificate',
+            'academic': 'academic_certificate'
+        }
 
-    # Absolute file path
-    absolute_path = default_storage.path(saved_path)
+        if certificate.certificate_type not in related_data_mapping:
+            raise CertificateError(f"Invalid certificate type: {certificate.certificate_type}")
 
-    return absolute_path
+        related_field = related_data_mapping[certificate.certificate_type]
+        related_data = getattr(certificate, related_field, None)
+
+        if related_data is None:
+            raise CertificateError(f"No related {certificate.certificate_type} data found")
+
+        return related_data
+
+    except Exception as e:
+        logger.error(f"Error getting related data for certificate {certificate.id}: {str(e)}")
+        raise CertificateError(f"Error retrieving related data: {str(e)}")
+
+
+def get_certificate_identifier(certificate, related_data):
+    """
+    Generate a unique identifier for QR code based on certificate type.
+
+    Args:
+        certificate: Certificate instance
+        related_data: Related model instance
+
+    Returns:
+        str: Unique identifier for the certificate
+    """
+    try:
+        identifier_mapping = {
+            'birth': lambda: related_data.birth_registration_number,
+            'marriage': lambda: f"MAR-{related_data.id}-{datetime.now().year}",
+            'death': lambda: f"DTH-{related_data.id}-{datetime.now().year}",
+            'character': lambda: f"CHR-{related_data.id}-{datetime.now().year}",
+            'academic': lambda: f"ACD-{related_data.id}-{datetime.now().year}"
+        }
+
+        get_identifier = identifier_mapping.get(certificate.certificate_type)
+        if not get_identifier:
+            raise CertificateError(f"Cannot generate identifier for type: {certificate.certificate_type}")
+
+        return get_identifier()
+
+    except Exception as e:
+        logger.error(f"Error generating identifier for certificate {certificate.id}: {str(e)}")
+        raise CertificateError(f"Error generating certificate identifier: {str(e)}")
+
+
+def generate_qr_code(registration_number):
+    """Generate QR code and return as base64 string"""
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(registration_number)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    # Save image to bytes buffer
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    # Convert to base64
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+    return f"data:image/png;base64,{img_str}"
 
 
 
 def print_certificate(request, certificate_id):
-    certificate = Certification.objects.get(id=certificate_id)
-    related_data = get_related_data(certificate)
-    qr_url = generate_qr_code(certificate)
+    """
+    Generate PDF certificate.
 
-    context = {
-        'certificate': certificate,
-        'related_data': related_data,
-        'qr_url': qr_url,
-    }
+    Args:
+        request: HTTP request object
+        certificate_id: ID of the certificate to print
 
-    html_string = render_to_string('immigration/certificate_template.html', context)
-    html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+    Returns:
+        HttpResponse with PDF content
 
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="certificate_{certificate.id}.pdf"'
-    html.write_pdf(response)
+    Raises:
+        Http404: If certificate not found
+        CertificateError: If PDF generation fails
+    """
+    try:
+        # Get certificate and related data
+        certificate = Certification.objects.select_related(
+            'birth_registration',
+            'marriage_details',
+            'death_details',
+            'character_certificate',
+            'academic_certificate'
+        ).get(id=certificate_id)
 
-    return response
+        # Determine QR data based on certificate type
+        if certificate.certificate_type == 'birth':
+            qr_data = certificate.birth_registration.birth_registration_number
+        elif certificate.certificate_type == 'marriage':
+            qr_data = f"{certificate.marriage_details.spouse1_name} & {certificate.marriage_details.spouse2_name}"
+        elif certificate.certificate_type == 'death':
+            qr_data = certificate.death_details.death_registration_number
+        elif certificate.certificate_type == 'character':
+            qr_data = f"Character-{certificate.character_certificate.full_name}"
+        elif certificate.certificate_type == 'academic':
+            qr_data = certificate.academic_certificate.certificate_number
+        else:
+            qr_data = "Unknown Certificate Type"
+
+        # Generate QR code as base64
+        qr_image = generate_qr_code(qr_data)
+
+        # Update context
+        context = {
+            'certificate': certificate,
+            'qr_image': qr_image,  # Pass the base64 QR code
+            'generated_date': datetime.now().strftime('%B %d, %Y'),
+            'certificate_number': f"{certificate.certificate_type.upper()}-{certificate.id}"
+        }
+
+        # Render HTML
+        html_string = render_to_string('immigration/certificate_template.html', context)
+        html = HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+
+        # Generate PDF response
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = (
+            f'attachment; filename="{certificate.certificate_type}_'
+            f'certificate_{certificate.id}.pdf"'
+        )
+
+        # Write PDF
+        html.write_pdf(response, presentational_hints=True)
+
+        # Log successful generation
+        logger.info(f"Successfully generated PDF for certificate {certificate_id}")
+
+        return response
+
+    except Certification.DoesNotExist:
+        logger.error(f"Certificate {certificate_id} not found")
+        raise Http404(f"Certificate with id {certificate_id} not found")
+
+    except CertificateError as ce:
+        logger.error(f"Certificate error: {str(ce)}")
+        raise
+
+    except Exception as e:
+        logger.error(f"Error generating PDF for certificate {certificate_id}: {str(e)}")
+        raise CertificateError(f"Error generating PDF: {str(e)}")
 
 
 @login_required
