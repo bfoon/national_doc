@@ -116,7 +116,7 @@
                 {% endif %}
             </div>
             <div class="signature-line">
-                <p>{{ certificate.registrar_name }}<br>Registrar of Vital Statistics</p>
+                <p>{{ certificate.approved_by.get_full_name }}<br>Registrar of Vital Statistics</p>
             </div>
             <!-- QR Code -->
             {% if qr_url %}
