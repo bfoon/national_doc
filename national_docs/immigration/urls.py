@@ -111,5 +111,7 @@ urlpatterns = [
     path('certificate/<int:cert_id>/save-more-info/', views.save_more_info, name='save_more_info'),
     path('certificate/print/<int:certificate_id>/', views.print_certificate, name='print_certificate'),
     path('certificate/<int:certificate_id>/save-checklist/', views.save_checklist, name='save_checklist'),
+    path('generate-pdf-report/', views.generate_pdf_report, name='generate_pdf_report'),
+    path('generate-csv-report/', views.generate_csv_report, name='generate_csv_report'),
 
 ]

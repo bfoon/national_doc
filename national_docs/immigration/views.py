@@ -48,6 +48,9 @@ from django.template.loader import render_to_string
 from weasyprint import HTML, CSS
 import logging
 import os
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import csv
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -2219,6 +2222,59 @@ def save_checklist(request, certificate_id):
         return redirect('certificate_detail', certificate.id)
 
     return HttpResponseForbidden()
+
+@login_required
+def generate_pdf_report(request):
+    certifications = Certification.objects.all()
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="certifications_report.pdf"'
+
+    p = canvas.Canvas(response, pagesize=letter)
+    width, height = letter
+
+    # Title
+    p.setFont("Helvetica", 16)
+    p.drawString(100, height - 40, "Certification Report")
+
+    # Column Headers
+    p.setFont("Helvetica", 12)
+    p.drawString(100, height - 80, "Request ID")
+    p.drawString(200, height - 80, "Type")
+    p.drawString(300, height - 80, "Applicant Name")
+    p.drawString(400, height - 80, "Status")
+    y_position = height - 100
+
+    # Add Certification Data
+    for cert in certifications:
+        p.drawString(100, y_position, f"#{cert.id}")
+        p.drawString(200, y_position, cert.get_certificate_type_display())
+        p.drawString(300, y_position, cert.applicant_name)
+        p.drawString(400, y_position, cert.status.capitalize())
+        y_position -= 20
+
+        if y_position < 40:  # If the page is filled, create a new page
+            p.showPage()
+            y_position = height - 40
+
+    p.showPage()
+    p.save()
+
+    return response
+
+@login_required
+def generate_csv_report(request):
+    certifications = Certification.objects.all()
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="certifications_report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Request ID', 'Type', 'Applicant Name', 'Status'])
+
+    for cert in certifications:
+        writer.writerow([cert.id, cert.get_certificate_type_display(), cert.applicant_name, cert.status.capitalize()])
+
+    return response
 
 # Take not for chat
 @login_required
