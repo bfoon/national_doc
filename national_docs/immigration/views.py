@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from docs.models import Application, UploadedDocument, ChatMessage, Certification
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile, Notification,
-                     FAQ, FAQCategory, CallNote, MessageNote, FollowUpNote, VerificationChecklist)
+                     FAQ, FAQCategory, CallNote, MessageNote, FollowUpNote,
+                     VerificationChecklist, CertificateNote)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.dateparse import parse_date
@@ -1768,7 +1769,20 @@ def close_chat(request):
 
 @login_required
 def certificate_request(request):
+    # Fetch all certifications initially
     certifications = Certification.objects.all()
+
+    # Handle filtering
+    status_filter = request.GET.get('status', None)
+    certificate_type_filter = request.GET.get('certificate_type', None)
+    applicant_name_filter = request.GET.get('applicant_name', None)
+
+    if status_filter:
+        certifications = certifications.filter(status=status_filter)
+    if certificate_type_filter:
+        certifications = certifications.filter(certificate_type=certificate_type_filter)
+    if applicant_name_filter:
+        certifications = certifications.filter(applicant_name__icontains=applicant_name_filter)
 
     # Current counts
     pending_count = certifications.filter(status='pending').count()
@@ -1812,11 +1826,16 @@ def certificate_request(request):
     approved_arrow_month = 'up' if approved_change_month >= 0 else 'down'
     rejected_arrow_month = 'up' if rejected_change_month >= 0 else 'down'
 
+    # Pagination setup
+    paginator = Paginator(certifications, 10)  # Show 10 certificates per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     # Recent activity
     recent_activity = certifications.order_by('-submission_date')[:5]
 
     return render(request, 'immigration/certificate-dashboard.html', {
-        'certifications': certifications,
+        'certifications': page_obj,
         'pending_count': pending_count,
         'approved_count': approved_count,
         'rejected_count': rejected_count,
@@ -1833,6 +1852,10 @@ def certificate_request(request):
         'approved_arrow_month': approved_arrow_month,
         'rejected_arrow_month': rejected_arrow_month,
         'recent_activity': recent_activity,
+        'page_obj': page_obj,  # Add paginated certificates
+        'status_filter': status_filter,
+        'certificate_type_filter': certificate_type_filter,
+        'applicant_name_filter': applicant_name_filter,
     })
 
 @login_required
@@ -1872,6 +1895,8 @@ def certificate_detail(request, cert_id):
     # Fetch supporting documents for the certificate
     supporting_documents = certificate.attachments.all()
 
+    # Fetch certificate notes
+    certificate_notes = CertificateNote.objects.filter(certificate=certificate).order_by('-created_at')
     # Fetch or create a checklist for the certificate
     checklist, created = VerificationChecklist.objects.get_or_create(certificate=certificate, defaults={'user': request.user})
 
@@ -1891,6 +1916,7 @@ def certificate_detail(request, cert_id):
         'supporting_documents': supporting_documents,
         'qr_url': qr_url if qr_url is not None else '',  # Ensure qr_url is never None
         'checklist': checklist,
+        'certificate_notes': certificate_notes,
         'is_certificate_locked': is_certificate_locked,
     })
 
@@ -2114,6 +2140,30 @@ def reject_certificate(request, cert_id):
 
     messages.success(request, f"Certificate {certification.get_certificate_type_display()} has been rejected.")
     return redirect('certificate_detail', cert_id=cert_id)
+
+
+@login_required
+def save_more_info(request, cert_id):
+    # Get the certificate
+    certificate = get_object_or_404(Certification, id=cert_id)
+
+    if certificate.status != 'pending':
+        messages.error(request, "You cannot add more information because this certificate is not in 'pending' status.")
+        return redirect('certificate_detail', cert_id=cert_id)
+
+    # Save the additional information
+    if request.method == 'POST':
+        additional_info = request.POST.get('additional_info')
+
+        # Add a field for additional information or save to a related model
+        # For example, if you have a `CertificateNote` model to store additional information:
+        certificate.notes.create(
+            created_by=request.user,
+            content=additional_info
+        )
+
+        messages.success(request, "Additional information has been saved successfully.")
+        return redirect('certificate_detail', cert_id=cert_id)
 
 @login_required
 def get_user_application(request, user_id):

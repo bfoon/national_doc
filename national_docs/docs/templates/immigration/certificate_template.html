@@ -433,16 +433,16 @@
                     <div class="official-use-title">For Official Use Only</div>
                     <div class="official-use-grid">
                         <div class="official-use-item">
-                            Issue Date: {{ certificate.issue_date|date:"F d, Y" }}
+                            Issue Date: {{ certificate.last_updated|date:"F d, Y" }}
                         </div>
                         <div class="official-use-item">
                             Certificate No: {{ certificate.id }}
                         </div>
                         <div class="official-use-item">
-                            Issued By: {{ certificate.approved_by }}
+                            Issued By: {{ certificate.approved_by.get_full_name }}
                         </div>
                         <div class="official-use-item">
-                            Office Location: {{ certificate.office_location }}
+                            Office Location: {{ certificate.approved_by.officerprofile.post_location }}
                         </div>
                     </div>
                 </div>

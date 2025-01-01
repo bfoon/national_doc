@@ -5,8 +5,6 @@ from docs.models import Application, ChatMessage, Certification
 from django.utils import timezone
 from django.utils.text import slugify
 
-
-
 class PostLocation(models.Model):
     name = models.CharField(max_length=255)
     address = models.TextField()
@@ -434,3 +432,12 @@ class VerificationChecklist(models.Model):
 
     def __str__(self):
         return f"Checklist for Certificate {self.certificate.id} by {self.user.username}"
+
+class CertificateNote(models.Model):
+    certificate = models.ForeignKey(Certification, related_name='notes', on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Note on {self.certificate} by {self.created_by}"

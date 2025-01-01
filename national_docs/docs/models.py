@@ -118,6 +118,7 @@ class Certification(models.Model):
     approved_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, related_name='certifications_approved', null=True, blank=True
     )
+    last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.get_certificate_type_display()} - {self.applicant_name}"

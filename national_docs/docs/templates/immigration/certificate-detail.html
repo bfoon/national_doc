@@ -267,9 +267,10 @@
                     <a href="{% url 'reject_certificate' certificate.id %}" class="btn btn-danger {% if certificate.status != 'pending' %}disabled{% endif %}">
                         <i class="fas fa-times-circle me-2"></i>Reject Request
                     </a>
-                    <button class="btn btn-secondary {% if certificate.status != 'pending' %}disabled{% endif %}">
+                    <button class="btn btn-secondary {% if certificate.status != 'pending' %}disabled{% endif %}" data-bs-toggle="modal" data-bs-target="#requestMoreInfoModal">
                         <i class="fas fa-clock me-2"></i>Request More Information
                     </button>
+
                 </div>
             </div>
         </div>
@@ -278,6 +279,143 @@
 <br>
 <br>
 <br>
+
+<!-- More Information Modal -->
+<div class="modal fade" id="requestMoreInfoModal" tabindex="-1" aria-labelledby="requestMoreInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold" id="requestMoreInfoModalLabel">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>Request Additional Information
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form method="post" action="{% url 'save_more_info' certificate.id %}" id="moreInfoForm">
+                    {% csrf_token %}
+
+                    <!-- Certificate History Timeline -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3 d-flex align-items-center">
+                            <i class="fas fa-history me-2 text-primary"></i>
+                            Certificate History
+                        </h6>
+                        <div class="timeline">
+                            {% for note in certificate_notes %}
+                                <div class="card shadow-sm mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-2">
+                                                    <i class="fas fa-user-circle fa-lg text-primary"></i>
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold">{{ note.created_by }}</h6>
+                                                    <small class="text-muted">
+                                                        <i class="far fa-clock me-1"></i>
+                                                        {{ note.created_at|date:"F j, Y, g:i a" }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <span class="badge bg-light text-dark">Note</span>
+                                        </div>
+                                        <p class="mb-0 text-body">{{ note.content }}</p>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="alert alert-info d-flex align-items-center">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <div>No previous notes available for this certificate.</div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Request Information Form -->
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-body">
+                            <h6 class="fw-bold mb-3 d-flex align-items-center">
+                                <i class="fas fa-pen me-2 text-primary"></i>
+                                Add New Request
+                            </h6>
+                            <div class="mb-3">
+                                <label for="additional_info" class="form-label fw-semibold">What additional information is needed?</label>
+                                <textarea
+                                    class="form-control"
+                                    id="additional_info"
+                                    name="additional_info"
+                                    rows="4"
+                                    placeholder="Please specify what additional information or documents are required..."
+                                    required></textarea>
+                                <div class="form-text">
+                                    Be specific about what documents or information you need from the applicant.
+                                </div>
+                            </div>
+
+                            <!-- Optional: Priority Selection -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Priority Level</label>
+                                <div class="btn-group w-100" role="group" aria-label="Priority selection">
+                                    <input type="radio" class="btn-check" name="priority" id="priority1" value="low">
+                                    <label class="btn btn-outline-success" for="priority1">Low</label>
+
+                                    <input type="radio" class="btn-check" name="priority" id="priority2" value="medium" checked>
+                                    <label class="btn btn-outline-warning" for="priority2">Medium</label>
+
+                                    <input type="radio" class="btn-check" name="priority" id="priority3" value="high">
+                                    <label class="btn btn-outline-danger" for="priority3">High</label>
+                                </div>
+                            </div>
+
+                            <!-- Optional: Due Date -->
+                            <div class="mb-3">
+                                <label for="due_date" class="form-label fw-semibold">Response Expected By</label>
+                                <input type="date" class="form-control" id="due_date" name="due_date">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Send Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Optional: Add this script at the bottom of your template -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.getElementById('moreInfoForm');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Set minimum date for due date input to today
+    const dueDateInput = document.getElementById('due_date');
+    if (dueDateInput) {
+        const today = new Date().toISOString().split('T')[0];
+        dueDateInput.setAttribute('min', today);
+
+        // Set default due date to 7 days from now
+        const defaultDueDate = new Date();
+        defaultDueDate.setDate(defaultDueDate.getDate() + 7);
+        dueDateInput.value = defaultDueDate.toISOString().split('T')[0];
+    }
+});
+</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
