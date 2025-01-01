@@ -50,6 +50,11 @@ import logging
 import os
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 import csv
 
 
@@ -2223,42 +2228,121 @@ def save_checklist(request, certificate_id):
 
     return HttpResponseForbidden()
 
+
 @login_required
 def generate_pdf_report(request):
-    certifications = Certification.objects.all()
+    # Get certifications and sort them by status
+    certifications = Certification.objects.all().order_by('status', '-id')
+
+    # Create the HttpResponse object with PDF headers
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="certifications_report.pdf"'
 
-    p = canvas.Canvas(response, pagesize=letter)
-    width, height = letter
+    # Create the PDF object using ReportLab
+    doc = SimpleDocTemplate(
+        response,
+        pagesize=letter,
+        leftMargin=0.5 * inch,
+        rightMargin=0.5 * inch,
+        topMargin=0.5 * inch,
+        bottomMargin=0.5 * inch
+    )
 
-    # Title
-    p.setFont("Helvetica", 16)
-    p.drawString(100, height - 40, "Certification Report")
+    # Container for the 'Flowable' objects
+    elements = []
 
-    # Column Headers
-    p.setFont("Helvetica", 12)
-    p.drawString(100, height - 80, "Request ID")
-    p.drawString(200, height - 80, "Type")
-    p.drawString(300, height - 80, "Applicant Name")
-    p.drawString(400, height - 80, "Status")
-    y_position = height - 100
+    # Styles
+    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(
+        name='CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=24,
+        spaceAfter=30,
+        alignment=1  # Center alignment
+    ))
 
-    # Add Certification Data
+    # Add title
+    title = Paragraph("Certification Report", styles['CustomTitle'])
+    elements.append(title)
+
+    # Add report metadata
+    report_date = datetime.now().strftime("%B %d, %Y")
+    metadata_text = f"Generated on: {report_date}"
+    elements.append(Paragraph(metadata_text, styles['Normal']))
+    elements.append(Spacer(1, 20))
+
+    # Prepare data for table
+    table_data = [
+        ['Request ID', 'Type', 'Applicant Name', 'Status', 'Submission Date']
+    ]
+
     for cert in certifications:
-        p.drawString(100, y_position, f"#{cert.id}")
-        p.drawString(200, y_position, cert.get_certificate_type_display())
-        p.drawString(300, y_position, cert.applicant_name)
-        p.drawString(400, y_position, cert.status.capitalize())
-        y_position -= 20
+        # Format date as string
+        submission_date = cert.submission_date.strftime("%Y-%m-%d") if cert.submission_date else "N/A"
 
-        if y_position < 40:  # If the page is filled, create a new page
-            p.showPage()
-            y_position = height - 40
+        table_data.append([
+            f"#{cert.id}",
+            cert.get_certificate_type_display(),
+            cert.applicant_name,
+            cert.status.capitalize(),
+            submission_date
+        ])
 
-    p.showPage()
-    p.save()
+    # Create table
+    table = Table(table_data, repeatRows=1)
 
+    # Add style to table
+    table.setStyle(TableStyle([
+        # Header style
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        # Cell style
+        ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+        ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        # Row color alternation
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
+        # Padding
+        ('TOPPADDING', (0, 1), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 1), (-1, -1), 8),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ]))
+
+    elements.append(table)
+
+    # Add summary section
+    elements.append(Spacer(1, 20))
+    summary_style = ParagraphStyle(
+        'SummaryStyle',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=colors.grey
+    )
+
+    # Calculate statistics
+    total_certs = len(certifications)
+    status_counts = {}
+    for cert in certifications:
+        status_counts[cert.status] = status_counts.get(cert.status, 0) + 1
+
+    # Add summary text
+    summary_text = f"""
+    Total Certifications: {total_certs}<br/>
+    Status Distribution:<br/>
+    """ + "<br/>".join([f"- {status.capitalize()}: {count}"
+                        for status, count in status_counts.items()])
+
+    elements.append(Paragraph(summary_text, summary_style))
+
+    # Build PDF document
+    doc.build(elements)
     return response
 
 @login_required
