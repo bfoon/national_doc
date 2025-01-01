@@ -13,6 +13,12 @@ admin.site.register(Boot)
 admin.site.register(MessageNote)
 admin.site.register(CallNote)
 
+@admin.register(VerificationChecklist)
+class VerificationChecklistAdmin(admin.ModelAdmin):
+    list_display = ('certificate', 'user', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('certificate__applicant_name', 'user__username')
+
 @admin.register(CustomGroup)
 class CustomGroupAdmin(admin.ModelAdmin):
     list_display = ('name', 'created_at', 'updated_at')

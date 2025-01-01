@@ -107,6 +107,8 @@ urlpatterns = [
     path('certificate_request/', views.certificate_request, name='certificate_request'),
     path('certificate_detail/<int:cert_id>/', views.certificate_detail, name='certificate_detail'),
     path('certificates/approve/<int:cert_id>/', views.approve_certificate, name='approve_certificate'),
+    path('certificate/<int:cert_id>/reject/', views.reject_certificate, name='reject_certificate'),
     path('certificate/print/<int:certificate_id>/', views.print_certificate, name='print_certificate'),
+    path('certificate/<int:certificate_id>/save-checklist/', views.save_checklist, name='save_checklist'),
 
 ]

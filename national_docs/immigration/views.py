@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from docs.models import Application, UploadedDocument, ChatMessage, Certification
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile, Notification,
-                     FAQ, FAQCategory, CallNote, MessageNote, FollowUpNote)
+                     FAQ, FAQCategory, CallNote, MessageNote, FollowUpNote, VerificationChecklist)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.dateparse import parse_date
@@ -1872,12 +1872,26 @@ def certificate_detail(request, cert_id):
     # Fetch supporting documents for the certificate
     supporting_documents = certificate.attachments.all()
 
-    # Add qr_url directly to the context with a fallback value if None
+    # Fetch or create a checklist for the certificate
+    checklist, created = VerificationChecklist.objects.get_or_create(certificate=certificate, defaults={'user': request.user})
+
+    # Handle form submission for updating checklist
+    if request.method == 'POST':
+        checklist.all_documents_provided = request.POST.get('all_documents_provided') == 'on'
+        checklist.information_matches_records = request.POST.get('information_matches_records') == 'on'
+        checklist.id_verification_complete = request.POST.get('id_verification_complete') == 'on'
+        checklist.review_notes = request.POST.get('review_notes', '')
+        checklist.updated_by = request.user
+        checklist.save()
+    is_certificate_locked = certificate.status in ['approved', 'rejected']
+    # Render the template with the context
     return render(request, 'immigration/certificate-detail.html', {
         'certificate': certificate,
         'related_data': related_data,
         'supporting_documents': supporting_documents,
         'qr_url': qr_url if qr_url is not None else '',  # Ensure qr_url is never None
+        'checklist': checklist,
+        'is_certificate_locked': is_certificate_locked,
     })
 
 # Set up logging
@@ -1977,7 +1991,7 @@ def generate_qr_code(registration_number):
     img_str = base64.b64encode(buffer.getvalue()).decode()
     return f"data:image/png;base64,{img_str}"
 
-
+@login_required
 def print_certificate(request, certificate_id):
     """
     Generate PDF certificate.
@@ -2075,15 +2089,31 @@ def approve_certificate(request, cert_id):
 
     if certification.status == 'approved':
         messages.info(request, "This certificate is already approved.")
-        return redirect('certificate_dashboard')
+        return redirect('certificate_detail',cert_id)
 
     certification.status = 'approved'
     certification.approved_by = request.user
     certification.save()
 
     messages.success(request, f"Certificate {certification.get_certificate_type_display()} has been approved.")
-    return redirect('certificate_dashboard')
+    return redirect('certificate_detail',cert_id)
 
+@login_required
+def reject_certificate(request, cert_id):
+    certification = get_object_or_404(Certification, id=cert_id)
+
+    # Check if the certificate is already approved or rejected
+    if certification.status in ['approved', 'rejected']:
+        messages.info(request, "This certificate has already been processed (either approved or rejected).")
+        return redirect('certificate_detail', cert_id=cert_id)
+
+    # Set the certificate's status to 'rejected'
+    certification.status = 'rejected'
+    certification.approved_by = request.user  # You can set the 'approved_by' field for rejection as well
+    certification.save()
+
+    messages.success(request, f"Certificate {certification.get_certificate_type_display()} has been rejected.")
+    return redirect('certificate_detail', cert_id=cert_id)
 
 @login_required
 def get_user_application(request, user_id):
@@ -2120,6 +2150,25 @@ def get_user_application(request, user_id):
             'progress': 'N/A',  # No progress available
         }
         return JsonResponse(response_data)
+
+@login_required
+def save_checklist(request, certificate_id):
+    certificate = get_object_or_404(Certification, id=certificate_id)
+
+    if request.method == 'POST':
+        checklist, created = VerificationChecklist.objects.get_or_create(
+            certificate=certificate,
+            user=request.user
+        )
+        checklist.all_documents_provided = request.POST.get('all_documents_provided') == 'on'
+        checklist.information_matches_records = request.POST.get('information_matches_records') == 'on'
+        checklist.id_verification_complete = request.POST.get('id_verification_complete') == 'on'
+        checklist.review_notes = request.POST.get('review_notes')
+        checklist.save()
+
+        return redirect('certificate_detail', certificate.id)
+
+    return HttpResponseForbidden()
 
 # Take not for chat
 @login_required

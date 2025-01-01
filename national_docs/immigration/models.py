@@ -1,9 +1,10 @@
 # immigration/models.py
 from django.db import models
 from django.contrib.auth.models import User, Group
-from docs.models import Application, ChatMessage
+from docs.models import Application, ChatMessage, Certification
 from django.utils import timezone
 from django.utils.text import slugify
+
 
 
 class PostLocation(models.Model):
@@ -414,3 +415,22 @@ class CustomGroup(Group):
         verbose_name = "Group"
         verbose_name_plural = "Groups"
 
+class VerificationChecklist(models.Model):
+    certificate = models.ForeignKey(
+        Certification,
+        on_delete=models.CASCADE,
+        related_name='verification_checklists'
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='created_by'
+    )
+    all_documents_provided = models.BooleanField(default=False)
+    information_matches_records = models.BooleanField(default=False)
+    id_verification_complete = models.BooleanField(default=False)
+    review_notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Checklist for Certificate {self.certificate.id} by {self.user.username}"
