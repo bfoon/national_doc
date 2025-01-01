@@ -413,3 +413,4 @@ class CustomGroup(Group):
     class Meta:
         verbose_name = "Group"
         verbose_name_plural = "Groups"
+

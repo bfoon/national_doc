@@ -1978,7 +1978,6 @@ def generate_qr_code(registration_number):
     return f"data:image/png;base64,{img_str}"
 
 
-
 def print_certificate(request, certificate_id):
     """
     Generate PDF certificate.
@@ -1995,7 +1994,7 @@ def print_certificate(request, certificate_id):
         CertificateError: If PDF generation fails
     """
     try:
-        # Get certificate and related data
+        # Get the certificate and related data
         certificate = Certification.objects.select_related(
             'birth_registration',
             'marriage_details',
@@ -2003,6 +2002,14 @@ def print_certificate(request, certificate_id):
             'character_certificate',
             'academic_certificate'
         ).get(id=certificate_id)
+
+        # Check if the certificate is approved
+        if certificate.status != 'approved':  # Check the status field
+            logger.warning(f"Attempted to print an unapproved certificate {certificate_id}")
+            return HttpResponse(
+                "This certificate is not approved and cannot be printed.",
+                status=403
+            )
 
         # Determine QR data based on certificate type
         if certificate.certificate_type == 'birth':
@@ -2059,6 +2066,7 @@ def print_certificate(request, certificate_id):
     except Exception as e:
         logger.error(f"Error generating PDF for certificate {certificate_id}: {str(e)}")
         raise CertificateError(f"Error generating PDF: {str(e)}")
+
 
 
 @login_required

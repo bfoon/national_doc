@@ -36,39 +36,52 @@
 }
 </style>
 <!-- Breadcrumb -->
-<nav aria-label="breadcrumb">
-    <ol class="breadcrumb px-3 py-2 mb-4">
+<nav aria-label="breadcrumb" class="bg-light rounded-3 shadow-sm">
+    <ol class="breadcrumb px-4 py-3 mb-0">
         <li class="breadcrumb-item">
-            <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a>
+            <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">
+                <i class="fas fa-home me-1"></i>Dashboard
+            </a>
         </li>
         <li class="breadcrumb-item">
             <a href="{% url 'certificate_request' %}" class="text-decoration-none">Certificate Dashboard</a>
         </li>
-        <li class="breadcrumb-item active" aria-current="page">Certificate Detail</li>
+        <li class="breadcrumb-item active fw-semibold" aria-current="page">Certificate Detail</li>
     </ol>
 </nav>
 
 <!-- Header with Request Info -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h2>Review Certificate Request #{{ certificate.id }}</h2>
-        <p class="text-muted">Submitted on {{ certificate.submission_date|date:"F d, Y" }} at {{ certificate.submission_date|time:"H:i" }}</p>
+        <h2 class="display-6 fw-bold mb-2">Review Certificate Request #{{ certificate.id }}</h2>
+        <p class="text-muted mb-0">
+            <i class="far fa-calendar-alt me-2"></i>
+            {{ certificate.submission_date|date:"F d, Y" }} at {{ certificate.submission_date|time:"H:i" }}
+        </p>
     </div>
-    <div class="badge
-    {% if certificate.status == 'approved' %}bg-success{% elif certificate.status == 'rejected' %}bg-danger{% elif certificate.status == 'pending' %}bg-warning{% else %}bg-secondary{% endif %} fs-6">
-    {{ certificate.status|upper }}
-</div>
+  <div class="badge
+        {% if certificate.status == 'approved' %}bg-success
+        {% elif certificate.status == 'rejected' %}bg-danger
+        {% elif certificate.status == 'pending' %}bg-warning
+        {% else %}bg-secondary{% endif %}
+        fs-6 px-3 py-2 rounded-pill shadow-sm">
+        <i class="fas fa-circle me-2 small"></i>{{ certificate.status|upper }}
+    </div>
 
 </div>
 
-<div class="row">
-    <!-- Certificate Preview -->
+<div class="row g-4">
+    <!-- Certificate Preview with enhanced styling -->
     <div class="col-lg-8">
-        <div class="certificate" id="certificateToPrint">
-            <div class="certificate-header">
-                <h2>{{ certificate.get_certificate_type_display }}</h2>
-                <div class="certificate-seal">SEAL</div>
-            </div>
+        <div class="card shadow-sm" id="certificateToPrint">
+            <div class="card-body p-5">
+                <div class="certificate-header text-center mb-5">
+                    <h2 class="display-5 fw-bold mb-4">{{ certificate.get_certificate_type_display }}</h2>
+                    <div class="certificate-seal mb-4">
+                        <i class="fas fa-certificate fa-3x text-primary opacity-75"></i>
+                    </div>
+                </div>
+                </div>
             <div class="mb-3">
                 {% if certificate.certificate_type == 'birth' %}
                     <p class="text-center">This is to certify that</p>
@@ -116,7 +129,8 @@
                 {% endif %}
             </div>
             <div class="signature-line">
-                <p>{{ certificate.approved_by.get_full_name }}<br>Registrar of Vital Statistics</p>
+                <p class="fw-bold mb-0">{{ certificate.approved_by.get_full_name }}</p>
+                            <p class="text-muted">Registrar of Vital Statistics</p>
             </div>
             <!-- QR Code -->
             {% if qr_url %}
@@ -125,88 +139,126 @@
         </div>
 
     <!-- Print Button -->
-       <button class="btn btn-primary" onclick="window.location.href='{% url 'print_certificate' certificate.id %}'">
+    <div class="mt-4">
+    {% if certificate.status == "approved" %}
+        <button class="btn btn-primary btn-lg" onclick="window.location.href='{% url 'print_certificate' certificate.id %}'">
             <i class="fas fa-print me-2"></i>Print Certificate
         </button>
+    {% else %}
+        <button class="btn btn-secondary btn-lg" disabled>
+            <i class="fas fa-print me-2"></i>Print Certificate (Not Approved)
+        </button>
+    {% endif %}
+</div>
 
     </div>
     <!-- Review Panel -->
     <div class="col-lg-4">
-        <div class="review-section p-4">
-            <h4 class="mb-4">Review Details</h4>
-
-            <!-- Applicant Information -->
-            <div class="mb-4">
-                <h5>Applicant Information</h5>
-                <ul class="list-unstyled">
-                    <li><strong>Name:</strong> {{ certificate.applicant_name }}</li>
-                    <li><strong>Email:</strong> {{ certificate.applicant_email }}</li>
-                    <li><strong>Phone:</strong> {{ certificate.applicant_phone }}</li>
-                    <li><strong>Purpose:</strong> {{ certificate.purpose }}</li>
-                </ul>
+        <div class="card shadow-sm">
+            <div class="card-header bg-light py-3">
+                <h4 class="card-title mb-0 fw-bold">Review Details</h4>
             </div>
-
-           <!-- Supporting Documents -->
-            <div class="supporting-docs mb-4">
-                <h5>Supporting Documents</h5>
-                {% for document in supporting_documents %}
-                <div class="doc-preview">
-                    <i class="fas fa-file-{{ document.attachment_type }} me-2"></i>
-                    <strong>{{ document.get_attachment_type_display }}</strong>
-                    <p>{{ document.description }}</p>
-                    <a href="{{ document.file.url }}" class="btn btn-sm btn-link" target="_blank">View</a>
+            <div class="card-body">
+                <!-- Applicant Information -->
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-user me-2 text-primary"></i>Applicant Information
+                    </h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0">
+                            <small class="text-muted d-block">Name</small>
+                            <span class="fw-semibold">{{ certificate.applicant_name }}</span>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <small class="text-muted d-block">Email</small>
+                            <span class="fw-semibold">{{ certificate.applicant_email }}</span>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <small class="text-muted d-block">Phone</small>
+                            <span class="fw-semibold">{{ certificate.applicant_phone }}</span>
+                        </div>
+                        <div class="list-group-item px-0">
+                            <small class="text-muted d-block">Purpose</small>
+                            <span class="fw-semibold">{{ certificate.purpose }}</span>
+                        </div>
+                    </div>
                 </div>
-                {% empty %}
-                <p>No supporting documents provided.</p>
-                {% endfor %}
-            </div>
 
-
-            <!-- Verification Checklist -->
-            <div class="verification-checklist mb-4">
-                <h5>Verification Checklist</h5>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="check1">
-                    <label class="form-check-label" for="check1">
-                        All required documents provided
-                    </label>
+                <!-- Supporting Documents -->
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-file-alt me-2 text-primary"></i>Supporting Documents
+                    </h5>
+                    {% for document in supporting_documents %}
+                    <div class="card mb-2">
+                        <div class="card-body p-3">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-file-{{ document.attachment_type }} fa-lg text-primary me-3"></i>
+                                <div>
+                                    <h6 class="mb-1">{{ document.get_attachment_type_display }}</h6>
+                                    <p class="small text-muted mb-0">{{ document.description }}</p>
+                                </div>
+                                <a href="{{ document.file.url }}" class="btn btn-sm btn-outline-primary ms-auto" target="_blank">
+                                    <i class="fas fa-eye me-1"></i>View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="alert alert-info mb-0">
+                        <i class="fas fa-info-circle me-2"></i>No supporting documents provided.
+                    </div>
+                    {% endfor %}
                 </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="check2">
-                    <label class="form-check-label" for="check2">
-                        Information matches records
-                    </label>
-                </div>
-                <div class="form-check mb-2">
-                    <input class="form-check-input" type="checkbox" id="check3">
-                    <label class="form-check-label" for="check3">
-                        ID verification complete
-                    </label>
-                </div>
-            </div>
 
-            <!-- Review Notes -->
-            <div class="mb-4">
-                <h5>Review Notes</h5>
-                <textarea class="form-control" rows="3" placeholder="Add your review notes here..."></textarea>
-            </div>
+                <!-- Enhanced Verification Checklist -->
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-tasks me-2 text-primary"></i>Verification Checklist
+                    </h5>
+                    <div class="list-group">
+                        <label class="list-group-item d-flex gap-2">
+                            <input class="form-check-input flex-shrink-0" type="checkbox" id="check1">
+                            <span>All required documents provided</span>
+                        </label>
+                        <label class="list-group-item d-flex gap-2">
+                            <input class="form-check-input flex-shrink-0" type="checkbox" id="check2">
+                            <span>Information matches records</span>
+                        </label>
+                        <label class="list-group-item d-flex gap-2">
+                            <input class="form-check-input flex-shrink-0" type="checkbox" id="check3">
+                            <span>ID verification complete</span>
+                        </label>
+                    </div>
+                </div>
 
-            <!-- Action Buttons -->
-            <div class="d-grid gap-2">
-                <button class="btn btn-success">
-                    <i class="fas fa-check me-2"></i>Approve Certificate
-                </button>
-                <button class="btn btn-danger">
-                    <i class="fas fa-times me-2"></i>Reject Request
-                </button>
-                <button class="btn btn-secondary">
-                    <i class="fas fa-clock me-2"></i>Request More Information
-                </button>
+                <!-- Review Notes -->
+                <div class="mb-4">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-comment-alt me-2 text-primary"></i>Review Notes
+                    </h5>
+                    <textarea class="form-control" rows="4" placeholder="Add your review notes here..."></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success btn-lg">
+                        <i class="fas fa-check-circle me-2"></i>Approve Certificate
+                    </button>
+                    <button class="btn btn-danger">
+                        <i class="fas fa-times-circle me-2"></i>Reject Request
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-clock me-2"></i>Request More Information
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+    </div>
 <br>
 <br>
+<br>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
