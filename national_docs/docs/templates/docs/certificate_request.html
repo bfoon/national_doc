@@ -193,351 +193,493 @@
             padding: 1rem;
         }
     </style>
-    <div class="container">
-    <!-- Add Certificate Request Button -->
-    <div class="d-flex justify-content-end mt-4 mb-4">
-        <button type="button" class="btn btn-lg btn-primary" data-bs-toggle="modal" data-bs-target="#certificateModal">
-            <i class="fas fa-plus me-2"></i> New Certificate Request
-        </button>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="row">
-        <!-- Total Applications Card -->
-        <div class="col-md-3">
-            <div class="card shadow-sm bg-primary text-white mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Total Applications</h5>
-                    <h2 class="display-4">1,234</h2>
-                </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <small>Updated today</small>
-                    <div><i class="fas fa-angle-right"></i></div>
-                </div>
-            </div>
+ <div class="container">
+        <!-- Add Certificate Request Button -->
+        <div class="d-flex justify-content-end mt-4 mb-4">
+            <button type="button" class="btn btn-lg btn-primary" data-bs-toggle="modal" data-bs-target="#certificateModal">
+                <i class="fas fa-plus me-2"></i> New Certificate Request
+            </button>
         </div>
 
-        <!-- Approved Applications Card -->
-        <div class="col-md-3">
-            <div class="card shadow-sm bg-success text-white mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Approved</h5>
-                    <h2 class="display-4">892</h2>
-                </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <small>72% success rate</small>
-                    <div><i class="fas fa-angle-right"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pending Applications Card -->
-        <div class="col-md-3">
-            <div class="card shadow-sm bg-warning text-dark mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Pending</h5>
-                    <h2 class="display-4">245</h2>
-                </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <small>Average wait: 2 days</small>
-                    <div><i class="fas fa-angle-right"></i></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Rejected Applications Card -->
-        <div class="col-md-3">
-            <div class="card shadow-sm bg-danger text-white mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Rejected</h5>
-                    <h2 class="display-4">97</h2>
-                </div>
-                <div class="card-footer d-flex align-items-center justify-content-between">
-                    <small>8% rejection rate</small>
-                    <div><i class="fas fa-angle-right"></i></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Applications Table -->
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Recent Applications</h5>
-            <div class="d-flex gap-2">
-                <input type="text" class="form-control" placeholder="Search applications..." aria-label="Search applications">
-                <select class="form-select" style="width: auto;">
-                    <option value="all">All Status</option>
-                    <option value="approved">Approved</option>
-                    <option value="pending">Pending</option>
-                    <option value="rejected">Rejected</option>
-                </select>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Applicant Name</th>
-                            <th>Certificate Type</th>
-                            <th>Submission Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>#APP001</td>
-                            <td>John Doe</td>
-                            <td>Birth Certificate</td>
-                            <td>2025-01-01</td>
-                            <td><span class="badge bg-success">Approved</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-primary">View</button>
-                                <button class="btn btn-sm btn-secondary">Download</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#APP002</td>
-                            <td>Jane Smith</td>
-                            <td>Marriage Certificate</td>
-                            <td>2025-01-02</td>
-                            <td><span class="badge bg-warning">Pending</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-primary">View</button>
-                                <button class="btn btn-sm btn-secondary">Track</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#APP003</td>
-                            <td>Robert Johnson</td>
-                            <td>Death Certificate</td>
-                            <td>2025-01-02</td>
-                            <td><span class="badge bg-danger">Rejected</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-primary">View</button>
-                                <button class="btn btn-sm btn-warning">Appeal</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#APP004</td>
-                            <td>Maria Garcia</td>
-                            <td>Birth Certificate</td>
-                            <td>2025-01-03</td>
-                            <td><span class="badge bg-success">Approved</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-primary">View</button>
-                                <button class="btn btn-sm btn-secondary">Download</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>#APP005</td>
-                            <td>William Brown</td>
-                            <td>Marriage Certificate</td>
-                            <td>2025-01-03</td>
-                            <td><span class="badge bg-warning">Pending</span></td>
-                            <td>
-                                <button class="btn btn-sm btn-primary">View</button>
-                                <button class="btn btn-sm btn-secondary">Track</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="text-muted">
-                    Showing 1 to 5 of 1,234 entries
-                </div>
-                <nav aria-label="Page navigation">
-                    <ul class="pagination mb-0">
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#" tabindex="-1">Previous</a>
-                        </li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-    </div>
-</div>
-<br>
-
-
-        <!-- Certificate Request Modal -->
-        <div class="modal fade" id="certificateModal" tabindex="-1" aria-labelledby="certificateModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-scrollable">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="certificateModalLabel">Certificate Request Portal</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <!-- Statistics Cards -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card shadow-sm bg-primary text-white mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Applications</h5>
+                        <h2 class="display-4">{{ stats.total }}</h2>
                     </div>
-                    <div class="modal-body">
-                        <p class="text-muted mb-4">Request official certificates online - Fast, secure, and convenient</p>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <small>Updated today</small>
+                        <div><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
 
-                        <ul class="nav nav-tabs" id="certificateTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="birth-tab" data-bs-toggle="tab" data-bs-target="#birth" type="button" role="tab">Birth Certificate</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="marriage-tab" data-bs-toggle="tab" data-bs-target="#marriage" type="button" role="tab">Marriage Certificate</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="death-tab" data-bs-toggle="tab" data-bs-target="#death" type="button" role="tab">Death Certificate</button>
-                            </li>
-                        </ul>
+            <div class="col-md-3">
+                <div class="card shadow-sm bg-success text-white mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Approved</h5>
+                        <h2 class="display-4">{{ stats.approved }}</h2>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <small>{{ stats.approved_percentage }}% success rate</small>
+                        <div><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
 
-            <div class="tab-content" id="certificateTabsContent">
-                <!-- Birth Certificate Form -->
-                <div class="tab-pane fade show active" id="birth" role="tabpanel">
-                    <form class="needs-validation" novalidate>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="birthFullName" placeholder="Full Name" required>
-                                    <label for="birthFullName" class="required-field">Full Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="date" class="form-control" id="birthDate" required>
-                                    <label for="birthDate" class="required-field">Date of Birth</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="birthPlace" placeholder="Place of Birth" required>
-                                    <label for="birthPlace" class="required-field">Place of Birth</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="fatherName" placeholder="Father's Name" required>
-                                    <label for="fatherName" class="required-field">Father's Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="motherName" placeholder="Mother's Name" required>
-                                    <label for="motherName" class="required-field">Mother's Name</label>
-                                </div>
-                            </div>
-                        </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm bg-warning text-dark mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Pending</h5>
+                        <h2 class="display-4">{{ stats.pending }}</h2>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <small>Average wait: 2 days</small>
+                        <div><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="row g-3 mt-3">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <select class="form-select" id="purpose" required>
-                                        <option value="">Select purpose</option>
-                                        <option value="official">Official/Legal</option>
-                                        <option value="personal">Personal Use</option>
-                                        <option value="employment">Employment</option>
-                                        <option value="travel">Travel</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                    <label for="purpose" class="required-field">Purpose of Request</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <select class="form-select" id="delivery" required>
-                                        <option value="">Select delivery method</option>
-                                        <option value="digital">Digital Copy</option>
-                                        <option value="physical">Physical Copy</option>
-                                        <option value="express">Express Delivery</option>
-                                    </select>
-                                    <label for="delivery" class="required-field">Delivery Method</label>
-                                </div>
-                            </div>
-                        </div>
+            <div class="col-md-3">
+                <div class="card shadow-sm bg-danger text-white mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Rejected</h5>
+                        <h2 class="display-4">{{ stats.rejected }}</h2>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <small>{{ stats.rejected_percentage }}% rejection rate</small>
+                        <div><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <div class="mt-4">
-                            <div class="alert alert-info" role="alert">
-                                <i class="bi bi-info-circle"></i> Please ensure all required fields marked with * are filled out correctly.
-                            </div>
-                        </div>
+        <!-- Applications Table -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Applications</h5>
+                <div class="d-flex gap-2">
+                    <input type="text" class="form-control" name="search" value="{{ search_query }}" placeholder="Search applications..." aria-label="Search applications">
+                    <select class="form-select" name="status" style="width: auto;">
+                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Applicant Name</th>
+                                <th>Certificate Type</th>
+                                <th>Submission Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cert in certifications %}
+                            <tr>
+                                <td>#{{ cert.id }}</td>
+                                <td>{{ cert.applicant_name }}</td>
+                                <td>{{ cert.get_certificate_type_display }}</td>
+                                <td>{{ cert.submission_date|date:"Y-m-d" }}</td>
+                                <!-- Status Badge -->
+                                <td>
+                                    {% with status=cert.status %}
+                                        <span class="badge {% if status == 'pending' %}bg-warning text-dark{% elif status == 'approved' %}bg-success{% elif status == 'rejected' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                            {{ cert.get_status_display }}
+                                        </span>
+                                    {% endwith %}
+                                </td>
+                                <td>
+                                   <!-- Button to Trigger Modal -->
+                                <a href="#" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#certificateDetailModal{{ cert.pk }}">
+                                    View
+                                </a>
 
-                        <div class="d-flex justify-content-between align-items-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-submit">Submit Request</button>
-                        </div>
-                    </form>
+                                    <!-- Modal Structure -->
+                                    <div class="modal fade" id="certificateDetailModal{{ cert.pk }}" tabindex="-1" aria-labelledby="certificateDetailLabel{{ cert.pk }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="certificateDetailLabel{{ cert.pk }}">Certificate Details</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <!-- Static Certificate Details -->
+                                                    <p><strong>Certificate Type:</strong> {{ cert.certificate_type }}</p>
+                                                    <p><strong>Applicant Name:</strong> {{ cert.applicant_name }}</p>
+                                                    <p><strong>Email:</strong> {{ cert.applicant_email }}</p>
+                                                    <p><strong>Phone:</strong> {{ cert.applicant_phone }}</p>
+                                                    <p><strong>Date of Request:</strong> {{ cert.created_at|date:"M d, Y" }}</p>
+
+                                                    <!-- Add any other fields you want to display -->
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {% if cert.status == 'approved' %}
+                                        <a href="{% url 'download_certificate' cert.pk %}" class="btn btn-sm btn-secondary">Download</a>
+                                    {% elif cert.status == 'pending' %}
+                                        <a href="{% url 'track_certificate' cert.pk %}" class="btn btn-sm btn-secondary">Track</a>
+                                    {% elif cert.status == 'rejected' %}
+                                        <a href="{% url 'appeal_certificate' cert.pk %}" class="btn btn-sm btn-warning">Appeal</a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">No certificates found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
 
-                <!-- Marriage Certificate Form -->
-                <div class="tab-pane fade" id="marriage" role="tabpanel">
-                    <form class="needs-validation" novalidate>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="spouse1Name" placeholder="Spouse 1's Full Name" required>
-                                    <label for="spouse1Name" class="required-field">Spouse 1's Full Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="spouse2Name" placeholder="Spouse 2's Full Name" required>
-                                    <label for="spouse2Name" class="required-field">Spouse 2's Full Name</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="date" class="form-control" id="marriageDate" required>
-                                    <label for="marriageDate" class="required-field">Date of Marriage</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="marriagePlace" placeholder="Place of Marriage" required>
-                                    <label for="marriagePlace" class="required-field">Place of Marriage</label>
-                                </div>
-                            </div>
-                        </div>
+        <!-- Pagination -->
+        {% if certifications.has_other_pages %}
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted">
+                Showing {{ start_index }} to {{ end_index }} of {{ total_count }} entries
+            </div>
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    <!-- Previous Button -->
+                    {% if certifications.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ certifications.previous_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" aria-label="Previous">
+                                <span aria-hidden="true">Previous</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Previous</span>
+                        </li>
+                    {% endif %}
 
-                        <div class="row g-3 mt-3">
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <select class="form-select" id="marriagePurpose" required>
-                                        <option value="">Select purpose</option>
-                                        <option value="official">Official/Legal</option>
-                                        <option value="personal">Personal Use</option>
-                                        <option value="employment">Employment</option>
-                                        <option value="travel">Travel</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                    <label for="marriagePurpose" class="required-field">Purpose of Request</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating">
-                                    <select class="form-select" id="marriageDelivery" required>
-                                        <option value="">Select delivery method</option>
-                                        <option value="digital">Digital Copy</option>
-                                        <option value="physical">Physical Copy</option>
-                                        <option value="express">Express Delivery</option>
-                                    </select>
-                                    <label for="marriageDelivery" class="required-field">Delivery Method</label>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- Page Numbers -->
+                    {% for page_num in page_range %}
+                        {% if certifications.number == page_num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_num }}{% if query_params %}&{{ query_params }}{% endif %}">{{ page_num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
 
-                        <div class="mt-4">
-                            <div class="alert alert-info" role="alert">
-                                <i class="bi bi-info-circle"></i> Please ensure all required fields marked with * are filled out correctly.
-                            </div>
-                        </div>
+                    <!-- Next Button -->
+                    {% if certifications.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ certifications.next_page_number }}{% if query_params %}&{{ query_params }}{% endif %}" aria-label="Next">
+                                <span aria-hidden="true">Next</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">Next</span>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+        </div>
+        </div>
+        </div>
+        <br>
 
-                        <div class="d-flex justify-content-between align-items-center mt-4">
-                            <button type="submit" class="btn btn-primary btn-submit">Submit Request</button>
-                        </div>
-                    </form>
+<!-- Certificate Request Modal -->
+<div class="modal fade" id="certificateModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Certificate Request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs" id="certificateTabs" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#birth">Birth Certificate</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#marriage">Marriage Certificate</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#death">Death Certificate</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content mt-3">
+    <!-- Birth Certificate Form -->
+    <div class="tab-pane fade show active" id="birth">
+        <form action="{% url 'certificate_create' %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="certificate_type" value="birth">
+
+            <!-- Common Fields -->
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" name="applicant_name" required>
+                        <label class="required-field">Applicant Name</label>
+                    </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="email" class="form-control" name="applicant_email" required>
+                        <label class="required-field">Email</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="tel" class="form-control" name="applicant_phone" required>
+                        <label class="required-field">Phone</label>
+                    </div>
+                </div>
+            </div>
 
+            <!-- Birth Certificate Specific Fields -->
+            <div class="row g-3 mt-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="date" class="form-control" name="date_of_birth" required>
+                        <label class="required-field">Date of Birth</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="time" class="form-control" name="time_of_birth" required>
+                        <label class="required-field">Time of Birth</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" name="place_of_birth" required>
+                        <label class="required-field">Place of Birth</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" name="father_name" required>
+                        <label class="required-field">Father's Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <input type="text" class="form-control" name="mother_name" required>
+                        <label class="required-field">Mother's Name</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select class="form-select" name="sex" required>
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                        </select>
+                        <label class="required-field">Gender</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attachments Section -->
+            <div class="mt-4">
+                <h6 class="mb-3">Required Documents</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <select class="form-select" name="attachment_type" required>
+                            <option value="">Select Document Type</option>
+                            {% for type_id, type_name in attachment_types %}
+                            <option value="{{ type_id }}">{{ type_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="file" class="form-control" name="attachments" multiple required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Purpose Section -->
+            <div class="mt-4">
+                <div class="form-floating">
+                    <textarea class="form-control" name="purpose" style="height: 100px" required></textarea>
+                    <label class="required-field">Purpose of Request</label>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer mt-3">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Submit Request</button>
+            </div>
+        </form>
+    </div>
+
+<!-- Marriage Certificate Form -->
+<div class="tab-pane fade" id="marriage" role="tabpanel">
+    <form action="{% url 'certificate_create' %}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="certificate_type" value="marriage">
+
+        <!-- Common Fields -->
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="text" class="form-control" name="applicant_name" required>
+                    <label class="required-field">Applicant Name</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="email" class="form-control" name="applicant_email" required>
+                    <label class="required-field">Email</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="tel" class="form-control" name="applicant_phone" required>
+                    <label class="required-field">Phone</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marriage Certificate Specific Fields -->
+        <div class="row g-3 mt-3">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="text" class="form-control" name="spouse1_name" required>
+                    <label class="required-field">Spouse 1's Full Name</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="text" class="form-control" name="spouse2_name" required>
+                    <label class="required-field">Spouse 2's Full Name</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="date" class="form-control" name="marriage_date" required>
+                    <label class="required-field">Date of Marriage</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="text" class="form-control" name="marriage_place" required>
+                    <label class="required-field">Place of Marriage</label>
+                </div>
+            </div>
+
+            <!-- Marriage Type and Additional Information -->
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <select class="form-select" name="marriage_type" required>
+                        <option value="">Select Marriage Type</option>
+                        <option value="civil">Civil Marriage</option>
+                        <option value="religious">Religious Marriage</option>
+                        <option value="customary">Customary Marriage</option>
+                    </select>
+                    <label class="required-field">Type of Marriage</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <select class="form-select" name="marriage_status" required>
+                        <option value="">Select Status</option>
+                        <option value="first">First Marriage</option>
+                        <option value="remarriage">Remarriage</option>
+                    </select>
+                    <label class="required-field">Marriage Status</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Witness Information -->
+        <div class="row g-3 mt-3">
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="text" class="form-control" name="witness1_name" required>
+                    <label class="required-field">Witness 1 Full Name</label>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-floating">
+                    <input type="text" class="form-control" name="witness2_name" required>
+                    <label class="required-field">Witness 2 Full Name</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Attachments -->
+        <div class="mt-4">
+            <h6 class="mb-3">Required Documents</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-floating">
+                        <select class="form-select" name="attachment_type" required>
+                            <option value="">Select Document Type</option>
+                            <option value="id_proof">ID Proof</option>
+                            <option value="marriage_license">Marriage License</option>
+                            <option value="witness_statement">Witness Statement</option>
+                            <option value="other">Other Supporting Document</option>
+                        </select>
+                        <label class="required-field">Document Type</label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <input type="file" class="form-control h-100" name="attachments" multiple required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Purpose of Request -->
+        <div class="mt-4">
+            <div class="form-floating">
+                <textarea class="form-control" name="purpose" style="height: 100px" required></textarea>
+                <label class="required-field">Purpose of Request</label>
+            </div>
+        </div>
+
+        <!-- Terms and Declaration -->
+        <div class="mt-4">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="marriage_declaration" required>
+                <label class="form-check-label" for="marriage_declaration">
+                    I declare that the information provided is true and correct to the best of my knowledge.
+                </label>
+            </div>
+        </div>
+
+        <!-- Alert for Required Fields -->
+        <div class="mt-4">
+            <div class="alert alert-info" role="alert">
+                <i class="bi bi-info-circle"></i> Please ensure all required fields marked with * are filled out correctly.
+            </div>
+        </div>
+
+        <!-- Form Buttons -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary">Submit Request</button>
+        </div>
+    </form>
+</div>
                 <!-- Death Certificate Form -->
                 <div class="tab-pane fade" id="death" role="tabpanel">
                     <form class="needs-validation" novalidate>
@@ -610,7 +752,6 @@
             </div>
         </div>
     </div>
-</div>
     </div>
 
     <!-- Form validation script -->

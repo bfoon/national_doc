@@ -5,6 +5,7 @@ from django.db import IntegrityError, transaction
 from django.utils.crypto import get_random_string
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from datetime import date
 
 
 class Profile(models.Model):
@@ -162,14 +163,71 @@ class BirthRegistration(models.Model):
         return f"Birth Registration for {self.father_name} and {self.mother_name}'s child"
 
 class MarriageDetails(models.Model):
+    MARRIAGE_TYPES = [
+        ('civil', 'Civil Marriage'),
+        ('religious', 'Religious Marriage'),
+        ('customary', 'Customary Marriage'),
+    ]
+
+    MARRIAGE_STATUS = [
+        ('first', 'First Marriage'),
+        ('remarriage', 'Remarriage'),
+    ]
+
+    # Link to main certification
     certification = models.OneToOneField(Certification, on_delete=models.CASCADE, related_name='marriage_details')
+
+    # Spouse Information
     spouse1_name = models.CharField(max_length=255)
     spouse2_name = models.CharField(max_length=255)
     marriage_date = models.DateField()
+    marriage_place = models.CharField(max_length=255)
+    marriage_type = models.CharField(max_length=20, choices=MARRIAGE_TYPES)
+    marriage_status = models.CharField(max_length=20, choices=MARRIAGE_STATUS)
+
+    # Witness Information
+    witness1_name = models.CharField(max_length=255)
+    witness2_name = models.CharField(max_length=255)
+
+    # Marriage Registration Details
     marriage_registration_number = models.CharField(max_length=50, unique=True, editable=False)
+    registration_date = models.DateField(auto_now_add=True)
+
+    # Additional Fields
+    officiant_name = models.CharField(max_length=255, blank=True)
+    ceremony_place = models.CharField(max_length=255, blank=True)
+    remarks = models.TextField(blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.marriage_registration_number:
+            # Generate a unique marriage registration number
+            marriage_date_str = self.marriage_date.strftime('%Y%m%d')
+            location_code = ''.join([word[0].upper() for word in self.marriage_place.split()[:2]])
+            random_suffix = get_random_string(6, '0123456789')
+            self.marriage_registration_number = f"M{marriage_date_str}-{location_code}-{random_suffix}"
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Marriage Details"
+        verbose_name_plural = "Marriage Details"
+        ordering = ['-marriage_date']
 
     def __str__(self):
         return f"Marriage Certificate for {self.spouse1_name} and {self.spouse2_name}"
+
+    def get_marriage_age(self):
+        """Returns the duration of marriage"""
+        if self.marriage_date:
+            today = date.today()
+            years = today.year - self.marriage_date.year
+            months = today.month - self.marriage_date.month
+            if today.day < self.marriage_date.day:
+                months -= 1
+            if months < 0:
+                years -= 1
+                months += 12
+            return f"{years} years, {months} months"
+        return None
 
 class DeathDetails(models.Model):
     certification = models.OneToOneField(Certification, on_delete=models.CASCADE, related_name='death_details')

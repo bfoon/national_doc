@@ -5,7 +5,10 @@ from django.contrib.auth.decorators import login_required
 from .models import (NationalIDApplication,
                      UploadedDocument, Application,
                      ResidentPermitApplication,
-                     WorkPermitApplication, Profile, ChatMessage, ExtendOrPrint)
+                     WorkPermitApplication, Profile, ChatMessage, ExtendOrPrint,
+                     Certification, BirthRegistration, MarriageDetails,
+    DeathDetails, CharacterCertificate, AcademicCertificate,
+    CertificationAttachment)
 from django.core.files.storage import FileSystemStorage
 from immigration.models import PostLocation, Fulfiller, FAQ, OfficerProfile
 from finance.models import Token, TokenLog, UserRisk
@@ -19,8 +22,8 @@ from .models import Profile
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt
 import json
-from django.db.models import Q
-from django.core.paginator import Paginator
+from django.db.models import Q, Count
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import random
 from twilio.rest import Client
 from django.conf import settings
@@ -28,6 +31,9 @@ from django.core.mail import send_mail
 from datetime import timedelta
 import datetime
 from django.http import JsonResponse, HttpResponseForbidden
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views import View
 
 
 def landing_page(request):
@@ -909,5 +915,200 @@ def get_client_ip(request):
         ip = request.META.get("REMOTE_ADDR")
     return ip
 
-def request_certificate(request):
-    return render(request,'docs/certificate_request.html')
+class CertificationView(LoginRequiredMixin, ListView):
+    model = Certification
+    template_name = 'docs/certificate_request.html'
+    context_object_name = 'certifications'
+    paginate_by = 5
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_query = self.request.GET.get('search', '')
+        status_filter = self.request.GET.get('status', '')
+
+        if search_query:
+            queryset = queryset.filter(applicant_name__icontains=search_query)
+
+        if status_filter and status_filter != 'all':
+            queryset = queryset.filter(status=status_filter)
+
+        return queryset.order_by('-submission_date')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get the queryset
+        queryset = self.get_queryset()
+
+        # Get current page number
+        page = self.request.GET.get('page', 1)
+        paginator = Paginator(queryset, self.paginate_by)
+
+        try:
+            certifications = paginator.page(page)
+        except PageNotAnInteger:
+            certifications = paginator.page(1)
+        except EmptyPage:
+            certifications = paginator.page(paginator.num_pages)
+
+        # Calculate visible page range
+        page_number = certifications.number
+        total_pages = paginator.num_pages
+
+        # Show 2 pages before and after the current page
+        page_range = range(max(page_number - 2, 1), min(page_number + 3, total_pages + 1))
+
+        # Get statistics
+        stats = Certification.objects.aggregate(
+            total=Count('id'),
+            approved=Count('id', filter=Q(status='approved')),
+            pending=Count('id', filter=Q(status='pending')),
+            rejected=Count('id', filter=Q(status='rejected'))
+        )
+
+        # Calculate percentages
+        if stats['total'] > 0:
+            stats['approved_percentage'] = round((stats['approved'] / stats['total']) * 100, 1)
+            stats['rejected_percentage'] = round((stats['rejected'] / stats['total']) * 100, 1)
+        else:
+            stats['approved_percentage'] = 0
+            stats['rejected_percentage'] = 0
+
+        # Get all query parameters for maintaining filters in pagination
+        query_params = self.request.GET.copy()
+        if 'page' in query_params:
+            del query_params['page']
+
+        context.update({
+            'stats': stats,
+            'search_query': self.request.GET.get('search', ''),
+            'status_filter': self.request.GET.get('status', ''),
+            'certificate_types': Certification.CERTIFICATE_TYPES,
+            'attachment_types': CertificationAttachment.ATTACHMENT_TYPES,
+            'certifications': certifications,
+            'page_range': page_range,
+            'query_params': query_params.urlencode(),
+            'total_pages': total_pages,
+            'start_index': certifications.start_index(),
+            'end_index': certifications.end_index(),
+            'total_count': paginator.count,
+        })
+        return context
+
+@login_required
+def create_certification(request):
+    if request.method == 'POST':
+        cert_type = request.POST.get('certificate_type')
+
+        try:
+            # Create base certification
+            certification = Certification.objects.create(
+                certificate_type=cert_type,
+                applicant_name=request.POST.get('applicant_name'),
+                applicant_email=request.POST.get('applicant_email'),
+                applicant_phone=request.POST.get('applicant_phone'),
+                purpose=request.POST.get('purpose'),
+                submitted_by=request.user
+            )
+
+            # Handle specific certificate type details
+            if cert_type == 'birth':
+                BirthRegistration.objects.create(
+                    certification=certification,
+                    date_of_birth=request.POST.get('date_of_birth'),
+                    place_of_birth=request.POST.get('place_of_birth'),
+                    time_of_birth=request.POST.get('time_of_birth'),
+                    father_name=request.POST.get('father_name'),
+                    mother_name=request.POST.get('mother_name'),
+                    sex=request.POST.get('sex')
+                )
+            elif cert_type == 'marriage':
+                MarriageDetails.objects.create(
+                    certification=certification,
+                    # Spouse Information
+                    spouse1_name=request.POST.get('spouse1_name'),
+                    spouse2_name=request.POST.get('spouse2_name'),
+                    marriage_date=request.POST.get('marriage_date'),
+                    marriage_place=request.POST.get('marriage_place'),
+                    marriage_type=request.POST.get('marriage_type'),
+                    marriage_status=request.POST.get('marriage_status'),
+
+                    # Witness Information
+                    witness1_name=request.POST.get('witness1_name'),
+                    witness2_name=request.POST.get('witness2_name'),
+
+                    # Additional Information
+                    officiant_name=request.POST.get('officiant_name', ''),
+                    ceremony_place=request.POST.get('ceremony_place', ''),
+                    remarks=request.POST.get('remarks', '')
+                )
+            elif cert_type == 'death':
+                DeathDetails.objects.create(
+                    certification=certification,
+                    full_name=request.POST.get('full_name'),
+                    date_of_death=request.POST.get('date_of_death'),
+                    place_of_death=request.POST.get('place_of_death'),
+                    cause_of_death=request.POST.get('cause_of_death')
+                )
+
+            # Handle file attachments
+            for file in request.FILES.getlist('attachments'):
+                CertificationAttachment.objects.create(
+                    certification=certification,
+                    file=file,
+                    attachment_type=request.POST.get('attachment_type')
+                )
+
+            messages.success(request, 'Certificate request submitted successfully!')
+            return redirect('docs:certificate_list')
+
+        except Exception as e:
+            messages.error(request, f'Error submitting certificate request: {str(e)}')
+            return redirect('docs:certificate_list')
+
+    return render(request, 'certifications/certificate_form.html')
+
+class CertificationDetailView(LoginRequiredMixin, View):
+    def get(self, request, pk):
+        certification = Certification.objects.get(pk=pk)
+        specific_details = None
+
+        if certification.certificate_type == 'birth':
+            specific_details = certification.birth_registration
+        elif certification.certificate_type == 'marriage':
+            specific_details = certification.marriage_details
+        elif certification.certificate_type == 'death':
+            specific_details = certification.death_details
+
+        context = {
+            'certification': certification,
+            'specific_details': specific_details,
+            'attachments': certification.attachments.all()
+        }
+        return render(request, 'certificates/certification_detail.html', context)
+
+def download_certificate(request, certificate_id):
+    # Add logic for generating and downloading certificate
+    return redirect(f'/immigration/certificate/print/{certificate_id}/', )
+
+
+def track_certificate(request, pk):
+    # Add logic for tracking certificate status
+    pass
+
+
+def appeal_certificate(request, pk):
+    # Add logic for handling certificate appeals
+    pass
+
+
+def update_certification_status(request, pk):
+    if request.method == 'POST' and request.user.is_staff:
+        certification = Certification.objects.get(pk=pk)
+        new_status = request.POST.get('status')
+        if new_status in dict(Certification.STATUS_CHOICES):
+            certification.status = new_status
+            certification.approved_by = request.user if new_status == 'approved' else None
+            certification.save()
+            messages.success(request, f'Certificate status updated to {new_status}')
+        return redirect('docs:certificate_detail', pk=pk)
