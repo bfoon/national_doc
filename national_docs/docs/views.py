@@ -51,6 +51,8 @@ def login_page(request):
                 return redirect('immigration_dashboard')  # Immigration dashboard URL
             elif user.groups.filter(name__in=['sysadmin']):
                 return redirect('officer_profiles')
+            elif user.groups.filter(name__in=['registrar']):
+                return redirect('certificate_request')
             else:
                 return redirect('dashboard')  # Default dashboard URL for other users
 
@@ -190,13 +192,28 @@ def dashboard(request):
 @login_required
 def profile_view(request):
     try:
+        # Fetch the appropriate profile
         profile = get_object_or_404(Profile, user=request.user)
     except:
         profile = get_object_or_404(OfficerProfile, user=request.user)
 
+    # Check if the user belongs to any of the special groups
     user_groups = request.user.groups.values_list('name', flat=True)
-    belongs_to_special_group = any(group in ['immigration', 'police', 'tax'] for group in user_groups)
+    belongs_to_special_group = any(group in ['immigration', 'police', 'tax', 'registrar'] for group in user_groups)
 
+    # Redirect to the appropriate URL if the user belongs to a special group
+    if belongs_to_special_group:
+        special_group_urls = {
+            'immigration': '/immigration/dashboard/',
+            'police': '/police/dashboard/',
+            'tax': '/tax/dashboard/',
+            'registrar': '/police/certificate_request/',
+        }
+        for group in user_groups:
+            if group in special_group_urls:
+                return redirect(special_group_urls[group])
+
+    # Render the profile page for non-special group users
     return render(request, 'docs/profile.html', {
         'profile': profile,
         'belongs_to_special_group': belongs_to_special_group,

@@ -156,6 +156,7 @@
             </a>
         </div>
 
+       {% if show_certificate_services %}
         <div class="col-md-3 col-sm-6">
             <a href="{% url 'certificate_request' %}" class="text-decoration-none">
                 <div class="card">
@@ -167,6 +168,7 @@
                 </div>
             </a>
         </div>
+        {% endif %}
 
         {% if request.user.is_staff or request.user.is_superuser %}
             <div class="col-md-3 col-sm-6">

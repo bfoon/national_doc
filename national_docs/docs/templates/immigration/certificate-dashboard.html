@@ -16,20 +16,66 @@
     opacity: 0.9; /* Add hover effect for better UX */
 }
 
+.dashboard-header .user-name {
+    font-weight: 500;
+    color: #1a1f36;
+}
+
+.dashboard-header .divider {
+    margin: 0 0.5rem;
+    color: #8792a2;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+    background: linear-gradient(120deg, var(--primary-color), #4f46e5);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    position: relative;
+    padding: 0 2px;
+    text-shadow: 0px 1px 1px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.2px;
+}
+
+.user-name::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg,
+        var(--primary-color) 0%,
+        #4f46e5 50%,
+        var(--primary-color) 100%
+    );
+    opacity: 0.7;
+    border-radius: 2px;
+}
+
 </style>
 <!-- Breadcrumb -->
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb px-3 py-2 mb-4">
-        <li class="breadcrumb-item">
-            <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a>
-        </li>
+        {% if not is_registrar %}
+            <li class="breadcrumb-item">
+                <a href="{% url 'immigration_dashboard' %}" class="text-decoration-none">Dashboard</a>
+            </li>
+        {% endif %}
         <li class="breadcrumb-item active" aria-current="page">Certificate Dashboard</li>
     </ol>
 </nav>
 
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="mb-0">Certificate Dashboard Overview</h2>
+    <div class="welcome-text">
+        <h2 class="mb-0">Certificate Dashboard Overview</h2>
+            <span class="user-name">{{ user.get_full_name }}</span>
+            <span class="divider">•</span>
+            <span>Welcome to the centralized immigration services dashboard</span>
+        </div>
 
     <div class="d-flex gap-3">
         <!-- Dropdown for Report Generation -->

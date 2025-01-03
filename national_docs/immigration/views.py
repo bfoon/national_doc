@@ -56,6 +56,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 import csv
+from collections import OrderedDict
 
 
 def send_email_in_thread(subject, message, recipient_email):
@@ -142,12 +143,16 @@ def immigration_dashboard(request):
             application__post_location=post_location
         ).count()
 
+    user_groups = request.user.groups.values_list('name', flat=True)
+    show_certificate_services = 'registrar' in user_groups or request.user.is_superuser
+
     context = {
         'new_requests_count': new_requests_count,
         'pending_requests_count': pending_requests_count,
         'waiting_requests_count': waiting_requests_count,
         'interview_requests_count': interview_requests_count,
         'pending_todo_count': pending_todo_count,
+        'show_certificate_services': show_certificate_services,
     }
 
     return render(request, 'immigration/dashboard.html', context)
@@ -490,72 +495,82 @@ def list_officer_users(request):
         messages.warning(request, "You do not have permission to view this list.")
         return redirect('immigration_dashboard')  # Redirect to a safe page
 
-    immigration_officers = User.objects.filter(groups__name='immigration')
-    police_officers = User.objects.filter(groups__name='police')
-    tax_officers = User.objects.filter(groups__name='tax')
+    groups = Group.objects.filter(name__in=['immigration', 'police', 'tax', 'admin', 'sysadmin', 'registrar'])
+    officers_by_group = {}
+
+    for group in groups:
+        officers_by_group[group.name] = User.objects.filter(groups=group)
+
+    # Sort the dictionary by group names in ascending order
+    officers_by_group = OrderedDict(sorted(officers_by_group.items(), key=lambda x: x[0].lower()))
 
     context = {
-        'immigration_officers': immigration_officers,
-        'police_officers': police_officers,
-        'tax_officers': tax_officers
+        'officers_by_group': officers_by_group,
     }
 
     return render(request, 'immigration/list_officer_users.html', context)
 
 @login_required
 def create_user(request):
-    # Ensure that only superusers can create users
+    # Ensure only superusers can access this view
     if not request.user.is_superuser:
         messages.warning(request, "You do not have permission to create users.")
         return redirect('list_officer_users')
 
     if request.method == 'POST':
-        username = request.POST.get('username')
-        first_name = request.POST.get('first_name')
-        last_name = request.POST.get('last_name')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        role = request.POST.get('role')  # Immigration, Police, or Tax officer
-        post_location_id = request.POST.get('post_location')
-        officer_batch_number = request.POST.get('officer_batch_number')
+        username = request.POST.get('username', '').strip()
+        first_name = request.POST.get('first_name', '').strip()
+        last_name = request.POST.get('last_name', '').strip()
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()
+        role = request.POST.get('role', '').strip()
+        post_location_id = request.POST.get('post_location', '').strip()
+        officer_batch_number = request.POST.get('officer_batch_number', '').strip()
 
-        # Check if the username already exists
+        # Validation
+        if not all([username, first_name, last_name, email, password, role, post_location_id]):
+            messages.warning(request, 'All fields are required.')
+            return redirect('create_user')
+
         if User.objects.filter(username=username).exists():
             messages.warning(request, 'Username already exists.')
-        else:
-            # Create the user
+            return redirect('create_user')
+
+        # Create user and associate role and post location
+        try:
             user = User.objects.create_user(username=username, email=email, password=password)
             user.first_name = first_name
             user.last_name = last_name
             user.save()
 
-            # Try to get the group by name (role) instead of id
-            try:
-                group = Group.objects.get(name=role)
-                user.groups.add(group)  # Add the user to the group
-                user.save()
+            # Associate group
+            group = Group.objects.get(name=role)
+            user.groups.add(group)
 
-                # Create the officer profile
-                post_location = PostLocation.objects.get(id=post_location_id)
-                OfficerProfile.objects.create(
-                    user=user,
-                    officer_batch_number=officer_batch_number,
-                    post_location=post_location
-                )
-                # user = request.user  # Assuming the current user is the one to notify
-                # send_notification(user, f"Officer user account {username} was created.")
-                messages.success(request, f'{role.capitalize()} user created successfully!')
-                return redirect('list_officer_users')
-            except Group.DoesNotExist:
-                messages.warning(request, f'Group "{role}" does not exist.')
-            except PostLocation.DoesNotExist:
-                messages.warning(request, 'Invalid post location.')
+            # Create officer profile
+            post_location = PostLocation.objects.get(id=post_location_id)
+            OfficerProfile.objects.create(
+                user=user,
+                officer_batch_number=officer_batch_number,
+                post_location=post_location
+            )
 
-    # Fetch groups based on their name
-    groups = Group.objects.filter(name__in=['immigration', 'police', 'tax', 'admin'])
+            messages.success(request, f'{role.capitalize()} user created successfully!')
+            return redirect('list_officer_users')
+
+        except Group.DoesNotExist:
+            messages.warning(request, f'Role "{role}" does not exist.')
+        except PostLocation.DoesNotExist:
+            messages.warning(request, 'Invalid post location.')
+
+    # Fetch groups and post locations
+    groups = Group.objects.filter(name__in=['immigration', 'police', 'tax', 'admin', 'sysadmin', 'registrar'])
     post_locations = PostLocation.objects.all()
 
-    return render(request, 'immigration/create_user.html', {'groups': groups, 'post_locations': post_locations})
+    return render(request, 'immigration/create_user.html', {
+        'groups': groups,
+        'post_locations': post_locations
+    })
 
 @login_required
 def edit_user(request, user_id):
@@ -1380,7 +1395,6 @@ def export_webpage(request):
 def is_staff_or_superuser(user):
     return user.is_staff or user.is_superuser
 
-
 @login_required
 def support_desk(request):
     # Fetch FAQs
@@ -1740,8 +1754,6 @@ def respond_chat(request):
         messages.error(request, 'Invalid request method.')
         return redirect('support_desk')
 
-
-
 @login_required
 @user_passes_test(is_staff_or_superuser)
 @csrf_exempt
@@ -1775,7 +1787,12 @@ def close_chat(request):
             return JsonResponse({'success': False, 'error': 'Chat message not found'})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
+def is_superuser_or_registrar(user):
+    return user.is_superuser or user.groups.filter(name="registrar").exists()
+
+
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def certificate_request(request):
     # Fetch all certifications initially
     certifications = Certification.objects.all()
@@ -1842,6 +1859,9 @@ def certificate_request(request):
     # Recent activity
     recent_activity = certifications.order_by('-submission_date')[:5]
 
+    user_groups = request.user.groups.values_list('name', flat=True)
+    is_registrar = 'registrar' in user_groups
+
     return render(request, 'immigration/certificate-dashboard.html', {
         'certifications': page_obj,
         'pending_count': pending_count,
@@ -1864,9 +1884,11 @@ def certificate_request(request):
         'status_filter': status_filter,
         'certificate_type_filter': certificate_type_filter,
         'applicant_name_filter': applicant_name_filter,
+        'is_registrar': is_registrar,
     })
 
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def certificate_detail(request, cert_id):
     # Fetch the certificate
     certificate = get_object_or_404(Certification, id=cert_id)
@@ -2026,6 +2048,7 @@ def generate_qr_code(registration_number):
     return f"data:image/png;base64,{img_str}"
 
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def print_certificate(request, certificate_id):
     """
     Generate PDF certificate.
@@ -2115,9 +2138,8 @@ def print_certificate(request, certificate_id):
         logger.error(f"Error generating PDF for certificate {certificate_id}: {str(e)}")
         raise CertificateError(f"Error generating PDF: {str(e)}")
 
-
-
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def approve_certificate(request, cert_id):
     certification = get_object_or_404(Certification, id=cert_id)
 
@@ -2133,6 +2155,7 @@ def approve_certificate(request, cert_id):
     return redirect('certificate_detail',cert_id)
 
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def reject_certificate(request, cert_id):
     certification = get_object_or_404(Certification, id=cert_id)
 
@@ -2149,8 +2172,8 @@ def reject_certificate(request, cert_id):
     messages.success(request, f"Certificate {certification.get_certificate_type_display()} has been rejected.")
     return redirect('certificate_detail', cert_id=cert_id)
 
-
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def save_more_info(request, cert_id):
     # Get the certificate
     certificate = get_object_or_404(Certification, id=cert_id)
@@ -2174,6 +2197,7 @@ def save_more_info(request, cert_id):
         return redirect('certificate_detail', cert_id=cert_id)
 
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def get_user_application(request, user_id):
     try:
         # Fetch the latest application for the user
@@ -2210,6 +2234,7 @@ def get_user_application(request, user_id):
         return JsonResponse(response_data)
 
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def save_checklist(request, certificate_id):
     certificate = get_object_or_404(Certification, id=certificate_id)
 
@@ -2228,8 +2253,8 @@ def save_checklist(request, certificate_id):
 
     return HttpResponseForbidden()
 
-
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def generate_pdf_report(request):
     # Get certifications and sort them by status
     certifications = Certification.objects.all().order_by('status', '-id')
@@ -2346,6 +2371,7 @@ def generate_pdf_report(request):
     return response
 
 @login_required
+@user_passes_test(is_superuser_or_registrar)
 def generate_csv_report(request):
     certifications = Certification.objects.all()
 
