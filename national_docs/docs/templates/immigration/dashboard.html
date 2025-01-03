@@ -169,6 +169,19 @@
             </a>
         </div>
         {% endif %}
+            {% if show_certificate_services %}
+        <div class="col-md-3 col-sm-6">
+            <a href="{% url 'request_certificate' %}" class="text-decoration-none">
+                <div class="card">
+                    <div class="card-body">
+                       <i class="fas fa-calendar text-primary"></i>
+                        <h5 class="card-title">Certificate Request</h5>
+                        <p class="card-text">certificate requests</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
 
         {% if request.user.is_staff or request.user.is_superuser %}
             <div class="col-md-3 col-sm-6">

@@ -35,4 +35,5 @@ urlpatterns = [
     path('application/<int:application_id>/extend-or-reprint/', views.apply_extend_or_reprint,
          name='apply_extend_or_reprint'),
     path('verify-token/', views.verify_token, name='verify_token'),
+    path('request-certificate/', views.request_certificate, name='request_certificate'),
 ]

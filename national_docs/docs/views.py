@@ -908,3 +908,6 @@ def get_client_ip(request):
     else:
         ip = request.META.get("REMOTE_ADDR")
     return ip
+
+def request_certificate(request):
+    return render(request,'docs/certificate_request.html')
