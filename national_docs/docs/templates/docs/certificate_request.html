@@ -2,197 +2,332 @@
 {% block content %}
 {% load static %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-          :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --success-color: #198754;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --light-gray: #f8f9fa;
-            --border-radius: 8px;
-            --box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        }
+  <style>
+/* CSS Variables for better maintainability */
+:root {
+    /* Color Palette */
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary-color: #64748b;
+    --success-color: #22c55e;
+    --warning-color: #eab308;
+    --danger-color: #ef4444;
+    --light-gray: #f1f5f9;
+    --border-color: #e2e8f0;
 
-        /* Card Enhancements */
-        .card {
-            border: none;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+    /* Spacing */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
 
-        .card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
+    /* Border Radius */
+    --border-radius-sm: 0.375rem;
+    --border-radius-md: 0.5rem;
+    --border-radius-lg: 0.75rem;
 
-        .card-body {
-            padding: 1.5rem;
-        }
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
 
-        .card-footer {
-            background: transparent;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            padding: 1rem 1.5rem;
-        }
+/* Enhanced Table Styles */
+.table {
+    margin: 0;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
 
-        /* Button Styles */
-        .btn {
-            border-radius: 6px;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            transition: all 0.2s ease;
-        }
+.table th {
+    background-color: var(--light-gray);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 2px solid var(--border-color);
+}
 
-        .btn-lg {
-            padding: 0.75rem 1.5rem;
-        }
+.table td {
+    padding: var(--spacing-sm) var(--spacing-md);
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+}
 
-        .btn-primary {
-            background: linear-gradient(45deg, var(--primary-color), #0b5ed7);
-            border: none;
-            box-shadow: 0 2px 6px rgba(13, 110, 253, 0.2);
-        }
+.table tbody tr:hover {
+    background-color: var(--light-gray);
+}
 
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
-        }
+/* Modern Form Controls */
+.form-control, .form-select {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
 
-        /* Table Enhancements */
-        .table {
-            margin-bottom: 0;
-        }
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
 
-        .table th {
-            font-weight: 600;
-            color: var(--secondary-color);
-            border-top: none;
-            padding: 1rem;
-        }
+/* Enhanced Button Styles */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
 
-        .table td {
-            padding: 1rem;
-            vertical-align: middle;
-        }
+.btn-primary {
+    background: var(--primary-color);
+    border: none;
+}
 
-        .table-hover tbody tr:hover {
-            background-color: var(--light-gray);
-        }
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
 
-        /* Badge Styles */
-        .badge {
-            padding: 0.5rem 0.8rem;
-            font-weight: 500;
-            border-radius: 6px;
-        }
+.stat-footer span {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+}
 
-        /* Form Controls */
-        .form-control, .form-select {
-            border-radius: 6px;
-            border-color: #dee2e6;
-            padding: 0.625rem 1rem;
-        }
+/* Table Card */
+.table-card {
+    padding: 0;
+}
 
-        .form-control:focus, .form-select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(13,110,253,0.15);
-        }
+.table-card .card-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 1.5rem;
+}
 
-        /* Modal Enhancements */
-        .modal-content {
-            border: none;
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
+.table-card .card-header h5 {
+    margin: 0;
+    font-weight: 600;
+    color: #1F2937;
+}
 
-        .modal-header {
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-            padding: 1.5rem;
-        }
+.table-card .table {
+    margin: 0;
+}
 
-        .modal-body {
-            padding: 1.5rem;
-        }
+.table-card .table th {
+    border-top: none;
+    font-weight: 600;
+    color: #6B7280;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
 
-        .modal-footer {
-            border-top: 1px solid rgba(0,0,0,0.05);
-            padding: 1.5rem;
-        }
+.table-card .table td {
+    vertical-align: middle;
+    color: #374151;
+}
 
-        /* Navigation Tabs */
-        .nav-tabs {
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
+.stat-card {
+    border: none;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 160px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
 
-        .nav-tabs .nav-link {
-            border: none;
-            color: var(--secondary-color);
-            padding: 1rem 1.5rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
 
-        .nav-tabs .nav-link:hover {
-            border: none;
-            color: var(--primary-color);
-        }
+/* Card Background Gradients */
+.stat-card.bg-primary {
+    background: linear-gradient(135deg, #4361ee, #3730a3);
+}
 
-        .nav-tabs .nav-link.active {
-            color: var(--primary-color);
-            border: none;
-            border-bottom: 2px solid var(--primary-color);
-            background: transparent;
-        }
+.stat-card.bg-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
 
-        /* Pagination Refinements */
-        .pagination {
-            margin-bottom: 0;
-        }
+.stat-card.bg-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
 
-        .page-link {
-            border: none;
-            padding: 0.5rem 1rem;
-            color: var(--secondary-color);
-            border-radius: 6px;
-            margin: 0 0.2rem;
-        }
+.stat-card.bg-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+}
 
-        .page-item.active .page-link {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
+/* Card Content Styles */
+.stat-card .card-body {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
 
-        /* Alert Styling */
-        .alert {
-            border-radius: var(--border-radius);
-            border: 1px solid transparent;
-        }
+.stat-card .card-title {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        .alert-info {
-            background-color: rgba(13,110,253,0.1);
-            border-color: rgba(13,110,253,0.1);
-            color: var(--primary-color);
-        }
+.stat-card .display-4 {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+}
 
-        /* Statistics Cards */
-        .bg-primary { background: linear-gradient(45deg, #0d6efd, #0b5ed7) !important; }
-        .bg-success { background: linear-gradient(45deg, #198754, #157347) !important; }
-        .bg-warning { background: linear-gradient(45deg, #ffc107, #ffca2c) !important; }
-        .bg-danger { background: linear-gradient(45deg, #dc3545, #bb2d3b) !important; }
+.stat-card .card-footer {
+    background: rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 1.5rem;
+}
 
-        /* Form Floating Labels */
-        .form-floating > label {
-            padding: 0.5rem 1rem;
-        }
+.stat-card .card-footer small {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
 
-        .form-floating > .form-control,
-        .form-floating > .form-select {
-            height: calc(3.5rem + 2px);
-            padding: 1rem;
-        }
-    </style>
+/* Icon Styles */
+.stat-card .icon-background {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 8rem;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover .icon-background {
+    transform: rotate(-5deg) scale(1.1);
+}
+
+/* Warning Card Text Color Override */
+.stat-card.bg-warning .card-title,
+.stat-card.bg-warning .display-4,
+.stat-card.bg-warning .card-footer small {
+    color: rgba(0, 0, 0, 0.9);
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: 1rem;
+    }
+
+    .stat-card .display-4 {
+        font-size: 2rem;
+    }
+
+    .stat-card .icon-background {
+        font-size: 6rem;
+    }
+}
+/* Modal Improvements */
+.modal-content {
+    border: none;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--spacing-md);
+}
+
+.modal-body {
+    padding: var(--spacing-md);
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: var(--spacing-md);
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    color: var(--secondary-color);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-weight: 500;
+    position: relative;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color);
+    background: transparent;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* Responsive Improvements */
+@media (max-width: 768px) {
+    .stat-card {
+        margin-bottom: var(--spacing-md);
+    }
+
+    .table-responsive {
+        margin: 0 calc(-1 * var(--spacing-sm));
+        padding: 0 var(--spacing-sm);
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: var(--spacing-xs);
+    }
+}
+
+/* Utility Classes */
+.shadow-hover:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.text-xs {
+    font-size: 0.75rem;
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+</style>
  <div class="container">
         <!-- Add Certificate Request Button -->
         <div class="d-flex justify-content-end mt-4 mb-4">
@@ -201,60 +336,72 @@
             </button>
         </div>
 
-        <!-- Statistics Cards -->
-        <div class="row">
-            <div class="col-md-3">
-                <div class="card shadow-sm bg-primary text-white mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Applications</h5>
-                        <h2 class="display-4">{{ stats.total }}</h2>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <small>Updated today</small>
-                        <div><i class="fas fa-angle-right"></i></div>
-                    </div>
-                </div>
+        <!-- Enhanced Statistics Cards -->
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="stat-card bg-primary">
+            <div class="icon-background">
+                <i class="fas fa-file-alt"></i>
             </div>
-
-            <div class="col-md-3">
-                <div class="card shadow-sm bg-success text-white mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Approved</h5>
-                        <h2 class="display-4">{{ stats.approved }}</h2>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <small>{{ stats.approved_percentage }}% success rate</small>
-                        <div><i class="fas fa-angle-right"></i></div>
-                    </div>
-                </div>
+            <div class="card-body">
+                <h5 class="card-title">Total Applications</h5>
+                <h2 class="display-4">{{ stats.total }}</h2>
             </div>
-
-            <div class="col-md-3">
-                <div class="card shadow-sm bg-warning text-dark mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Pending</h5>
-                        <h2 class="display-4">{{ stats.pending }}</h2>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <small>Average wait: 2 days</small>
-                        <div><i class="fas fa-angle-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="card shadow-sm bg-danger text-white mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Rejected</h5>
-                        <h2 class="display-4">{{ stats.rejected }}</h2>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <small>{{ stats.rejected_percentage }}% rejection rate</small>
-                        <div><i class="fas fa-angle-right"></i></div>
-                    </div>
-                </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <small>Updated today</small>
+                <div><i class="fas fa-chevron-right"></i></div>
             </div>
         </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-success">
+            <div class="icon-background">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Approved</h5>
+                <h2 class="display-4">{{ stats.approved }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <small>{{ stats.approved_percentage }}% success rate</small>
+                <div><i class="fas fa-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-warning">
+            <div class="icon-background">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Pending</h5>
+                <h2 class="display-4">{{ stats.pending }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <small>Average wait: 2 days</small>
+                <div><i class="fas fa-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="stat-card bg-danger">
+            <div class="icon-background">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Rejected</h5>
+                <h2 class="display-4">{{ stats.rejected }}</h2>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <small>{{ stats.rejected_percentage }}% rejection rate</small>
+                <div><i class="fas fa-chevron-right"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
 
         <!-- Applications Table -->
         <div class="card mb-4 shadow-sm">
