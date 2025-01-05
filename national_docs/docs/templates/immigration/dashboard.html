@@ -92,7 +92,7 @@
                 </div>
             </a>
         </div>
-
+        {% if request.user.is_superuser or "admin" in user_groups %}
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/todos" class="text-decoration-none">
                 <div class="card position-relative">
@@ -107,6 +107,7 @@
                 </div>
             </a>
         </div>
+        {% endif %}
 
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/interviews" class="text-decoration-none">
@@ -120,6 +121,7 @@
             </a>
         </div>
 
+        {% if request.user.is_superuser or "admin" in user_groups %}
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/available_slots" class="text-decoration-none">
                 <div class="card">
@@ -131,7 +133,9 @@
                 </div>
             </a>
         </div>
+        {% endif %}
 
+        {% if request.user.is_superuser or "admin" in user_groups %}
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/post_locations" class="text-decoration-none">
                 <div class="card">
@@ -143,7 +147,9 @@
                 </div>
             </a>
         </div>
+        {% endif %}
 
+        {% if request.user.is_staff or request.user.is_superuser %}
         <div class="col-md-3 col-sm-6">
             <a href="/immigration/list_officer_users" class="text-decoration-none">
                 <div class="card">
@@ -155,6 +161,7 @@
                 </div>
             </a>
         </div>
+       {% endif %}
 
        {% if show_certificate_services %}
         <div class="col-md-3 col-sm-6">

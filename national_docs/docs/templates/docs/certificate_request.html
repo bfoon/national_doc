@@ -582,8 +582,34 @@
         padding: 1.5rem;
     }
 }
+
+/* Add new styles for the portal header */
+.portal-header {
+    background: linear-gradient(135deg, #4F46E5, #4338CA);
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.portal-title {
+    color: white;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.user-name {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
 </style>
  <div class="container">
+     <div class="portal-header">
+        <h1 class="portal-title">Certificate Requesting Portal</h1>
+        <div class="user-name">Welcome, {{ user.get_full_name }}</div>
+    </div>
         <!-- Add Certificate Request Button -->
        <div class="button-container d-flex justify-content-end">
             <button type="button" class="btn-create" data-bs-toggle="modal" data-bs-target="#certificateModal">
@@ -593,71 +619,71 @@
         </div>
 
         <!-- Enhanced Statistics Cards -->
-<div class="row g-4">
-    <div class="col-md-3">
-        <div class="stat-card bg-primary">
-            <div class="icon-background">
-                <i class="fas fa-file-alt"></i>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="stat-card bg-primary">
+                    <div class="icon-background">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Total Applications</h5>
+                        <h2 class="display-4">{{ stats.total }}</h2>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <small>Updated today</small>
+                        <div><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">Total Applications</h5>
-                <h2 class="display-4">{{ stats.total }}</h2>
-            </div>
-            <div class="card-footer d-flex align-items-center justify-content-between">
-                <small>Updated today</small>
-                <div><i class="fas fa-chevron-right"></i></div>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="stat-card bg-success">
-            <div class="icon-background">
-                <i class="fas fa-check-circle"></i>
+            <div class="col-md-3">
+                <div class="stat-card bg-success">
+                    <div class="icon-background">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Approved</h5>
+                        <h2 class="display-4">{{ stats.approved }}</h2>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <small>{{ stats.approved_percentage }}% success rate</small>
+                        <div><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">Approved</h5>
-                <h2 class="display-4">{{ stats.approved }}</h2>
-            </div>
-            <div class="card-footer d-flex align-items-center justify-content-between">
-                <small>{{ stats.approved_percentage }}% success rate</small>
-                <div><i class="fas fa-chevron-right"></i></div>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="stat-card bg-warning">
-            <div class="icon-background">
-                <i class="fas fa-clock"></i>
+            <div class="col-md-3">
+                <div class="stat-card bg-warning">
+                    <div class="icon-background">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Pending</h5>
+                        <h2 class="display-4">{{ stats.pending }}</h2>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <small>Average wait: 2 days</small>
+                        <div><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <h5 class="card-title">Pending</h5>
-                <h2 class="display-4">{{ stats.pending }}</h2>
-            </div>
-            <div class="card-footer d-flex align-items-center justify-content-between">
-                <small>Average wait: 2 days</small>
-                <div><i class="fas fa-chevron-right"></i></div>
-            </div>
-        </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="stat-card bg-danger">
-            <div class="icon-background">
-                <i class="fas fa-times-circle"></i>
-            </div>
-            <div class="card-body">
-                <h5 class="card-title">Rejected</h5>
-                <h2 class="display-4">{{ stats.rejected }}</h2>
-            </div>
-            <div class="card-footer d-flex align-items-center justify-content-between">
-                <small>{{ stats.rejected_percentage }}% rejection rate</small>
-                <div><i class="fas fa-chevron-right"></i></div>
+            <div class="col-md-3">
+                <div class="stat-card bg-danger">
+                    <div class="icon-background">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Rejected</h5>
+                        <h2 class="display-4">{{ stats.rejected }}</h2>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <small>{{ stats.rejected_percentage }}% rejection rate</small>
+                        <div><i class="fas fa-chevron-right"></i></div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
         <!-- Applications Table -->
         <div class="card mb-4 shadow-sm">
@@ -742,7 +768,7 @@
 
                                                     <div class="cert-detail-item">
                                                         <span class="cert-detail-label">Date of Request</span>
-                                                        <div class="cert-detail-value">{{ cert.created_at|date:"M d, Y" }}</div>
+                                                        <div class="cert-detail-value">{{ cert.submission_date|date:"M d, Y" }}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -834,30 +860,28 @@
         {% endif %}
         </div>
         </div>
-        </div>
         <br>
 
-<!-- Certificate Request Modal -->
-<div class="modal fade" id="certificateModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">New Certificate Request</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <ul class="nav nav-tabs" id="certificateTabs" role="tablist">
-                    <li class="nav-item">
-                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#birth">Birth Certificate</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#marriage">Marriage Certificate</button>
-                    </li>
-                    <li class="nav-item">
-                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#death">Death Certificate</button>
-                    </li>
-                </ul>
-
+    <!-- Certificate Request Modal -->
+    <div class="modal fade" id="certificateModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Certificate Request</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="certificateTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#birth">Birth Certificate</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#marriage">Marriage Certificate</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#death">Death Certificate</button>
+                        </li>
+                    </ul>
                 <div class="tab-content mt-3">
     <!-- Birth Certificate Form -->
     <div class="tab-pane fade show active" id="birth">

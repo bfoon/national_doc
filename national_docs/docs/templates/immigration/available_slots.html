@@ -114,11 +114,17 @@
                             </div>
                         </div>
                     </td>
-                    <td>
-                        <span class="badge {% if slot.is_available %}bg-success{% else %}bg-danger{% endif %}">
-                            {{ slot.is_available|yesno:"Available,Full" }}
-                        </span>
+                   <td>
+                        {% if slot.date_time|date:"U" < current_time|date:"U" and slot.current_interviewees < slot.max_interviewees %}
+                            <span class="badge bg-secondary">Expired</span>
+                        {% else %}
+                            <span class="badge {% if slot.is_available %}bg-success{% else %}bg-danger{% endif %}">
+                                {{ slot.is_available|yesno:"Available,Full" }}
+                            </span>
+                        {% endif %}
                     </td>
+
+
                     <td>
                         <div class="btn-group">
                             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editSlotModal-{{ slot.id }}">

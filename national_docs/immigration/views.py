@@ -152,6 +152,7 @@ def immigration_dashboard(request):
         'waiting_requests_count': waiting_requests_count,
         'interview_requests_count': interview_requests_count,
         'pending_todo_count': pending_todo_count,
+        'user_groups': user_groups,
         'show_certificate_services': show_certificate_services,
     }
 
@@ -740,7 +741,6 @@ def delete_group(request, group_id):
 
     return render(request, 'immigration/delete_group.html', {'group': group})
 
-
 @login_required
 def available_slots(request):
     user = request.user
@@ -753,11 +753,35 @@ def available_slots(request):
         messages.warning(request, "You do not have permission to view available interview slots.")
         return redirect('todo_list')
 
-    # Retrieve interview slots sorted from newest to oldest
+    # Retrieve interview slots filtered by location
     if user.is_superuser:
-        interview_slots = InterviewSlot.objects.all().order_by('-date_time')
+        interview_slots = InterviewSlot.objects.all()
     else:
-        interview_slots = InterviewSlot.objects.filter(location=user.officerprofile.post_location).order_by('-date_time')
+        interview_slots = InterviewSlot.objects.filter(location=user.officerprofile.post_location)
+
+    # Mark expired slots as unavailable
+    for slot in interview_slots.filter(is_available=True):
+        if slot.date_time < now():
+            slot.is_available = False
+            slot.save()
+
+    # Advanced Search Filters
+    date_filter = request.GET.get('date', '').strip()
+    location_filter = request.GET.get('location', '').strip()
+    availability_filter = request.GET.get('availability', '').strip()
+
+    if date_filter:
+        interview_slots = interview_slots.filter(date_time__date=date_filter)
+    if location_filter:
+        interview_slots = interview_slots.filter(location__id=location_filter)
+    if availability_filter:
+        if availability_filter.lower() == 'full':
+            interview_slots = interview_slots.filter(current_interviewees__gte=F('max_interviewees'))
+        elif availability_filter.lower() == 'available':
+            interview_slots = interview_slots.filter(current_interviewees__lt=F('max_interviewees'))
+
+    # Sort the slots from newest to oldest
+    interview_slots = interview_slots.order_by('-date_time')
 
     paginator = Paginator(interview_slots, 5)  # Show 5 slots per page
     page_number = request.GET.get('page')
@@ -789,6 +813,12 @@ def available_slots(request):
     return render(request, 'immigration/available_slots.html', {
         'page_obj': page_obj,
         'post_locations': post_locations,
+        'filters': {
+            'date': date_filter,
+            'location': location_filter,
+            'availability': availability_filter,
+        },
+        'current_time': now(),
     })
 
 @login_required
