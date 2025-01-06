@@ -59,6 +59,8 @@ def login_page(request):
                 return redirect('officer_profiles')
             elif user.groups.filter(name__in=['registrar']):
                 return redirect('certificate_request')
+            elif user.groups.filter(name__in=['nurse']):
+                return redirect('certificate_list')
             else:
                 return redirect('dashboard')  # Default dashboard URL for other users
 
@@ -205,7 +207,7 @@ def profile_view(request):
 
     # Check if the user belongs to any of the special groups
     user_groups = request.user.groups.values_list('name', flat=True)
-    belongs_to_special_group = any(group in ['immigration', 'police', 'tax', 'registrar'] for group in user_groups)
+    belongs_to_special_group = any(group in ['immigration', 'police', 'tax', 'registrar','nurse'] for group in user_groups)
 
     # Redirect to the appropriate URL if the user belongs to a special group
     if belongs_to_special_group:
@@ -214,6 +216,7 @@ def profile_view(request):
             'police': '/police/dashboard/',
             'tax': '/tax/dashboard/',
             'registrar': '/police/certificate_request/',
+            'nurse': '/certificates/',
         }
         for group in user_groups:
             if group in special_group_urls:
@@ -1112,3 +1115,31 @@ def update_certification_status(request, pk):
             certification.save()
             messages.success(request, f'Certificate status updated to {new_status}')
         return redirect('docs:certificate_detail', pk=pk)
+
+
+@login_required
+def get_certificate_tracking(request, certificate_id):
+    try:
+        certificate = get_object_or_404(Certification, id=certificate_id)
+
+        # Get all notes for this certificate
+        notes = []
+        for note in certificate.notes.select_related('created_by').order_by('-created_at'):
+            notes.append({
+                'content': note.content,
+                'created_by': note.created_by.get_full_name() or note.created_by.username,
+                'created_at': note.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            })
+
+        data = {
+            'certificate_id': certificate.id,
+            'status': certificate.status,
+            'status_display': certificate.get_status_display(),
+            'submission_date': certificate.submission_date.strftime('%Y-%m-%d'),
+            'notes': notes
+        }
+
+        return JsonResponse(data)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)

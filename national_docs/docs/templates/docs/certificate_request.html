@@ -604,6 +604,125 @@
     font-size: 1.1rem;
     font-weight: 500;
 }
+.tracking-list {
+    max-width: 800px;
+    margin: 1.5rem auto;
+    position: relative;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tracking-item {
+    padding: 2rem 0;
+    border-left: 3px solid #dee2e6;
+    position: relative;
+    padding-left: 3.5rem;
+    margin-left: 1.5rem;
+}
+
+.tracking-item:last-child {
+    border-left: 3px solid transparent;
+}
+
+.tracking-item::before {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid #dee2e6;
+    position: absolute;
+    left: -13px;
+    top: 2rem;
+    z-index: 1;
+}
+
+.tracking-item.completed::before {
+    background: #28a745;
+    border-color: #28a745;
+    box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
+}
+
+.tracking-item.rejected::before {
+    background: #dc3545;
+    border-color: #dc3545;
+    box-shadow: 0 0 6px rgba(220, 53, 69, 0.6);
+}
+
+.tracking-item.pending::before {
+    background: #ffc107;
+    border-color: #ffc107;
+    box-shadow: 0 0 6px rgba(255, 193, 7, 0.6);
+}
+
+.status-badge {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-weight: 600;
+    display: inline-block;
+    text-transform: capitalize;
+}
+
+.status-badge.completed {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.status-badge.pending {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.status-badge.rejected {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.btn-action {
+    padding: 0.4rem 0.8rem;
+    border-radius: 0.3rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    background-color: #007bff;
+    border: 1px solid #0056b3;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-action:hover {
+    background-color: #0056b3;
+    border-color: #003865;
+    color: #fff;
+}
+
+.btn-track i {
+    font-size: 1rem;
+    color: #fff;
+}
+
+.tracking-item p {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+.tracking-item h4 {
+    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
+    color: #343a40;
+}
+
+.alert {
+    font-size: 0.9rem;
+    border-radius: 0.3rem;
+}
+
 </style>
  <div class="container">
      <div class="portal-header">
@@ -787,10 +906,10 @@
                                         Download
                                     </a>
                                 {% elif cert.status == 'pending' %}
-                                    <a href="{% url 'track_certificate' cert.pk %}" class="btn-action btn-track">
-                                        <i class="fas fa-search"></i>
-                                        Track
-                                    </a>
+                                    <button class="btn-action btn-track" data-bs-toggle="modal" data-bs-target="#trackingModal" data-cert-id="{{ cert.id }}">
+            <i class="fas fa-search"></i>
+            Track
+        </button>
                                 {% elif cert.status == 'rejected' %}
                                     <a href="{% url 'appeal_certificate' cert.pk %}" class="btn-action btn-appeal">
                                         <i class="fas fa-exclamation-circle"></i>
@@ -861,6 +980,125 @@
         </div>
         </div>
         <br>
+
+<!-- Single Tracking Modal outside the loop -->
+<div class="modal fade" id="trackingModal" tabindex="-1" aria-labelledby="trackingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="trackingModalLabel">
+                    <i class="fas fa-search"></i>
+                    Application Status Tracking
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="tracking-list" id="trackingContent">
+                    <!-- Content will be loaded dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                    <i class="fas fa-times"></i>
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add this JavaScript after your other scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize modal
+    const trackingModal = document.getElementById('trackingModal');
+    const modalInstance = new bootstrap.Modal(trackingModal);
+
+    // Handle track button clicks
+    const trackButtons = document.querySelectorAll('.btn-track');
+    trackButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const certId = this.getAttribute('data-cert-id');
+
+            // Get the tracking content container
+            const trackingContent = document.getElementById('trackingContent');
+
+            // Clear previous content
+            trackingContent.innerHTML = '';
+
+            // Fetch certificate notes using AJAX
+            fetch(`/certificates/tracking/${certId}/json/`)
+                .then(response => response.json())
+                .then(data => {
+                    // Extract submission_date and status
+                    const submissionDate = data.submission_date;
+                    const certStatus = data.status_display || data.status;
+
+                    // Add registration step
+                    const registrationStep = document.createElement('div');
+                    registrationStep.className = 'tracking-item completed';
+                    registrationStep.innerHTML = `
+                        <h4>
+                            Registration
+                            <span class="status-badge bg-success text-white">Completed</span>
+                        </h4>
+                        <p class="text-muted">Submission Date: ${submissionDate}</p>
+                    `;
+                    trackingContent.appendChild(registrationStep);
+
+                    // Add notes
+                    if (Array.isArray(data.notes)) {
+                        data.notes.forEach(note => {
+                            const noteElement = document.createElement('div');
+                            noteElement.className = `tracking-item completed`;
+                            noteElement.innerHTML = `
+                                <h4>${note.content}</h4>
+                                <p class="text-muted">Created by: ${note.created_by}</p>
+                                <small class="text-muted">Updated: ${new Date(note.created_at).toLocaleString()}</small>
+                            `;
+                            trackingContent.appendChild(noteElement);
+                        });
+                    } else {
+                        trackingContent.innerHTML = '<div class="alert alert-warning">No tracking steps found</div>';
+                    }
+
+                    // Add final status step
+                    const finalStep = document.createElement('div');
+                    finalStep.className = `tracking-item ${
+                        certStatus.toLowerCase() === 'approved' ? 'completed' :
+                        certStatus.toLowerCase() === 'rejected' ? 'rejected' : ''
+                    }`;
+                    finalStep.innerHTML = `
+                        <h4>
+                            Final Decision
+                            <span class="status-badge ${
+                                certStatus.toLowerCase() === 'approved' ? 'bg-success text-white' :
+                                certStatus.toLowerCase() === 'rejected' ? 'bg-danger text-white' :
+                                'bg-primary text-white'
+                            }">
+                                ${certStatus}
+                            </span>
+                        </h4>
+                        ${
+                            certStatus.toLowerCase() === 'pending' ?
+                            '<p class="text-muted">Awaiting final decision</p>' :
+                            ''
+                        }
+                    `;
+                    trackingContent.appendChild(finalStep);
+                })
+                .catch(error => {
+                    console.error('Error fetching certificate notes:', error);
+                    trackingContent.innerHTML = '<div class="alert alert-danger">Error loading tracking information</div>';
+                });
+
+            // Show the modal
+            modalInstance.show();
+        });
+    });
+});
+
+</script>
 
     <!-- Certificate Request Modal -->
     <div class="modal fade" id="certificateModal" tabindex="-1">
@@ -1212,6 +1450,7 @@
         </div>
     </div>
     </div>
+
 
     <!-- Form validation script -->
     <script>

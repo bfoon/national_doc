@@ -46,4 +46,5 @@ urlpatterns = [
     path('certificates/track/<int:pk>/', views.track_certificate, name='track_certificate'),
     path('certificates/appeal/<int:pk>/', views.appeal_certificate, name='appeal_certificate'),
     path('certificates/update-status/<int:pk>/', views.update_certification_status, name='update_status'),
+    path('certificates/tracking/<int:certificate_id>/json/', views.get_certificate_tracking, name='get_certificate_tracking'),
 ]
