@@ -5,410 +5,899 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/certificate-detail.css' %}">
 <style>
+:root {
+  --primary-color: #3B82F6;
+  --secondary-color: #475569;
+  --success-color: #10B981;
+  --danger-color: #EF4444;
+  --warning-color: #F59E0B;
+  --light-color: #F9FAFB;
+  --dark-color: #111827;
+  --border-radius: 0.5rem;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #F3F4F6;
+  color: #1F2937;
+}
+
+.card {
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.certificate-card {
+  background-color: #FFF;
+  position: relative;
+  overflow: hidden;
+}
+
+.certificate-header {
+  position: relative;
+  padding: 3rem 0 2rem;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
 .certificate-seal {
-    position: relative;
-    text-align: center;
-    font-size: 2rem;
-    font-weight: bold;
-    padding: 20px;
-    background: url("/media/Coat_of_arms_of_The_Gambia.svg") no-repeat center center;
-    background-size: contain;
-    color: red;
-    z-index: 1; /* Ensure text stays on top of the background */
+  position: relative;
+  margin: 0 auto;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: url("/media/Coat_of_arms_of_The_Gambia.svg") no-repeat center center;
+  background-size: 80%;
+  z-index: 1;
 }
 
 .certificate-seal::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.5); /* Faded white overlay */
-    z-index: -1; /* Place the overlay behind the text */
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  z-index: -1;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
 }
+
+.certificate-content {
+  padding: 2rem 3rem;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.certificate-footer {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #E5E7EB;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.signature-line {
+  text-align: center;
+  position: relative;
+  padding-top: 1rem;
+}
+
+.signature-line::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 1px;
+  background-color: #000;
+}
+
 .qr-code {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 100px; /* Adjust size as needed */
-    height: 100px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  width: 110px;
+  height: 110px;
+  padding: 5px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.breadcrumb {
+  font-size: 0.9rem;
+}
+
+.badge-status {
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badge-status.approved {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: var(--success-color);
+}
+
+.badge-status.rejected {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--danger-color);
+}
+
+.badge-status.pending {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: var(--warning-color);
+}
+
+.section-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--dark-color);
+}
+
+.section-title i {
+  color: var(--primary-color);
+}
+
+.list-group-item {
+  padding: 1rem 0;
+  border: none;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: var(--secondary-color);
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  font-weight: 600;
+}
+
+.timeline-item {
+  position: relative;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background-color: #FFF;
+  border-radius: var(--border-radius);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.document-card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background: white;
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--primary-color);
+}
+
+.document-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-right: 1rem;
+}
+
+.document-info {
+  flex-grow: 1;
+}
+
+.document-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.document-description {
+  font-size: 0.875rem;
+  color: var(--secondary-color);
+}
+
+.btn-action {
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-print {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  background-color: var(--primary-color);
+  color: white;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-print:hover {
+  background-color: #2563EB;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.btn-print:disabled {
+  background-color: #CBD5E1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.form-check-input {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.25rem;
+  margin-right: 0.75rem;
+  cursor: pointer;
+}
+
+.review-checklist {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.review-checklist-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background-color: #F9FAFB;
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.modal-header {
+  border-bottom: none;
+  padding: 1.5rem 1.5rem 0;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  border-top: none;
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* Added animation for better user experience */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Certificate Content Animation */
+.certificate-content p {
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.certificate-content p:nth-child(1) { animation-delay: 0.1s; }
+.certificate-content p:nth-child(2) { animation-delay: 0.2s; }
+.certificate-content p:nth-child(3) { animation-delay: 0.3s; }
+.certificate-content p:nth-child(4) { animation-delay: 0.4s; }
+.certificate-content p:nth-child(5) { animation-delay: 0.5s; }
+.certificate-content p:nth-child(6) { animation-delay: 0.6s; }
+.certificate-content p:nth-child(7) { animation-delay: 0.7s; }
+.certificate-content p:nth-child(8) { animation-delay: 0.8s; }
+.certificate-content p:nth-child(9) { animation-delay: 0.9s; }
+
+/* Material Design Inspired Form Elements */
+.form-control {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #E5E7EB;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  border-color: var(--primary-color);
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--dark-color);
+}
+
+/* Tab styles */
+.nav-tabs {
+  border: none;
+  margin-bottom: 1.5rem;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  color: var(--secondary-color);
+  font-weight: 600;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--primary-color);
+  background-color: rgba(59, 130, 246, 0.1);
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.tooltip-icon {
+  color: #CBD5E1;
+  cursor: help;
 }
 </style>
-<!-- Breadcrumb -->
-<nav aria-label="breadcrumb" class="bg-light rounded-3 shadow-sm">
-    <ol class="breadcrumb px-4 py-3 mb-0">
-        <li class="breadcrumb-item">
-            <a href="{% url 'certificate_request' %}" class="text-decoration-none">Certificate Dashboard</a>
-        </li>
-        <li class="breadcrumb-item active fw-semibold" aria-current="page">Certificate Detail</li>
+
+<!-- Navbar and breadcrumb -->
+<div class="container-fluid px-4 pt-4 pb-2 animate-in">
+  <nav class="breadcrumb-nav mb-4">
+    <ol class="breadcrumb p-0 m-0">
+      <li class="breadcrumb-item">
+        <a href="{% url 'certificate_request' %}" class="text-decoration-none text-secondary">
+          <i class="fas fa-home me-1"></i>Dashboard
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'certificate_request' %}" class="text-decoration-none text-secondary">
+          Certificates
+        </a>
+      </li>
+      <li class="breadcrumb-item active fw-semibold" aria-current="page">
+        Request #{{ certificate.id }}
+      </li>
     </ol>
-</nav>
+  </nav>
 
-<!-- Header with Request Info -->
-<div class="d-flex justify-content-between align-items-center mb-4">
+  <!-- Header with Request Info -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
     <div>
-        <h2 class="display-6 fw-bold mb-2">Review Certificate Request #{{ certificate.id }}</h2>
-        <p class="text-muted mb-0">
-            <i class="far fa-calendar-alt me-2"></i>
-            {{ certificate.submission_date|date:"F d, Y" }} at {{ certificate.submission_date|time:"H:i" }}
+      <h1 class="h3 fw-bold mb-1 d-flex align-items-center">
+        {{ certificate.get_certificate_type_display }} Certificate
+        {% if certificate.status == 'approved' %}
+        <span class="ms-2 fs-6 badge-status approved">
+          <i class="fas fa-check-circle"></i> Approved
+        </span>
+        {% elif certificate.status == 'rejected' %}
+        <span class="ms-2 fs-6 badge-status rejected">
+          <i class="fas fa-times-circle"></i> Rejected
+        </span>
+        {% elif certificate.status == 'pending' %}
+        <span class="ms-2 fs-6 badge-status pending">
+          <i class="fas fa-clock"></i> Pending Review
+        </span>
+        {% else %}
+        <span class="ms-2 fs-6 badge bg-secondary">
+          <i class="fas fa-circle me-1"></i> {{ certificate.status|upper }}
+        </span>
+        {% endif %}
+      </h1>
+      <p class="text-secondary mb-0">
+        <i class="far fa-calendar-alt me-1"></i>
+        Submitted on {{ certificate.submission_date|date:"F d, Y" }} at {{ certificate.submission_date|time:"H:i" }}
+      </p>
+    </div>
+
+    <div class="mt-3 mt-md-0">
+      {% if certificate.status == "approved" %}
+      <button class="btn-print" onclick="window.location.href='{% url 'print_certificate' certificate.id %}'">
+        <i class="fas fa-print"></i> Print Certificate
+      </button>
+      {% else %}
+      <button class="btn-print" disabled>
+        <i class="fas fa-print"></i> Print Certificate
+      </button>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid px-4 pb-5">
+  <div class="row g-4">
+    <!-- Left Column: Certificate Preview -->
+    <div class="col-lg-8 animate-in" style="animation-delay: 0.1s">
+      <div class="card certificate-card mb-4" id="certificateToPrint">
+        <div class="certificate-header">
+          <h2 class="text-center h3 fw-bold mb-3">{{ certificate.get_certificate_type_display }}</h2>
+          <div class="certificate-seal mb-2"></div>
+        </div>
+
+        <div class="certificate-content">
+          {% if certificate.certificate_type == 'birth' %}
+            <p>This is to certify that</p>
+            <p class="h4 fw-bold mb-3">{{ certificate.applicant_name }}</p>
+            <p>was born on</p>
+            <p class="h5 fw-bold mb-3">{{ related_data.date_of_birth|date:"F d, Y" }}</p>
+            <p>in</p>
+            <p class="h5 fw-bold mb-3">{{ related_data.place_of_birth }}</p>
+            <p>to</p>
+            <p class="h5 fw-bold mb-3">
+              {{ related_data.father_name }} <span class="fw-normal">(Father)</span> and
+              {{ related_data.mother_name }} <span class="fw-normal">(Mother)</span>
+            </p>
+            <div class="row mt-4">
+              <div class="col-md-4">
+                <p class="mb-1 text-secondary">Sex</p>
+                <p class="fw-bold">{{ related_data.sex }}</p>
+              </div>
+              <div class="col-md-4">
+                <p class="mb-1 text-secondary">Time of Birth</p>
+                <p class="fw-bold">{{ related_data.time_of_birth }}</p>
+              </div>
+              <div class="col-md-4">
+                <p class="mb-1 text-secondary">Registration Number</p>
+                <p class="fw-bold">{{ related_data.birth_registration_number }}</p>
+              </div>
+            </div>
+          {% elif certificate.certificate_type == 'marriage' %}
+            <p>This is to certify the marriage of</p>
+            <p class="h4 fw-bold mb-3">{{ related_data.spouse1_name }}</p>
+            <p>and</p>
+            <p class="h4 fw-bold mb-3">{{ related_data.spouse2_name }}</p>
+            <p>on</p>
+            <p class="h5 fw-bold mb-3">{{ related_data.marriage_date|date:"F d, Y" }}</p>
+          {% elif certificate.certificate_type == 'death' %}
+            <p>This is to certify the death of</p>
+            <p class="h4 fw-bold mb-3">{{ related_data.full_name }}</p>
+            <p>on</p>
+            <p class="h5 fw-bold mb-3">{{ related_data.date_of_death|date:"F d, Y" }}</p>
+            <p>at</p>
+            <p class="h5 fw-bold mb-3">{{ related_data.place_of_death }}</p>
+          {% elif certificate.certificate_type == 'character' %}
+            <p>This is to certify that</p>
+            <p class="h4 fw-bold mb-3">{{ related_data.full_name }}</p>
+            <p>has a record of good moral character as per our records.</p>
+          {% elif certificate.certificate_type == 'academic' %}
+            <p>This is to certify that</p>
+            <p class="h4 fw-bold mb-3">{{ related_data.full_name }}</p>
+            <p>has successfully completed the requirements for</p>
+            <p class="h5 fw-bold mb-3">{{ related_data.course }}</p>
+            <p>on</p>
+            <p class="h5 fw-bold mb-3">{{ related_data.date_of_completion|date:"F d, Y" }}</p>
+          {% else %}
+            <p>No details available for this certificate type.</p>
+          {% endif %}
+        </div>
+
+        <div class="certificate-footer">
+          <div class="signature-line">
+            <p class="fw-bold mb-0">{{ certificate.approved_by.get_full_name }}</p>
+            <p class="text-secondary small">Registrar of Vital Statistics</p>
+          </div>
+
+          <div class="official-seal">
+            <i class="fas fa-certificate text-primary opacity-50 fs-1"></i>
+          </div>
+        </div>
+
+        {% if qr_url %}
+        <img src="{{ qr_url }}" alt="QR Code" class="qr-code">
+        {% endif %}
+      </div>
+
+      <div class="text-center mb-4">
+        <p class="text-secondary small mb-1">
+          <i class="fas fa-lock me-1"></i> This certificate includes a secure QR code for verification
         </p>
-    </div>
-  <div class="badge
-        {% if certificate.status == 'approved' %}bg-success
-        {% elif certificate.status == 'rejected' %}bg-danger
-        {% elif certificate.status == 'pending' %}bg-warning
-        {% else %}bg-secondary{% endif %}
-        fs-6 px-3 py-2 rounded-pill shadow-sm">
-        <i class="fas fa-circle me-2 small"></i>{{ certificate.status|upper }}
+        <p class="text-secondary small">Certificate ID: #{{ certificate.id }}</p>
+      </div>
     </div>
 
-</div>
+    <!-- Right Column: Review Panel -->
+    <div class="col-lg-4 animate-in" style="animation-delay: 0.2s">
+      <div class="card mb-4">
+        <div class="card-body p-0">
+          <!-- Tabs navigation -->
+          <ul class="nav nav-tabs" id="reviewTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" id="applicant-tab" data-bs-toggle="tab"
+                     data-bs-target="#applicant-content" type="button" role="tab"
+                     aria-controls="applicant-content" aria-selected="true">
+                <i class="fas fa-user me-1"></i> Applicant
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="documents-tab" data-bs-toggle="tab"
+                     data-bs-target="#documents-content" type="button" role="tab"
+                     aria-controls="documents-content" aria-selected="false">
+                <i class="fas fa-file-alt me-1"></i> Documents
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" id="verification-tab" data-bs-toggle="tab"
+                     data-bs-target="#verification-content" type="button" role="tab"
+                     aria-controls="verification-content" aria-selected="false">
+                <i class="fas fa-tasks me-1"></i> Verification
+              </button>
+            </li>
+          </ul>
 
-<div class="row g-4">
-    <!-- Certificate Preview with enhanced styling -->
-    <div class="col-lg-8">
-        <div class="card shadow-sm" id="certificateToPrint">
-            <div class="card-body p-5">
-                <div class="certificate-header text-center mb-5">
-                    <h2 class="display-5 fw-bold mb-4">{{ certificate.get_certificate_type_display }}</h2>
-                    <div class="certificate-seal mb-4">
-                        <i class="fas fa-certificate fa-3x text-primary opacity-75"></i>
-                    </div>
+          <!-- Tab content -->
+          <div class="tab-content p-4" id="reviewTabsContent">
+            <!-- Applicant Information Tab -->
+            <div class="tab-pane fade show active" id="applicant-content" role="tabpanel" aria-labelledby="applicant-tab">
+              <h5 class="section-title">
+                <i class="fas fa-user-circle"></i> Applicant Information
+              </h5>
+
+              <div class="list-group list-group-flush">
+                <div class="list-group-item">
+                  <div class="label">Full Name</div>
+                  <div class="value">{{ certificate.applicant_name }}</div>
                 </div>
+                <div class="list-group-item">
+                  <div class="label">Email Address</div>
+                  <div class="value">{{ certificate.applicant_email }}</div>
                 </div>
-            <div class="mb-3">
-                {% if certificate.certificate_type == 'birth' %}
-                    <p class="text-center">This is to certify that</p>
-                    <p class="text-center"><strong>{{ related_data.full_name }}</strong></p>
-                    <p class="text-center">was born on</p>
-                    <p class="text-center"><strong>{{ related_data.date_of_birth|date:"F d, Y" }}</strong></p>
-                    <p class="text-center">in</p>
-                    <p class="text-center"><strong>{{ related_data.place_of_birth }}</strong></p>
-                    <p class="text-center">to</p>
-                    <p class="text-center">
-                        <strong>{{ related_data.father_name }}</strong> (Father) and <strong>{{ related_data.mother_name }}</strong> (Mother)
-                    </p>
-                    <p class="text-center mt-3">
-                        Sex: <strong>{{ related_data.sex }}</strong><br>
-                        Time of Birth: <strong>{{ related_data.time_of_birth }}</strong><br>
-                        Birth Registration Number: <strong>{{ related_data.birth_registration_number }}</strong>
-                    </p>
-                {% elif certificate.certificate_type == 'marriage' %}
-                    <p class="text-center">This is to certify the marriage of</p>
-                    <p class="text-center"><strong>{{ related_data.spouse1_name }}</strong></p>
-                    <p class="text-center">and</p>
-                    <p class="text-center"><strong>{{ related_data.spouse2_name }}</strong></p>
-                    <p class="text-center">on</p>
-                    <p class="text-center"><strong>{{ related_data.marriage_date|date:"F d, Y" }}</strong></p>
-                {% elif certificate.certificate_type == 'death' %}
-                    <p class="text-center">This is to certify the death of</p>
-                    <p class="text-center"><strong>{{ related_data.full_name }}</strong></p>
-                    <p class="text-center">on</p>
-                    <p class="text-center"><strong>{{ related_data.date_of_death|date:"F d, Y" }}</strong></p>
-                    <p class="text-center">at</p>
-                    <p class="text-center"><strong>{{ related_data.place_of_death }}</strong></p>
-                {% elif certificate.certificate_type == 'character' %}
-                    <p class="text-center">This is to certify that</p>
-                    <p class="text-center"><strong>{{ related_data.full_name }}</strong></p>
-                    <p class="text-center">has a record of good moral character as per our records.</p>
-                {% elif certificate.certificate_type == 'academic' %}
-                    <p class="text-center">This is to certify that</p>
-                    <p class="text-center"><strong>{{ related_data.full_name }}</strong></p>
-                    <p class="text-center">has successfully completed the requirements for</p>
-                    <p class="text-center"><strong>{{ related_data.course }}</strong></p>
-                    <p class="text-center">on</p>
-                    <p class="text-center"><strong>{{ related_data.date_of_completion|date:"F d, Y" }}</strong></p>
-                {% else %}
-                    <p class="text-center">No details available for this certificate type.</p>
-                {% endif %}
+                <div class="list-group-item">
+                  <div class="label">Phone Number</div>
+                  <div class="value">{{ certificate.applicant_phone }}</div>
+                </div>
+                <div class="list-group-item">
+                  <div class="label">Purpose of Request</div>
+                  <div class="value">{{ certificate.purpose }}</div>
+                </div>
+              </div>
             </div>
-            <div class="signature-line">
-                <p class="fw-bold mb-0">{{ certificate.approved_by.get_full_name }}</p>
-                            <p class="text-muted">Registrar of Vital Statistics</p>
+
+            <!-- Documents Tab -->
+            <div class="tab-pane fade" id="documents-content" role="tabpanel" aria-labelledby="documents-tab">
+              <h5 class="section-title">
+                <i class="fas fa-file-alt"></i> Supporting Documents
+              </h5>
+
+              {% for document in supporting_documents %}
+              <div class="document-card">
+                <div class="document-icon">
+                  <i class="fas fa-file-{{ document.attachment_type }}"></i>
+                </div>
+                <div class="document-info">
+                  <h6 class="document-title">{{ document.get_attachment_type_display }}</h6>
+                  <p class="document-description">{{ document.description }}</p>
+                </div>
+                <a href="{{ document.file.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </div>
+              {% empty %}
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>No supporting documents provided.
+              </div>
+              {% endfor %}
             </div>
-            <!-- QR Code -->
-            {% if qr_url %}
-                <img src="{{ qr_url }}" alt="QR Code" class="qr-code">
-            {% endif %}
+
+            <!-- Verification Tab -->
+            <div class="tab-pane fade" id="verification-content" role="tabpanel" aria-labelledby="verification-tab">
+              <h5 class="section-title">
+                <i class="fas fa-clipboard-check"></i> Verification Checklist
+              </h5>
+
+              <form method="post" action="{% url 'save_checklist' certificate.id %}">
+                {% csrf_token %}
+                <ul class="review-checklist mb-4">
+                  <li class="review-checklist-item">
+                    <input class="form-check-input" type="checkbox" name="all_documents_provided" id="check1"
+                         {% if checklist and checklist.all_documents_provided %}checked{% endif %}
+                         {% if is_certificate_locked %}disabled{% endif %}>
+                    <label class="ms-2 w-100" for="check1">All required documents provided</label>
+                  </li>
+                  <li class="review-checklist-item">
+                    <input class="form-check-input" type="checkbox" name="information_matches_records" id="check2"
+                         {% if checklist and checklist.information_matches_records %}checked{% endif %}
+                         {% if is_certificate_locked %}disabled{% endif %}>
+                    <label class="ms-2 w-100" for="check2">Information matches records</label>
+                  </li>
+                  <li class="review-checklist-item">
+                    <input class="form-check-input" type="checkbox" name="id_verification_complete" id="check3"
+                         {% if checklist and checklist.id_verification_complete %}checked{% endif %}
+                         {% if is_certificate_locked %}disabled{% endif %}>
+                    <label class="ms-2 w-100" for="check3">ID verification complete</label>
+                  </li>
+                </ul>
+
+                <div class="mb-4">
+                  <label for="review_notes" class="form-label">
+                    <i class="fas fa-comment-alt me-2 text-primary"></i>Review Notes
+                  </label>
+                  <textarea class="form-control" id="review_notes" name="review_notes" rows="4"
+                          placeholder="Add your review notes here..."
+                          {% if is_certificate_locked %}disabled{% endif %}>{{ checklist.review_notes|default:'' }}</textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100"
+                       {% if is_certificate_locked %}disabled{% endif %}>
+                  <i class="fas fa-save me-2"></i>Save Checklist
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
+      </div>
 
-    <!-- Print Button -->
-    <div class="mt-4">
-    {% if certificate.status == "approved" %}
-        <button class="btn btn-primary btn-lg" onclick="window.location.href='{% url 'print_certificate' certificate.id %}'">
-            <i class="fas fa-print me-2"></i>Print Certificate
-        </button>
-    {% else %}
-        <button class="btn btn-secondary btn-lg" disabled>
-            <i class="fas fa-print me-2"></i>Print Certificate (Not Approved)
-        </button>
-    {% endif %}
-</div>
+      <!-- Action Buttons Card -->
+      <div class="card animate-in" style="animation-delay: 0.3s">
+        <div class="card-body">
+          <h5 class="section-title">
+            <i class="fas fa-cog"></i> Certificate Actions
+          </h5>
 
-    </div>
-    <!-- Review Panel -->
-    <div class="col-lg-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-light py-3">
-                <h4 class="card-title mb-0 fw-bold">Review Details</h4>
-            </div>
-            <div class="card-body">
-                <!-- Applicant Information -->
-                <div class="mb-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="fas fa-user me-2 text-primary"></i>Applicant Information
-                    </h5>
-                    <div class="list-group list-group-flush">
-                        <div class="list-group-item px-0">
-                            <small class="text-muted d-block">Name</small>
-                            <span class="fw-semibold">{{ certificate.applicant_name }}</span>
-                        </div>
-                        <div class="list-group-item px-0">
-                            <small class="text-muted d-block">Email</small>
-                            <span class="fw-semibold">{{ certificate.applicant_email }}</span>
-                        </div>
-                        <div class="list-group-item px-0">
-                            <small class="text-muted d-block">Phone</small>
-                            <span class="fw-semibold">{{ certificate.applicant_phone }}</span>
-                        </div>
-                        <div class="list-group-item px-0">
-                            <small class="text-muted d-block">Purpose</small>
-                            <span class="fw-semibold">{{ certificate.purpose }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Supporting Documents -->
-                <div class="mb-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="fas fa-file-alt me-2 text-primary"></i>Supporting Documents
-                    </h5>
-                    {% for document in supporting_documents %}
-                    <div class="card mb-2">
-                        <div class="card-body p-3">
-                            <div class="d-flex align-items-center">
-                                <i class="fas fa-file-{{ document.attachment_type }} fa-lg text-primary me-3"></i>
-                                <div>
-                                    <h6 class="mb-1">{{ document.get_attachment_type_display }}</h6>
-                                    <p class="small text-muted mb-0">{{ document.description }}</p>
-                                </div>
-                                <a href="{{ document.file.url }}" class="btn btn-sm btn-outline-primary ms-auto" target="_blank">
-                                    <i class="fas fa-eye me-1"></i>View
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="alert alert-info mb-0">
-                        <i class="fas fa-info-circle me-2"></i>No supporting documents provided.
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Enhanced Verification Checklist -->
-                <div class="mb-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="fas fa-tasks me-2 text-primary"></i>Verification Checklist
-                    </h5>
-                    <form method="post" action="{% url 'save_checklist' certificate.id %}">
-                        {% csrf_token %}
-                        <div class="list-group">
-                            <label class="list-group-item d-flex gap-2">
-                                <input class="form-check-input flex-shrink-0" type="checkbox" name="all_documents_provided"
-                                       {% if checklist and checklist.all_documents_provided %}checked{% endif %}
-                                       {% if is_certificate_locked %}disabled{% endif %}>
-                                <span>All required documents provided</span>
-                            </label>
-                            <label class="list-group-item d-flex gap-2">
-                                <input class="form-check-input flex-shrink-0" type="checkbox" name="information_matches_records"
-                                       {% if checklist and checklist.information_matches_records %}checked{% endif %}
-                                        {% if is_certificate_locked %}disabled{% endif %}>
-                                <span>Information matches records</span>
-                            </label>
-                            <label class="list-group-item d-flex gap-2">
-                                <input class="form-check-input flex-shrink-0" type="checkbox" name="id_verification_complete"
-                                       {% if checklist and checklist.id_verification_complete %}checked{% endif %}
-                                        {% if is_certificate_locked %}disabled{% endif %}>
-                                <span>ID verification complete</span>
-                            </label>
-                        </div>
-
-                        <!-- Review Notes -->
-                        <div class="mb-4 mt-3">
-                            <h5 class="fw-bold mb-3">
-                                <i class="fas fa-comment-alt me-2 text-primary"></i>Review Notes
-                            </h5>
-                            <textarea class="form-control" name="review_notes" rows="4"
-                                      placeholder="Add your review notes here..."
-                                      {% if is_certificate_locked %}disabled{% endif %}>
-                                {{ checklist.review_notes|default:'' }}
-                            </textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary"
-                                 {% if is_certificate_locked %}disabled{% endif %}>
-                            Save Checklist
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="d-grid gap-2">
-                    <a href="{% url 'approve_certificate' certificate.id %}"
-                       class="btn btn-success btn-lg {% if certificate.status != 'pending' %}disabled{% endif %}">
-                        <i class="fas fa-check-circle me-2"></i>Approve Certificate
-                    </a>
-                    <a href="{% url 'reject_certificate' certificate.id %}" class="btn btn-danger {% if certificate.status != 'pending' %}disabled{% endif %}">
-                        <i class="fas fa-times-circle me-2"></i>Reject Request
-                    </a>
-                    <button class="btn btn-secondary {% if certificate.status != 'pending' %}disabled{% endif %}" data-bs-toggle="modal" data-bs-target="#requestMoreInfoModal">
-                        <i class="fas fa-clock me-2"></i>Request More Information
-                    </button>
-
-                </div>
-            </div>
+          <div class="d-grid gap-3">
+            <a href="{% url 'approve_certificate' certificate.id %}"
+              class="btn btn-success btn-action {% if certificate.status != 'pending' %}disabled{% endif %}">
+              <i class="fas fa-check-circle me-2"></i>Approve Certificate
+            </a>
+            <a href="{% url 'reject_certificate' certificate.id %}"
+              class="btn btn-danger btn-action {% if certificate.status != 'pending' %}disabled{% endif %}">
+              <i class="fas fa-times-circle me-2"></i>Reject Request
+            </a>
+            <button class="btn btn-outline-primary btn-action {% if certificate.status != 'pending' %}disabled{% endif %}"
+                   data-bs-toggle="modal" data-bs-target="#requestMoreInfoModal">
+              <i class="fas fa-comment-dots me-2"></i>Request More Information
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-    </div>
-<br>
-<br>
-<br>
+  </div>
+</div>
 
 <!-- More Information Modal -->
 <div class="modal fade" id="requestMoreInfoModal" tabindex="-1" aria-labelledby="requestMoreInfoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title fw-bold" id="requestMoreInfoModalLabel">
-                    <i class="fas fa-info-circle me-2 text-primary"></i>Request Additional Information
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="requestMoreInfoModalLabel">
+          <i class="fas fa-info-circle me-2 text-primary"></i>Request Additional Information
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'save_more_info' certificate.id %}" id="moreInfoForm" class="needs-validation" novalidate>
+          {% csrf_token %}
+
+          <!-- Certificate History Timeline -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h6 class="fw-bold mb-0 d-flex align-items-center">
+                <i class="fas fa-history me-2 text-primary"></i>
+                Communication History
+              </h6>
+              <span class="badge bg-light text-secondary px-3 py-2">{{ certificate_notes|length }} Notes</span>
             </div>
-            <div class="modal-body p-4">
-                <form method="post" action="{% url 'save_more_info' certificate.id %}" id="moreInfoForm">
-                    {% csrf_token %}
 
-                    <!-- Certificate History Timeline -->
-                    <div class="mb-4">
-                        <h6 class="fw-bold mb-3 d-flex align-items-center">
-                            <i class="fas fa-history me-2 text-primary"></i>
-                            Certificate History
-                        </h6>
-                        <div class="timeline">
-                            {% for note in certificate_notes %}
-                                <div class="card shadow-sm mb-3">
-                                    <div class="card-body">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar me-2">
-                                                    <i class="fas fa-user-circle fa-lg text-primary"></i>
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-0 fw-bold">{{ note.created_by }}</h6>
-                                                    <small class="text-muted">
-                                                        <i class="far fa-clock me-1"></i>
-                                                        {{ note.created_at|date:"F j, Y, g:i a" }}
-                                                    </small>
-                                                </div>
-                                            </div>
-                                            <span class="badge bg-light text-dark">Note</span>
-                                        </div>
-                                        <p class="mb-0 text-body">{{ note.content }}</p>
-                                    </div>
-                                </div>
-                            {% empty %}
-                                <div class="alert alert-info d-flex align-items-center">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    <div>No previous notes available for this certificate.</div>
-                                </div>
-                            {% endfor %}
-                        </div>
+            <div class="timeline">
+              {% for note in certificate_notes %}
+              <div class="timeline-item">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div class="d-flex align-items-center">
+                    <div class="me-2">
+                      <span class="avatar bg-light text-primary d-flex align-items-center justify-content-center"
+                           style="width: 40px; height: 40px; border-radius: 50%;">
+                        <i class="fas fa-user"></i>
+                      </span>
                     </div>
-
-                    <!-- Request Information Form -->
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-body">
-                            <h6 class="fw-bold mb-3 d-flex align-items-center">
-                                <i class="fas fa-pen me-2 text-primary"></i>
-                                Add New Request
-                            </h6>
-                            <div class="mb-3">
-                                <label for="additional_info" class="form-label fw-semibold">What additional information is needed?</label>
-                                <textarea
-                                    class="form-control"
-                                    id="additional_info"
-                                    name="additional_info"
-                                    rows="4"
-                                    placeholder="Please specify what additional information or documents are required..."
-                                    required></textarea>
-                                <div class="form-text">
-                                    Be specific about what documents or information you need from the applicant.
-                                </div>
-                            </div>
-
-                            <!-- Optional: Priority Selection -->
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Priority Level</label>
-                                <div class="btn-group w-100" role="group" aria-label="Priority selection">
-                                    <input type="radio" class="btn-check" name="priority" id="priority1" value="low">
-                                    <label class="btn btn-outline-success" for="priority1">Low</label>
-
-                                    <input type="radio" class="btn-check" name="priority" id="priority2" value="medium" checked>
-                                    <label class="btn btn-outline-warning" for="priority2">Medium</label>
-
-                                    <input type="radio" class="btn-check" name="priority" id="priority3" value="high">
-                                    <label class="btn btn-outline-danger" for="priority3">High</label>
-                                </div>
-                            </div>
-
-                            <!-- Optional: Due Date -->
-                            <div class="mb-3">
-                                <label for="due_date" class="form-label fw-semibold">Response Expected By</label>
-                                <input type="date" class="form-control" id="due_date" name="due_date">
-                            </div>
-                        </div>
+                    <div>
+                      <h6 class="mb-0 fw-bold">{{ note.created_by }}</h6>
+                      <small class="text-muted">
+                        {{ note.created_at|date:"F j, Y, g:i a" }}
+                      </small>
                     </div>
-
-                    <!-- Action Buttons -->
-                    <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                            <i class="fas fa-times me-2"></i>Cancel
-                        </button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-paper-plane me-2"></i>Send Request
-                        </button>
-                    </div>
-                </form>
+                  </div>
+                </div>
+                <p class="mb-0 ms-5 ps-2 border-start border-2 border-light py-2">{{ note.content }}</p>
+              </div>
+              {% empty %}
+              <div class="alert alert-info d-flex align-items-center">
+                <i class="fas fa-info-circle me-2"></i>
+                <div>No previous notes available for this certificate.</div>
+              </div>
+              {% endfor %}
             </div>
-        </div>
+          </div>
+
+          <!-- Request Information Form -->
+          <div class="card shadow-sm mb-4 border-0">
+            <div class="card-body">
+              <h6 class="fw-bold mb-3 d-flex align-items-center">
+                <i class="fas fa-pen me-2 text-primary"></i>
+                New Request
+              </h6>
+              <div class="mb-3">
+                <label for="additional_info" class="form-label">What additional information is needed?</label>
+                <textarea
+                  class="form-control"
+                  id="additional_info"
+                  name="additional_info"
+                  rows="4"
+                  placeholder="Please specify what additional information or documents are required..."
+                  required></textarea>
+                <div class="form-text text-muted">
+                  Be specific about what documents or information you need from the applicant.
+                </div>
+              </div>
+
+              <!-- Priority Selection with improved styling -->
+              <div class="mb-3">
+                <label class="form-label">Priority Level</label>
+                <div class="d-flex gap-2">
+                  <input type="radio" class="btn-check" name="priority" id="priority1" value="low">
+                  <label class="btn btn-outline-success flex-fill" for="priority1">
+                    <i class="fas fa-battery-quarter me-1"></i> Low
+                  </label>
+
+                  <input type="radio" class="btn-check" name="priority" id="priority2" value="medium" checked>
+                  <label class="btn btn-outline-warning flex-fill" for="priority2">
+                    <i class="fas fa-battery-half me-1"></i> Medium
+                  </label>
+
+                  <input type="radio" class="btn-check" name="priority" id="priority3" value="high">
+                  <label class="btn btn-outline-danger flex-fill" for="priority3">
+                    <i class="fas fa-battery-full me-1"></i> High
+                  </label>
+                </div>
+              </div>
+
+              <!-- Due Date Picker with calendar icon -->
+              <div class="mb-3">
+                <label for="due_date" class="form-label">Response Expected By</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-calendar-alt"></i>
+                  </span>
+                  <input type="date" class="form-control" id="due_date" name="due_date">
+                </div>
+                <div class="form-text text-muted">
+                  Select a reasonable deadline for the applicant to respond.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+              <i class="fas fa-times me-2"></i>Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane me-2"></i>Send Request
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
 
-<!-- Optional: Add this script at the bottom of your template -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Form validation
-    const form = document.getElementById('moreInfoForm');
-    form.addEventListener('submit', function(event) {
-        if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        form.classList.add('was-validated');
+  // Form validation using Bootstrap's built-in validation
+  const forms = document.querySelectorAll('.needs-validation');
+
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      form.classList.add('was-validated');
+    });
+  });
+
+  // Set minimum date for due date input to today
+  const dueDateInput = document.getElementById('due_date');
+  if (dueDateInput) {
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Format date to YYYY-MM-DD for input element
+    const formatDate = (date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+
+    dueDateInput.setAttribute('min', formatDate(tomorrow));
+
+    // Set default due date to 7 days from now
+    const defaultDueDate = new Date(today);
+    defaultDueDate.setDate(defaultDueDate.getDate() + 7);
+    dueDateInput.value = formatDate(defaultDueDate);
+  }
+
+  // Add hover effects for action buttons
+  const actionButtons = document.querySelectorAll('.btn-action:not(.disabled)');
+  actionButtons.forEach(button => {
+    button.addEventListener('mouseenter', () => {
+      if (!button.classList.contains('disabled')) {
+        button.style.transform = 'translateY(-2px)';
+        button.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+      }
     });
 
-    // Set minimum date for due date input to today
-    const dueDateInput = document.getElementById('due_date');
-    if (dueDateInput) {
-        const today = new Date().toISOString().split('T')[0];
-        dueDateInput.setAttribute('min', today);
+    button.addEventListener('mouseleave', () => {
+      button.style.transform = 'translateY(0)';
+      button.style.boxShadow = 'none';
+    });
+  });
 
-        // Set default due date to 7 days from now
-        const defaultDueDate = new Date();
-        defaultDueDate.setDate(defaultDueDate.getDate() + 7);
-        dueDateInput.value = defaultDueDate.toISOString().split('T')[0];
+  // Add print functionality
+  const printButton = document.querySelector('.btn-print:not([disabled])');
+  if (printButton) {
+    printButton.addEventListener('click', function(e) {
+      const certificateContent = document.getElementById('certificateToPrint');
+      const originalContents = document.body.innerHTML;
+
+      // Create a print-friendly version
+      const printContents = certificateContent.innerHTML;
+      document.body.innerHTML = `
+        <div style="padding: 20px;">
+          <div style="max-width: 800px; margin: 0 auto; border: 2px solid #333; padding: 40px; position: relative;">
+            ${printContents}
+          </div>
+        </div>
+      `;
+
+      window.print();
+      document.body.innerHTML = originalContents;
+      location.reload();
+    });
+  }
+
+  // Initialize tooltips if any
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+  });
+
+  // Certificate animations
+  setTimeout(() => {
+    const certificate = document.querySelector('.certificate-card');
+    if (certificate) {
+      certificate.style.transition = 'transform 0.5s ease';
+      certificate.addEventListener('mouseenter', () => {
+        certificate.style.transform = 'scale(1.01)';
+      });
+      certificate.addEventListener('mouseleave', () => {
+        certificate.style.transform = 'scale(1)';
+      });
     }
+  }, 1000);
 });
 </script>
 
