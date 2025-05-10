@@ -112,7 +112,11 @@ class ToDo(models.Model):
         (1, 'Approved'),
     ]
 
-    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name='todos')
+    application = models.OneToOneField(
+        Application,
+        on_delete=models.CASCADE,
+        related_name='todo'
+    )
     interview = models.ForeignKey(Interview, on_delete=models.CASCADE, null=True, blank=True, related_name='todos')
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True,  related_name='todos')  # The user assigned the task
     status = models.IntegerField(choices=STATUS_CHOICES, default=0)  # 0 by default, 1 if approved

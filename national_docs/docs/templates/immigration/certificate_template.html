@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Official Certificate - Government of The Gambia</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Lato:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
 
         @page {
             size: A4 portrait;
@@ -13,15 +13,17 @@
         }
 
         :root {
-            --primary-color: #2c3e50;
-            --accent-color: #c0392b;
-            --border-color: #34495e;
-            --text-color: #2c3e50;
+            --primary-color: #1d3557;
+            --accent-color: #e63946;
+            --border-color: #457b9d;
+            --text-color: #1d3557;
             --background-color: #fff;
+            --secondary-bg: #f1faee;
             --page-width: 210mm;
             --page-height: 297mm;
             --page-padding: 15mm;
-            --gold-color: #D4AF37;
+            --gold-color: #daa520;
+            --light-gold: rgba(218, 165, 32, 0.1);
         }
 
         * {
@@ -31,10 +33,11 @@
         }
 
         body {
-            background-color: #f5f6fa;
+            background-color: #f8f9fa;
             width: var(--page-width);
             margin: 0 auto;
-            font-family: 'Lato', sans-serif;
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-color);
         }
 
         .page {
@@ -45,105 +48,118 @@
             position: relative;
             overflow: hidden;
             page-break-after: always;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
 
-        /* Enhanced border pattern */
+        /* Modern gradient border */
         .border-pattern {
             position: absolute;
-            top: 5mm;
-            left: 5mm;
-            right: 5mm;
-            bottom: 5mm;
-            border: 2px solid var(--border-color);
-            pointer-events: none;
+            top: 10mm;
+            left: 10mm;
+            right: 10mm;
+            bottom: 10mm;
+            border-radius: 2px;
+            background: linear-gradient(to right, var(--border-color), var(--gold-color), var(--border-color));
+            padding: 2px;
+            z-index: 1;
         }
 
-        .border-pattern::before {
-            content: '';
+        .inner-content {
             position: absolute;
-            top: 2mm;
-            left: 2mm;
-            right: 2mm;
-            bottom: 2mm;
-            border: 1px solid var(--gold-color);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 2;
         }
 
         .certificate-header {
             text-align: center;
-            margin: 2rem auto;
+            margin: 2.5rem auto 2rem;
             padding: 0 2rem 1.5rem;
-            border-bottom: 2px solid var(--border-color);
             position: relative;
+            z-index: 3;
         }
 
-        /* Enhanced header decoration */
-        .certificate-header::before,
-        .certificate-header::after {
-            content: '';
+        .header-decoration {
             position: absolute;
-            bottom: -2px;
-            width: 20mm;
-            height: 2px;
-            background-color: var(--gold-color);
-        }
-
-        .certificate-header::before {
-            left: 25%;
-        }
-
-        .certificate-header::after {
-            right: 25%;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: linear-gradient(180deg, var(--light-gold) 0%, rgba(255,255,255,0) 100%);
+            z-index: -1;
+            border-bottom: 1px solid rgba(218, 165, 32, 0.3);
         }
 
         .certificate-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2.2rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
             color: var(--primary-color);
             margin-bottom: 1rem;
             text-transform: uppercase;
             letter-spacing: 3px;
-            text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-color), var(--border-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.05);
         }
 
-        /* Enhanced seal */
+        /* Modern seal design */
         .certificate-seal {
             position: relative;
             width: 130px;
             height: 130px;
-            margin: 0 auto 1.5rem;
+            margin: 1rem auto 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .seal-content {
-            border: 3px solid var(--gold-color);
+            border: 2px solid var(--gold-color);
             border-radius: 50%;
             width: 100%;
             height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Cormorant Garamond', serif;
-            font-weight: bold;
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
             color: var(--gold-color);
             text-transform: uppercase;
             font-size: 1.1rem;
             letter-spacing: 1px;
             position: relative;
-            background: linear-gradient(45deg, transparent, rgba(212,175,55,0.1));
+            background: radial-gradient(circle, rgba(255,255,255,1) 0%, var(--light-gold) 100%);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
         }
 
         .seal-content::before {
             content: '';
             position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
+            top: -8px;
+            left: -8px;
+            right: -8px;
+            bottom: -8px;
             border: 1px solid var(--gold-color);
             border-radius: 50%;
             opacity: 0.5;
+        }
+
+        .seal-content::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            border: 1px dashed var(--gold-color);
+            border-radius: 50%;
+            opacity: 0.7;
         }
 
         .certificate-body {
@@ -153,6 +169,8 @@
             font-size: 1.1rem;
             line-height: 1.8;
             color: var(--text-color);
+            position: relative;
+            z-index: 3;
         }
 
         .certificate-body p {
@@ -160,146 +178,251 @@
         }
 
         .certificate-body strong {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.4rem;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
             color: var(--primary-color);
+            font-weight: 600;
         }
 
+        /* Modern card-style details */
         .details-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.2rem;
-            margin: 2rem 0;
+            gap: 1.5rem;
+            margin: 2.5rem 2rem;
             text-align: left;
-            padding: 0 2rem;
         }
 
         .details-item {
-            padding: 0.5rem;
-            border-bottom: 1px solid rgba(52, 73, 94, 0.1);
+            padding: 1rem;
+            border-radius: 6px;
+            background-color: var(--secondary-bg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            transition: all 0.3s ease;
+        }
+
+        .details-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .details-item p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .details-item strong {
+            display: block;
+            margin-top: 5px;
+            font-size: 1.1rem;
         }
 
         /* Enhanced signature section */
-         .signature-section {
+        .signature-section {
             position: absolute;
-            bottom: 80px;
+            bottom: 90px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
-            width: auto;
-            max-width: 60%;
-            }
-
-        .signature-line {
-            display: inline-block;
-            min-width: 60mm;
-            text-align: center;
-            border-top: 2px solid var(--border-color);
-            padding-top: 0.5rem;
-            position: relative;
+            z-index: 5;
         }
 
-        .signature-line::before,
-        .signature-line::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            width: 2px;
-            height: 10px;
-            background-color: var(--border-color);
+        .signature-line {
+            position: relative;
+            min-width: 60mm;
+            text-align: center;
+            padding-top: 0.7rem;
         }
 
         .signature-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
             left: 0;
-        }
-
-        .signature-line::after {
             right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(69,123,157,0), var(--border-color), rgba(69,123,157,0));
         }
 
         .signature-title {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: var(--text-color);
             margin-top: 0.5rem;
             font-style: italic;
+            opacity: 0.8;
         }
 
-        /* Enhanced QR section */
+        /* Modern QR section */
         .qr-section {
             position: absolute;
-            bottom: 80px;
+            bottom: 90px;
             right: 50px;
             text-align: center;
+            z-index: 5;
         }
 
-        .qr-code {
-            width: 80px;
-            height: 80px;
-            padding: 5px;
-            background-color: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
         .qr-image {
-            width: 80px;
-            height: 80px;
+            width: 90px;
+            height: 90px;
             background: white;
             padding: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(69,123,157,0.2);
+        }
+
+        .verification-text {
+            font-size: 0.8rem;
+            margin-top: 8px;
+            color: var(--border-color);
+            font-weight: 500;
         }
 
         /* Back page specific styles */
         .back-content {
-            height: calc(100% - 10mm);
-            margin: 5mm;
+            position: absolute;
+            top: 10mm;
+            left: 10mm;
+            right: 10mm;
+            bottom: 10mm;
             padding: 20mm;
             display: flex;
             flex-direction: column;
-            position: relative;
+            z-index: 3;
         }
 
         .back-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             padding-bottom: 1rem;
-            border-bottom: 2px solid var(--border-color);
+            position: relative;
+        }
+
+        .back-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 30%;
+            right: 30%;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(69,123,157,0), var(--border-color), rgba(69,123,157,0));
+        }
+
+        .back-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            font-weight: 600;
         }
 
         .verification-details {
             flex: 1;
-            padding: 0 2rem;
+            padding: 0 1rem;
         }
 
         .verification-section {
-            margin-bottom: 2rem;
-            padding: 1rem;
-            background-color: rgba(44, 62, 80, 0.02);
-            border-radius: 4px;
+            margin-bottom: 2.5rem;
+            padding: 1.5rem;
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        }
+
+        .verification-heading {
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .verification-heading::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--gold-color);
+        }
+
+        .verification-list {
+            list-style: none;
+            padding-left: 0.5rem;
         }
 
         .verification-list li {
-            margin-bottom: 0.8rem;
-            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            padding-left: 1.8rem;
             position: relative;
+            line-height: 1.5;
         }
 
         .verification-list li::before {
-            content: "•";
-            color: var(--gold-color);
+            content: "✓";
+            color: var(--accent-color);
             font-weight: bold;
             position: absolute;
             left: 0;
         }
-        .verification-text {
-            font-size: 0.8rem;
-            margin-top: 5px;
-            color: var(--text-color);
-        }
+
+        /* Modern official-use section */
         .official-use {
-            margin-top: 2rem;
+            margin-top: 2.5rem;
             padding: 1.5rem;
-            border: 1px dashed var(--gold-color);
-            background-color: rgba(212,175,55,0.02);
-            border-radius: 4px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--light-gold), rgba(255,255,255,0.8));
+            box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+            border: 1px solid rgba(218,165,32,0.3);
+        }
+
+        .official-use-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .official-use-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .official-use-item {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .back-footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        .contact-info p {
+            margin-bottom: 0.3rem;
+        }
+
+        /* Watermark */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-family: 'Playfair Display', serif;
+            font-size: 8rem;
+            color: rgba(218,165,32,0.03);
+            white-space: nowrap;
+            z-index: 2;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            pointer-events: none;
         }
 
         @media print {
@@ -316,148 +439,162 @@
                 page-break-after: always;
             }
         }
-</style>
+    </style>
 </head>
 <body>
-    <div class="certificate-container">
-        <div class="border-pattern"></div>
+    <div class="page certificate-container">
+        <div class="border-pattern">
+            <div class="inner-content">
+                <div class="watermark">Official</div>
 
-        <div class="certificate-header">
-            <h1 class="certificate-title">{{ certificate.get_certificate_type_display }}</h1>
-            <div class="certificate-seal">
-                <div class="seal-content">Official Seal</div>
-            </div>
-        </div>
-
-        <div class="certificate-body">
-            {% if certificate.certificate_type == 'birth' %}
-                <p>This is to certify that</p>
-                <p><strong>{{ certificate.applicant_name }}</strong></p>
-                <p>was born on</p>
-                <p><strong>{{ certificate.birth_registration.date_of_birth|date:"F d, Y" }}</strong></p>
-
-                <div class="details-grid">
-                    <div class="details-item">
-                        <p>Place of Birth:<br><strong>{{ certificate.birth_registration.place_of_birth }}</strong></p>
-                    </div>
-                    <div class="details-item">
-                        <p>Time of Birth:<br><strong>{{ certificate.birth_registration.time_of_birth }}</strong></p>
-                    </div>
-                    <div class="details-item">
-                        <p>Father's Name:<br><strong>{{ certificate.birth_registration.father_name }}</strong></p>
-                    </div>
-                    <div class="details-item">
-                        <p>Mother's Name:<br><strong>{{ certificate.birth_registration.mother_name }}</strong></p>
-                    </div>
-                    <div class="details-item">
-                        <p>Sex:<br><strong>{{ certificate.birth_registration.sex }}</strong></p>
-                    </div>
-                    <div class="details-item">
-                        <p>Registration Number:<br><strong>{{ certificate.birth_registration.birth_registration_number }}</strong></p>
+                <div class="certificate-header">
+                    <div class="header-decoration"></div>
+                    <h1 class="certificate-title">{{ certificate.get_certificate_type_display }}</h1>
+                    <div class="certificate-seal">
+                        <div class="seal-content">Official Seal</div>
                     </div>
                 </div>
-            {% elif certificate.certificate_type == 'marriage' %}
-                <p>This is to certify the marriage of</p>
-                <p><strong>{{ certificate.marriage_details.spouse1_name }}</strong></p>
-                <p>and</p>
-                <p><strong>{{ certificate.marriage_details.spouse2_name }}</strong></p>
-                <p>solemnized on</p>
-                <p><strong>{{ certificate.marriage_details.marriage_date|date:"F d, Y" }}</strong></p>
-            {% elif certificate.certificate_type == 'death' %}
-                <p>This is to certify that</p>
-                <p><strong>{{ certificate.applicant_name }}</strong></p>
-                <p>passed away on</p>
-                <p><strong>{{ certificate.death_registration.date_of_death|date:"F d, Y" }}</strong></p>
-                <p>at</p>
-                <p><strong>{{ certificate.death_registration.place_of_death }}</strong></p>
-            {% elif certificate.certificate_type == 'character' %}
-                <p>This is to certify that</p>
-                <p><strong>{{ certificate.applicant_name }}</strong></p>
-                <p>has maintained a record of good moral character</p>
-                <p>as verified by our official records and investigations.</p>
-            {% elif certificate.certificate_type == 'academic' %}
-                <p>This is to certify that</p>
-                <p><strong>{{ certificate.academic_registration.full_name }}</strong></p>
-                <p>has successfully completed all requirements for</p>
-                <p><strong>{{ certificate.academic_registration.course }}</strong></p>
-                <p>on</p>
-                <p><strong>{{ certificate.academic_registration.date_of_completion|date:"F d, Y" }}</strong></p>
-            {% else %}
-                <p>Certificate details unavailable.</p>
-            {% endif %}
-        </div>
 
-        <div class="signature-section">
-            <div class="signature-line">
-                <p><strong>{{ certificate.approved_by.get_full_name }}</strong></p>
-                <p class="signature-title">Registrar of Vital Statistics</p>
+                <div class="certificate-body">
+                    {% if certificate.certificate_type == 'birth' %}
+                        <p>This is to certify that</p>
+                        <p><strong>{{ certificate.applicant_name }}</strong></p>
+                        <p>was born on</p>
+                        <p><strong>{{ certificate.birth_registration.date_of_birth|date:"F d, Y" }}</strong></p>
+
+                        <div class="details-grid">
+                            <div class="details-item">
+                                <p>Place of Birth</p>
+                                <strong>{{ certificate.birth_registration.place_of_birth }}</strong>
+                            </div>
+                            <div class="details-item">
+                                <p>Time of Birth</p>
+                                <strong>{{ certificate.birth_registration.time_of_birth }}</strong>
+                            </div>
+                            <div class="details-item">
+                                <p>Father's Name</p>
+                                <strong>{{ certificate.birth_registration.father_name }}</strong>
+                            </div>
+                            <div class="details-item">
+                                <p>Mother's Name</p>
+                                <strong>{{ certificate.birth_registration.mother_name }}</strong>
+                            </div>
+                            <div class="details-item">
+                                <p>Sex</p>
+                                <strong>{{ certificate.birth_registration.sex }}</strong>
+                            </div>
+                            <div class="details-item">
+                                <p>Registration Number</p>
+                                <strong>{{ certificate.birth_registration.birth_registration_number }}</strong>
+                            </div>
+                        </div>
+                    {% elif certificate.certificate_type == 'marriage' %}
+                        <p>This is to certify the marriage of</p>
+                        <p><strong>{{ certificate.marriage_details.spouse1_name }}</strong></p>
+                        <p>and</p>
+                        <p><strong>{{ certificate.marriage_details.spouse2_name }}</strong></p>
+                        <p>solemnized on</p>
+                        <p><strong>{{ certificate.marriage_details.marriage_date|date:"F d, Y" }}</strong></p>
+                    {% elif certificate.certificate_type == 'death' %}
+                        <p>This is to certify that</p>
+                        <p><strong>{{ certificate.applicant_name }}</strong></p>
+                        <p>passed away on</p>
+                        <p><strong>{{ certificate.death_registration.date_of_death|date:"F d, Y" }}</strong></p>
+                        <p>at</p>
+                        <p><strong>{{ certificate.death_registration.place_of_death }}</strong></p>
+                    {% elif certificate.certificate_type == 'character' %}
+                        <p>This is to certify that</p>
+                        <p><strong>{{ certificate.applicant_name }}</strong></p>
+                        <p>has maintained a record of good moral character</p>
+                        <p>as verified by our official records and investigations.</p>
+                    {% elif certificate.certificate_type == 'academic' %}
+                        <p>This is to certify that</p>
+                        <p><strong>{{ certificate.academic_registration.full_name }}</strong></p>
+                        <p>has successfully completed all requirements for</p>
+                        <p><strong>{{ certificate.academic_registration.course }}</strong></p>
+                        <p>on</p>
+                        <p><strong>{{ certificate.academic_registration.date_of_completion|date:"F d, Y" }}</strong></p>
+                    {% else %}
+                        <p>Certificate details unavailable.</p>
+                    {% endif %}
+                </div>
+
+                <div class="signature-section">
+                    <div class="signature-line">
+                        <p><strong>{{ certificate.approved_by.get_full_name }}</strong></p>
+                        <p class="signature-title">Registrar of Vital Statistics</p>
+                    </div>
+                </div>
+
+                <div class="qr-section">
+                    <img src="{{ qr_image }}" alt="Certificate QR Code" class="qr-image">
+                    <p class="verification-text">Scan to verify</p>
+                </div>
             </div>
-        </div>
-        <div class="qr-section">
-             <img src="{{ qr_image }}" alt="Certificate QR Code" class="qr-image">
-            <p class="verification-text">Scan to verify</p>
         </div>
     </div>
 
-
-<!-- Back Page -->
+    <!-- Back Page -->
     <div class="page certificate-back">
-        <div class="border-pattern"></div>
-        <div class="back-content">
-            <div class="back-header">
-                <h2 class="back-title">Certificate Verification Information</h2>
-            </div>
+        <div class="border-pattern">
+            <div class="inner-content">
+                <div class="watermark">Verified</div>
 
-            <div class="verification-details">
-                <div class="verification-section">
-                    <h3 class="verification-heading">How to Verify This Certificate</h3>
-                    <p class="verification-text">This certificate can be verified through the following methods:</p>
-                    <ul class="verification-list">
-                        <li>Scan the QR code on the front page using any QR code scanner</li>
-                        <li>Visit our online verification portal at verify.gambia.gov.gm</li>
-                        <li>Contact the Department of Vital Statistics office</li>
-                    </ul>
-                </div>
+                <div class="back-content">
+                    <div class="back-header">
+                        <h2 class="back-title">Certificate Verification Information</h2>
+                    </div>
 
-                <div class="verification-section">
-                    <h3 class="verification-heading">Security Features</h3>
-                    <ul class="verification-list">
-                        <li>Unique QR Code with embedded certificate data</li>
-                        <li>Official seal of the Government of The Gambia</li>
-                        <li>Unique certificate number and registration details</li>
-                        <li>Authorized signature and stamp</li>
-                    </ul>
-                </div>
+                    <div class="verification-details">
+                        <div class="verification-section">
+                            <h3 class="verification-heading">How to Verify This Certificate</h3>
+                            <p class="verification-text">This certificate can be verified through the following methods:</p>
+                            <ul class="verification-list">
+                                <li>Scan the QR code on the front page using any QR code scanner</li>
+                                <li>Visit our online verification portal at verify.gambia.gov.gm</li>
+                                <li>Contact the Department of Vital Statistics office</li>
+                            </ul>
+                        </div>
 
-                <div class="official-use">
-                    <div class="official-use-title">For Official Use Only</div>
-                    <div class="official-use-grid">
-                        <div class="official-use-item">
-                            Issue Date: {{ certificate.last_updated|date:"F d, Y" }}
+                        <div class="verification-section">
+                            <h3 class="verification-heading">Security Features</h3>
+                            <ul class="verification-list">
+                                <li>Unique QR Code with embedded certificate data</li>
+                                <li>Official seal of the Government of The Gambia</li>
+                                <li>Unique certificate number and registration details</li>
+                                <li>Authorized signature and stamp</li>
+                            </ul>
                         </div>
-                        <div class="official-use-item">
-                            Certificate No: {{ certificate.id }}
+
+                        <div class="official-use">
+                            <div class="official-use-title">For Official Use Only</div>
+                            <div class="official-use-grid">
+                                <div class="official-use-item">
+                                    Issue Date: {{ certificate.last_updated|date:"F d, Y" }}
+                                </div>
+                                <div class="official-use-item">
+                                    Certificate No: {{ certificate.id }}
+                                </div>
+                                <div class="official-use-item">
+                                    Issued By: {{ certificate.approved_by.get_full_name }}
+                                </div>
+                                <div class="official-use-item">
+                                    Office Location: {{ certificate.approved_by.officerprofile.post_location }}
+                                </div>
+                            </div>
                         </div>
-                        <div class="official-use-item">
-                            Issued By: {{ certificate.approved_by.get_full_name }}
-                        </div>
-                        <div class="official-use-item">
-                            Office Location: {{ certificate.approved_by.officerprofile.post_location }}
+                    </div>
+
+                    <div class="back-footer">
+                        <div class="contact-info">
+                            <p>Department of Vital Statistics</p>
+                            <p>Government of The Gambia</p>
+                            <p>Tel: +220 XXX XXXX | Email: vital.statistics@gambia.gov.gm</p>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="back-footer">
-                <div class="contact-info">
-                    <p>Department of Vital Statistics</p>
-                    <p>Government of The Gambia</p>
-                    <p>Tel: +220 XXX XXXX | Email: vital.statistics@gambia.gov.gm</p>
-                </div>
-            </div>
-
         </div>
-    </div>
     </div>
 </body>
 </html>

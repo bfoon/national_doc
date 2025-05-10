@@ -886,16 +886,14 @@ def interview_view(request, interview_id):
                 interview_slot.save()
 
                 application.save()  # Save the application updates
-                # user = request.user  # Assuming the current user is the one to notify
-                # send_notification(user, f"Interview was postpone")
                 messages.success(request, "Interview postponed successfully, and a new slot assigned.")
             else:
                 messages.warning(request, "No available interview slots for postponement.")
             return redirect('interview_list')
 
         else:  # Handle submitting the interview questionnaire and notes
-            questionnaire = request.POST.get('questionnaire')
-            notes = request.POST.get('notes')
+            questionnaire = request.POST.get('questionnaire', '')
+            notes = request.POST.get('notes', '')
             interview.questionnaire = questionnaire
             interview.notes = notes
             interview.status = 'waiting'  # Update the status to 'waiting'
@@ -910,8 +908,9 @@ def interview_view(request, interview_id):
                 approver=None,  # Approver can be set later
                 status=0  # Default to pending (0)
             )
-            user = request.user  # Assuming the current user is the one to notify
-            send_notification(user, f"Interview is awaiting {application.user.get_full_name()} approval ")
+
+            # Send notification to the user
+            send_notification(request.user, f"Interview is awaiting {application.user.get_full_name()} approval")
             messages.success(request, 'Interview details updated and ToDo created successfully.')
             return redirect('interview_list')
 
