@@ -4,6 +4,8 @@ from django.contrib.auth.models import User, Group
 from docs.models import Application, ChatMessage, Certification
 from django.utils import timezone
 from django.utils.text import slugify
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class PostLocation(models.Model):
     name = models.CharField(max_length=255)
@@ -416,6 +418,16 @@ class CustomGroup(Group):
     class Meta:
         verbose_name = "Group"
         verbose_name_plural = "Groups"
+# Automatically create CustomGroup entry when a Group is created
+@receiver(post_save, sender=Group)
+def create_or_update_custom_group(sender, instance, created, **kwargs):
+    if created:
+        CustomGroup.objects.get_or_create(id=instance.id, defaults={
+            'name': instance.name
+        })
+    else:
+        # Update name in case it's edited
+        CustomGroup.objects.filter(id=instance.id).update(name=instance.name)
 
 class VerificationChecklist(models.Model):
     certificate = models.ForeignKey(

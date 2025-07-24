@@ -146,28 +146,39 @@
                 </div>
             </div>
         </div>
-
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <!-- Group Info Card -->
-            <div class="card mb-4">
-                <div class="card-body">
-                    <h5 class="card-title">Group Details</h5>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Total Members</span>
-                        <span class="badge bg-primary">{{ group.user_set.count }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3">
-                        <span class="text-muted">Created On</span>
-                        <span>{{ group.created_at|date:"M d, Y" }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span class="text-muted">Last Updated</span>
-                        <span>{{ group.updated_at|date:"M d, Y" }}</span>
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <!-- Group Info Card -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Group Details</h5>
+                        <hr>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Total Members</span>
+                            <span class="badge bg-primary">{{ group.user_set.count }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">Created On</span>
+                            <span>
+                                {% if custom_group %}
+                                    {{ custom_group.created_at|date:"M d, Y" }}
+                                {% else %}
+                                    <em>Not available</em>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Last Updated</span>
+                            <span>
+                                {% if custom_group %}
+                                    {{ custom_group.updated_at|date:"M d, Y" }}
+                                {% else %}
+                                    <em>Not available</em>
+                                {% endif %}
+                            </span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
             <!-- Guidelines Card -->
             <div class="card">

@@ -4,7 +4,7 @@ from docs.models import Application, UploadedDocument, ChatMessage, Certificatio
 from .models import (Fulfiller,Note, PostLocation, InterviewSlot,
                      Interview, ToDo, Boot, OfficerProfile, Notification,
                      FAQ, FAQCategory, CallNote, MessageNote, FollowUpNote,
-                     VerificationChecklist, CertificateNote)
+                     VerificationChecklist, CertificateNote, CustomGroup)
 from django.contrib.auth.models import User, Group
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.dateparse import parse_date
@@ -668,6 +668,9 @@ def edit_group(request, group_id):
     available_users = OfficerProfile.objects.exclude(user__groups=group).order_by('user__username')
     group_members = OfficerProfile.objects.filter(user__groups=group).order_by('user__username')
 
+    # Get or create the CustomGroup associated with this group
+    custom_group, _ = CustomGroup.objects.get_or_create(name=group.name)
+
     if request.method == 'POST':
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             action = request.POST.get('action')
@@ -680,8 +683,6 @@ def edit_group(request, group_id):
                 }, status=400)
 
             try:
-
-
                 if action == 'remove':
                     officer_profile = OfficerProfile.objects.get(user__id=user_id)
                     officer_profile.user.groups.remove(group)
@@ -698,27 +699,32 @@ def edit_group(request, group_id):
                         'status': 'success',
                         'message': f'{officer_profile.user.get_full_name()} was added to the group successfully.'
                     })
-
             except OfficerProfile.DoesNotExist:
                 return JsonResponse({
                     'status': 'error',
                     'message': 'Officer profile not found.'
                 }, status=404)
 
-        # Regular form submission for group name update
+        # Handle regular form submission for group name change
         group_name = request.POST.get('group_name')
         if Group.objects.filter(name=group_name).exclude(id=group_id).exists():
             messages.error(request, 'Group name already exists.')
         else:
             group.name = group_name
             group.save()
-            user = request.user
-            send_notification(user, f"Group {group_name} was updated.")
+
+            # Also update custom group name and updated_at
+            custom_group.name = group_name
+            custom_group.updated_at = now()
+            custom_group.save()
+
+            send_notification(request.user, f"Group {group_name} was updated.")
             messages.success(request, f'Group "{group_name}" updated successfully.')
             return redirect('list_officer_users')
 
     return render(request, 'immigration/edit_group.html', {
         'group': group,
+        'custom_group': custom_group,
         'available_users': available_users,
         'group_members': group_members,
     })

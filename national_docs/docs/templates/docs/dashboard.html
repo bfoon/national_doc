@@ -140,10 +140,12 @@
                 {% else %}
                     <a href="#"
                        class="btn btn-sm btn-primary mb-2"
-                       data-toggle="modal"
-                       data-target="#paymentTokenModal">
+                       data-bs-toggle="modal"
+                       data-bs-target="#paymentTokenModal"
+                       data-application-type="national-id">
                         <i class="fas fa-plus-circle"></i> Start Application
                     </a>
+
                 {% endif %}
             </div>
             </div>
@@ -592,14 +594,27 @@
 </style>
 
 <script>
-    // Handle modal show event - set application type
+    // Pre-rendered Django URLs
+    const nationalIdUrl = "{% url 'apply_national_id' %}";
+    const residentPermitUrl = "{% url 'apply_resident_permit' %}";
+    const workPermitUrl = "{% url 'apply_work_permit' %}";
+
+    // Modal show: attach application type and reset form
     $('#paymentTokenModal').on('show.bs.modal', function (event) {
         const button = $(event.relatedTarget);
         const applicationType = button.data('application-type');
         const modal = $(this);
         modal.data('application-type', applicationType);
 
-        // Reset form and message when modal opens
+        // Reset form and message
+        const form = document.getElementById('tokenVerificationForm');
+        const messageDiv = document.getElementById('tokenVerificationMessage');
+        form.reset();
+        messageDiv.innerHTML = '';
+    });
+
+    // Reset on close
+    $('#paymentTokenModal').on('hidden.bs.modal', function () {
         const form = document.getElementById('tokenVerificationForm');
         const messageDiv = document.getElementById('tokenVerificationMessage');
         form.reset();
@@ -607,14 +622,14 @@
     });
 
     // Format token input
-    document.getElementById('paymentToken').addEventListener('input', function(e) {
+    document.getElementById('paymentToken').addEventListener('input', function () {
         this.value = this.value.slice(0, 6).toUpperCase();
         this.classList.remove('is-invalid');
         document.getElementById('tokenVerificationMessage').innerHTML = '';
     });
 
-    // Handle form submission
-    document.getElementById('tokenVerificationForm').addEventListener('submit', function(event) {
+    // Form submit handler
+    document.getElementById('tokenVerificationForm').addEventListener('submit', function (event) {
         event.preventDefault();
 
         const paymentToken = document.getElementById('paymentToken').value;
@@ -623,11 +638,11 @@
         const spinner = document.getElementById('tokenSpinner');
         const verifyButton = document.getElementById('verifyButton');
 
-        // Show loading state
+        // Loading state
         spinner.classList.remove('d-none');
         verifyButton.disabled = true;
 
-        // Send request to verify token
+        // Send POST request
         fetch('/verify-token/', {
             method: 'POST',
             headers: {
@@ -645,20 +660,24 @@
                         Token verified successfully!
                     </div>`;
 
-                // Handle redirect based on application type
+                // ✅ Confirm what was received
+                console.log("Redirecting to:", applicationType);
+
+                // Redirect after short delay
                 setTimeout(() => {
-                    switch(applicationType) {
+                    switch (applicationType) {
                         case 'national-id':
-                            window.location.href = "{% url 'apply_national_id' %}";
+                            window.location.href = nationalIdUrl;
                             break;
                         case 'resident-permit':
-                            window.location.href = "{% url 'apply_resident_permit' %}";
+                            window.location.href = residentPermitUrl;
                             break;
                         case 'work-permit':
-                            window.location.href = "{% url 'apply_work_permit' %}";
+                            window.location.href = workPermitUrl;
                             break;
+                        default:
+                            console.warn("Unknown application type:", applicationType);
                     }
-                    $('#paymentTokenModal').modal('hide');
                 }, 1000);
             } else {
                 messageContainer.innerHTML = `
@@ -677,20 +696,13 @@
                 </div>`;
         })
         .finally(() => {
-            // Hide loading state
+            // Reset loading state
             spinner.classList.add('d-none');
             verifyButton.disabled = false;
         });
     });
-
-    // Reset form when modal is closed
-    $('#paymentTokenModal').on('hidden.bs.modal', function() {
-        const form = document.getElementById('tokenVerificationForm');
-        const messageDiv = document.getElementById('tokenVerificationMessage');
-        form.reset();
-        messageDiv.innerHTML = '';
-    });
 </script>
+
 
 <!-- Modal for Viewing Application Details -->
 <div class="modal fade" id="applicationModal" tabindex="-1" aria-labelledby="applicationModalLabel" aria-hidden="true">

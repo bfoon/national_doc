@@ -11,6 +11,7 @@ class Token(models.Model):
     amount = models.DecimalField(max_digits=10, decimal_places=2)  # Associated amount
     created_at = models.DateTimeField(auto_now_add=True)  # Token creation time
     is_used = models.BooleanField(default=False)  # Token usage status
+    is_expired = models.BooleanField(default=False)  # Token usage status
     service_completed_at = models.DateTimeField(null=True, blank=True)  # Service completion time
 
     def save(self, *args, **kwargs):

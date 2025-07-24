@@ -4,373 +4,490 @@
 
 <style>
 :root {
-    --primary-color: #4f46e5;
+    --primary-color: #6366f1;
+    --secondary-color: #8b5cf6;
     --success-color: #10b981;
     --warning-color: #f59e0b;
+    --danger-color: #ef4444;
     --info-color: #3b82f6;
-    --border-radius: 12px;
-    --transition-speed: 0.3s;
+    --dark-color: #1f2937;
+    --light-color: #f3f4f6;
+    --border-radius: 16px;
+    --transition-speed: 0.4s;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* Card Styles */
-.token-card {
+.modern-card {
     border: none;
     border-radius: var(--border-radius);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
-    transition: all var(--transition-speed) ease-in-out;
-    background: #ffffff;
+    background: white;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-speed) ease;
     overflow: hidden;
 }
 
-.token-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.modern-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
-/* Dashboard Cards */
-.card-body {
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid #e5e7eb;
     padding: 1.5rem;
 }
 
-.card-icon {
-    width: 48px;
-    height: 48px;
+/* Dashboard Metrics */
+.metric-card {
+    position: relative;
+    background: linear-gradient(135deg, white 0%, #f9fafb 100%);
+    padding: 1.5rem;
+    transition: all var(--transition-speed);
+}
+
+.metric-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--primary-color);
+    transform: scaleX(0);
+    transition: transform var(--transition-speed);
+}
+
+.metric-card:hover::after {
+    transform: scaleX(1);
+}
+
+.metric-icon {
+    width: 52px;
+    height: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    transition: all var(--transition-speed);
-}
-
-.card-icon i {
+    border-radius: 14px;
     font-size: 1.5rem;
 }
 
-/* Form Controls */
-.form-control, .form-select {
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--dark-color);
+    margin: 0;
+}
+
+.metric-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Form Elements */
+.modern-input {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0.875rem 1.25rem;
     transition: all var(--transition-speed);
-    font-size: 0.95rem;
+    font-size: 1rem;
+    background: white;
 }
 
-.form-control:focus, .form-select:focus {
+.modern-input:focus {
+    outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
 }
 
-.input-group-text {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
+.modern-select {
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 0.875rem 1.25rem;
+    transition: all var(--transition-speed);
+    cursor: pointer;
+    background: white;
+    font-size: 1rem;
 }
 
 /* Buttons */
-.btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
-    font-weight: 500;
+.btn-modern {
+    padding: 0.875rem 2rem;
+    border-radius: 12px;
+    font-weight: 600;
     transition: all var(--transition-speed);
-}
-
-.btn-primary {
-    background-color: var(--primary-color);
     border: none;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
 }
 
-.btn-primary:hover {
-    background-color: #4338ca;
-    transform: translateY(-1px);
+.btn-modern::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    transition: width 0.6s, height 0.6s;
 }
 
-.btn-success {
-    background-color: var(--success-color);
-    border: none;
+.btn-modern:active::before {
+    width: 300px;
+    height: 300px;
 }
 
-.btn-success:hover {
-    background-color: #059669;
-    transform: translateY(-1px);
-}
-
-/* Transaction History */
-.log-entry {
-    border-left: 4px solid transparent;
-    border-radius: 8px;
-    transition: all var(--transition-speed);
-    margin-bottom: 0.75rem;
-    background-color: #f9fafb;
-}
-
-.log-entry:hover {
-    background-color: #f3f4f6;
-}
-
-.log-entry.generated {
-    border-left-color: var(--primary-color);
-}
-
-.log-entry.verified {
-    border-left-color: var(--success-color);
-}
-
-.token-badge {
-    font-family: 'SF Mono', 'Roboto Mono', monospace;
-    letter-spacing: 1.5px;
-    background-color: #f3f4f6;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-}
-
-/* Pagination */
-.pagination {
-    gap: 0.25rem;
-}
-
-.pagination .page-link {
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    color: #4b5563;
-    font-weight: 500;
-}
-
-.pagination .page-item.active .page-link {
-    background-color: var(--primary-color);
+.btn-primary-modern {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: white;
 }
 
-.pagination .page-link:hover:not(.active) {
-    background-color: #f3f4f6;
-    color: var(--primary-color);
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
 }
 
-/* Alerts */
-.alert-float {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 1050;
-    min-width: 300px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+.btn-success-modern {
+    background: linear-gradient(135deg, var(--success-color), #059669);
+    color: white;
+}
+
+.btn-success-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+/* Table Styles */
+.modern-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+.modern-table thead {
+    background: #f9fafb;
+}
+
+.modern-table th {
     padding: 1rem 1.5rem;
-    border: none;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #e5e7eb;
 }
 
-.alert-success {
-    background-color: #ecfdf5;
+.modern-table td {
+    padding: 1.25rem 1.5rem;
+    color: #4b5563;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.modern-table tbody tr {
+    transition: all var(--transition-speed);
+}
+
+.modern-table tbody tr:hover {
+    background: #f9fafb;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.375rem 0.875rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.status-badge.verified {
+    background: #d1fae5;
     color: #065f46;
 }
 
-.alert-danger {
-    background-color: #fef2f2;
+.status-badge.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.expired {
+    background: #fee2e2;
     color: #991b1b;
 }
 
-/* Responsive Adjustments */
+/* Token Display */
+.token-display {
+    font-family: 'SF Mono', 'Monaco', 'Courier New', monospace;
+    background: var(--light-color);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+}
+
+.token-display:hover {
+    background: #e5e7eb;
+}
+
+/* Search Box */
+.search-container {
+    position: relative;
+}
+
+.search-input {
+    padding-left: 3rem;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+/* Notifications */
+.notification-modern {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    z-index: 1050;
+    min-width: 300px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification-success {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    color: #065f46;
+}
+
+.notification-error {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    color: #991b1b;
+}
+
+/* Action Buttons */
+.action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-speed);
+    cursor: pointer;
+    border: none;
+}
+
+.action-btn:hover {
+    transform: scale(1.1);
+}
+
+.action-btn.view {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.action-btn.copy {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+/* Loading Animation */
+.loading-dots {
+    display: inline-flex;
+    gap: 0.25rem;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .token-card {
+    .metric-card {
         margin-bottom: 1rem;
     }
 
-    .container {
-        padding: 1rem;
+    .modern-table {
+        font-size: 0.875rem;
     }
 
-    .alert-float {
-        left: 16px;
-        right: 16px;
-        bottom: 16px;
-        min-width: auto;
+    .modern-table th,
+    .modern-table td {
+        padding: 0.75rem;
+    }
+
+    .btn-modern {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
     }
 }
 
 /* Dark Mode Support */
 @media (prefers-color-scheme: dark) {
     body {
-        background-color: #1f2937;
+        background-color: #111827;
         color: #f9fafb;
     }
 
-    .token-card {
-        background-color: #374151;
+    .modern-card {
+        background: #1f2937;
+        color: #f9fafb;
     }
 
-    .form-control, .form-select {
-        background-color: #1f2937;
+    .modern-input,
+    .modern-select {
+        background: #374151;
         border-color: #4b5563;
         color: #f9fafb;
     }
 
-    .input-group-text {
-        background-color: #374151;
+    .modern-table thead {
+        background: #374151;
+    }
+
+    .modern-table th {
+        color: #f3f4f6;
         border-color: #4b5563;
-        color: #f9fafb;
     }
 
-    .log-entry {
-        background-color: #374151;
+    .modern-table td {
+        color: #d1d5db;
+        border-color: #374151;
     }
 
-    .log-entry:hover {
-        background-color: #4b5563;
+    .modern-table tbody tr:hover {
+        background: #374151;
     }
-
-    .token-badge {
-        background-color: #1f2937;
-        color: #f9fafb;
-    }
-
-    .text-muted {
-        color: #9ca3af !important;
-    }
-}
-    /* Searchable Select Styles */
-.select-search-container {
-    position: relative;
-}
-
-.select-search-input {
-    padding-right: 30px;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-search' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z'%3E%3C/path%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 16px;
-}
-
-.select-search-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-    background: white;
-    border: 1px solid #dee2e6;
-    border-radius: 0.375rem;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    display: none;
-}
-
-.select-search-dropdown.show {
-    display: block;
-}
-
-.select-search-option {
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.select-search-option:hover {
-    background-color: #f8f9fa;
-}
-
-.select-search-option.highlighted {
-    background-color: #e9ecef;
-}
-
-.select-search-no-results {
-    padding: 0.5rem 1rem;
-    color: #6c757d;
-    text-align: center;
 }
 </style>
 
 <div class="container py-5">
-    <!-- Dashboard Cards -->
-<div class="row g-4 mb-4">
-    <!-- Total Tokens Card -->
-    <div class="col-md-3">
-        <div class="card token-card">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Total Tokens</h6>
-                        <h3 class="mb-0 fw-bold">{{ total_tokens|default:"0" }}</h3>
-                    </div>
-                    <div class="bg-primary bg-opacity-10 p-3 rounded">
-                        <i class="bi bi-credit-card text-primary fs-4"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Verified Tokens Card -->
-    <div class="col-md-3">
-        <div class="card token-card">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Used Tokens</h6>
-                        <h3 class="mb-0 fw-bold">{{ used_tokens|default:"0" }}</h3>
-                    </div>
-                    <div class="bg-success bg-opacity-10 p-3 rounded">
-                        <i class="bi bi-check-circle text-success fs-4"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pending Tokens Card -->
-    <div class="col-md-3">
-        <div class="card token-card">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Pending Tokens</h6>
-                        <h3 class="mb-0 fw-bold">{{ pending_tokens|default:"0" }}</h3>
-                    </div>
-                    <div class="bg-warning bg-opacity-10 p-3 rounded">
-                        <i class="bi bi-hourglass-split text-warning fs-4"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Total Amount Card -->
-    <div class="col-md-3">
-        <div class="card token-card">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted mb-2">Total Amount</h6>
-                        <h3 class="mb-0 fw-bold">D{{ total_amount|default:"0"|floatformat:2 }}</h3>
-                    </div>
-                    <div class="bg-info bg-opacity-10 p-3 rounded">
-                        <i class="bi bi-currency-dollar text-info fs-4"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-    <div class="row mb-4">
+    <!-- Page Header -->
+    <div class="row mb-5">
         <div class="col">
-            <h1 class="display-6 mb-3">Token Management</h1>
-            <p class="text-muted">Generate and verify transaction tokens</p>
+            <h1 class="display-5 fw-bold mb-3">Token Management</h1>
+            <p class="text-muted fs-5">Generate, verify, and track transaction tokens securely</p>
         </div>
     </div>
 
-    <div class="row g-4">
-        <!-- Generate Token Card -->
+    <!-- Dashboard Metrics -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-3 col-md-6">
+            <div class="modern-card metric-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="metric-label mb-1">Total Tokens</p>
+                        <h2 class="metric-value">{{ total_tokens|default:"0" }}</h2>
+                    </div>
+                    <div class="metric-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-credit-card-2-back-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="modern-card metric-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="metric-label mb-1">Used Tokens</p>
+                        <h2 class="metric-value">{{ used_tokens|default:"0" }}</h2>
+                    </div>
+                    <div class="metric-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="modern-card metric-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="metric-label mb-1">Pending Tokens</p>
+                        <h2 class="metric-value">{{ pending_tokens|default:"0" }}</h2>
+                    </div>
+                    <div class="metric-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-hourglass-split"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="modern-card metric-card">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="metric-label mb-1">Total Amount</p>
+                        <h2 class="metric-value">${{ total_amount|default:"0"|floatformat:2 }}</h2>
+                    </div>
+                    <div class="metric-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Token Operations -->
+    <div class="row g-4 mb-5">
         <div class="col-md-6">
-            <div class="card token-card">
+            <div class="modern-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Generate New Token</h5>
+                </div>
                 <div class="card-body p-4">
-                    <h5 class="card-title mb-4">Generate Token</h5>
                     <form id="generateTokenForm" method="POST">
                         {% csrf_token %}
-                        <div class="mb-3">
-                            <label for="user" class="form-label">Select User</label>
-                            <select id="user" name="user" class="form-select" required>
+                        <div class="mb-4">
+                            <label for="user" class="form-label fw-semibold">Select User</label>
+                            <select id="user" name="user" class="form-control modern-select" required>
                                 <option value="">Choose user...</option>
                                 {% for user in users %}
                                     <option value="{{ user.id }}">{{ user.username }}</option>
@@ -378,144 +495,240 @@
                             </select>
                         </div>
                         <div class="mb-4">
-                            <label for="amount" class="form-label">Amount</label>
+                            <label for="amount" class="form-label fw-semibold">Amount</label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" id="amount" name="amount"
-                                    class="form-control"
+                                    class="form-control modern-input"
                                     placeholder="0.00"
                                     step="0.01" min="0" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">
-                            Generate Token
+                        <button type="submit" class="btn btn-modern btn-primary-modern w-100">
+                            <i class="bi bi-plus-circle me-2"></i>Generate Token
                         </button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Verify Token Card -->
         <div class="col-md-6">
-            <div class="card token-card">
+            <div class="modern-card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Verify Token</h5>
+                </div>
                 <div class="card-body p-4">
-                    <h5 class="card-title mb-4">Verify Token</h5>
                     <form id="verifyTokenForm">
                         <div class="mb-4">
-                            <label for="token" class="form-label">Token</label>
+                            <label for="token" class="form-label fw-semibold">Enter Token</label>
                             <input type="text" id="token" name="token"
-                                class="form-control form-control-lg text-center token-badge"
+                                class="form-control modern-input text-center fs-4 font-monospace"
                                 maxlength="6"
                                 placeholder="000000" required>
                         </div>
-                        <button type="submit" class="btn btn-success w-100">
-                            Verify Token
+                        <button type="submit" class="btn btn-modern btn-success-modern w-100">
+                            <i class="bi bi-shield-check me-2"></i>Verify Token
                         </button>
                     </form>
+                    <div id="verificationResult" class="mt-4"></div>
                 </div>
             </div>
         </div>
     </div>
 
-   <!-- Transaction History -->
-<div class="row mt-4">
-    <div class="col">
-        <div class="card token-card">
-            <div class="card-body p-4">
-                <h5 class="card-title mb-4">Transaction History</h5>
-                <div id="tokenLogs">
-                    {% if token_logs %}
-                        {% for log in token_logs %}
-                            <div class="log-entry p-3 mb-2 rounded {{ log.action|lower }}">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <span class="fw-bold">{{ log.user.username }}</span>
-                                        <span class="text-muted mx-1">•</span>
-                                        <span class="token-badge">{{ log.token }}</span>
-                                        <span class="text-muted mx-1">•</span>
-                                        <span class="text-muted">${{ log.token.amount }}</span>
-                                    </div>
-                                    <div>
-                                        <span class="badge {% if log.action == 'Generated' %}bg-primary{% else %}bg-success{% endif %}">
-                                            {{ log.activity}}
-                                        </span>
-                                        <small class="text-muted ms-2">{{ log.created_at|date:"Y-m-d H:i" }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-
-                        <!-- Pagination -->
-                        {% if token_logs.has_other_pages %}
-                        <div class="d-flex justify-content-center mt-4">
-                            <nav aria-label="Transaction history pagination">
-                                <ul class="pagination">
-                                    {% if token_logs.has_previous %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ token_logs.previous_page_number }}" aria-label="Previous">
-                                                <span aria-hidden="true">&laquo;</span>
-                                            </a>
-                                        </li>
-                                    {% else %}
-                                        <li class="page-item disabled">
-                                            <span class="page-link" aria-hidden="true">&laquo;</span>
-                                        </li>
-                                    {% endif %}
-
-                                    {% for num in token_logs.paginator.page_range %}
-                                        {% if token_logs.number == num %}
-                                            <li class="page-item active">
-                                                <span class="page-link">{{ num }}</span>
-                                            </li>
+    <!-- Tokens Table -->
+    <div class="row">
+        <div class="col">
+            <div class="modern-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">All Tokens</h5>
+                    <div class="search-container">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" id="tokenSearch"
+                               class="form-control modern-input search-input"
+                               placeholder="Search tokens...">
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Token</th>
+                                    <th>User</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Used</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tokensTableBody">
+                                {% for token in all_tokens %}
+                                <tr>
+                                    <td>
+                                        <span class="token-display">{{ token.token }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-2">
+                                                <i class="bi bi-person text-primary"></i>
+                                            </div>
+                                            <span>{{token.user.username }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="fw-semibold">${{ token.amount|floatformat:2 }}</td>
+                                    <td>
+                                        {% if token.is_used %}
+                                            <span class="status-badge verified">
+                                                <i class="bi bi-check-circle-fill"></i> Used
+                                            </span>
+                                        {% elif token.is_expired %}
+                                            <span class="status-badge expired">
+                                                <i class="bi bi-x-circle-fill"></i> Expired
+                                            </span>
                                         {% else %}
-                                            <li class="page-item">
-                                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                                            </li>
+                                            <span class="status-badge pending">
+                                                <i class="bi bi-clock-fill"></i> Pending
+                                            </span>
                                         {% endif %}
-                                    {% endfor %}
-
-                                    {% if token_logs.has_next %}
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page={{ token_logs.next_page_number }}" aria-label="Next">
-                                                <span aria-hidden="true">&raquo;</span>
-                                            </a>
-                                        </li>
-                                    {% else %}
-                                        <li class="page-item disabled">
-                                            <span class="page-link" aria-hidden="true">&raquo;</span>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </nav>
-                        </div>
-                        {% endif %}
-
-                    {% else %}
-                        <p class="text-muted text-center py-4">No transaction history available</p>
-                    {% endif %}
+                                    </td>
+                                    <td>{{ token.created_at|date:"Y-m-d H:i" }}</td>
+                                    <td>
+                                        {% if token.service_completed_at %}
+                                            {{ token.service_completed_at|date:"Y-m-d H:i" }}
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="d-flex gap-2">
+                                            <button class="action-btn copy" title="Copy token"
+                                                    onclick="copyToken('{{ token.token }}')">
+                                                <i class="bi bi-clipboard"></i>
+                                            </button>
+                                            <button class="action-btn view" title="View details"
+                                                    onclick="viewTokenDetails('{{ token.token }}')">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        No tokens found
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Pagination -->
+    {% if all_tokens.has_other_pages %}
+    <div class="row mt-4">
+        <div class="col">
+            <nav aria-label="Token table pagination">
+                <ul class="pagination justify-content-center">
+                    {% if all_tokens.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ all_tokens.previous_page_number }}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in all_tokens.paginator.page_range %}
+                        {% if all_tokens.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if all_tokens.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ all_tokens.next_page_number }}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+    <!-- Token Logs Modal -->
+<div class="modal fade" id="tokenLogsModal" tabindex="-1" aria-labelledby="tokenLogsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tokenLogsModalLabel">Token Logs</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="tokenLogsContent">
+        <!-- Logs will be loaded here dynamically -->
+        <p class="text-muted">Loading token logs...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 </div>
 <br>
+<script>
+function viewTokenDetails(tokenValue) {
+    const modal = new bootstrap.Modal(document.getElementById('tokenLogsModal'));
+    modal.show();
+
+    // Set loading content
+    document.getElementById('tokenLogsContent').innerHTML = '<p class="text-muted">Loading token logs...</p>';
+
+    // Fetch the logs
+    fetch(`/finance/token-logs/${tokenValue}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network error');
+            }
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('tokenLogsContent').innerHTML = data;
+        })
+        .catch(error => {
+            document.getElementById('tokenLogsContent').innerHTML = `<p class="text-danger">Failed to load token logs.</p>`;
+        });
+}
+
+</script>
 
 <script>
     const csrfToken = "{{ csrf_token }}";
 
     // Show notification
     function showNotification(message, type = 'success') {
-        const alert = document.createElement('div');
-        alert.className = `alert alert-${type} alert-float alert-dismissible fade show`;
-        alert.innerHTML = `
-            ${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        const notification = document.createElement('div');
+        notification.className = `notification-modern notification-${type}`;
+        notification.innerHTML = `
+            <div class="d-flex align-items-center justify-content-between">
+                <span>${message}</span>
+                <button class="btn-close" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
         `;
-        document.body.appendChild(alert);
+        document.body.appendChild(notification);
 
         setTimeout(() => {
-            alert.classList.remove('show');
-            setTimeout(() => alert.remove(), 150);
+            notification.style.animation = 'slideOut 0.3s ease-out forwards';
+            setTimeout(() => notification.remove(), 300);
         }, 5000);
     }
 
@@ -524,6 +737,7 @@
         event.preventDefault();
         const submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
 
         try {
             const response = await fetch("/finance/generate-token/", {
@@ -543,14 +757,16 @@
             if (data.success) {
                 showNotification(`Token generated successfully: ${data.token}`);
                 this.reset();
-                updateTokenLog(data);
+                updateMetrics();
+                updateTokensTable();
             } else {
-                showNotification(data.error || 'Failed to generate token', 'danger');
+                showNotification(data.error || 'Failed to generate token', 'error');
             }
         } catch (error) {
-            showNotification('An unexpected error occurred', 'danger');
+            showNotification('An unexpected error occurred', 'error');
         } finally {
             submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-plus-circle me-2"></i>Generate Token';
         }
     });
 
@@ -559,6 +775,7 @@
         event.preventDefault();
         const submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
+        submitBtn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
 
         try {
             const response = await fetch("/finance/verify-token/", {
@@ -575,56 +792,84 @@
             if (data.success) {
                 showNotification(`Token verified successfully. Amount: $${data.amount}`);
                 this.reset();
-                updateTokenLog(data);
+                updateMetrics();
+                updateTokensTable();
+
+                // Show verification result
+                const resultDiv = document.getElementById('verificationResult');
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Token Verified!</strong><br>
+                        Amount: $${data.amount}<br>
+                        User: ${data.user}
+                    </div>
+                `;
             } else {
-                showNotification(data.error || 'Invalid token', 'danger');
+                showNotification(data.error || 'Invalid token', 'error');
             }
         } catch (error) {
-            showNotification('An unexpected error occurred', 'danger');
+            showNotification('An unexpected error occurred', 'error');
         } finally {
             submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="bi bi-shield-check me-2"></i>Verify Token';
         }
     });
 
-    // Update token log
-    function updateTokenLog(data) {
-        const tokenLogs = document.getElementById('tokenLogs');
-        const logEntry = document.createElement('div');
-        logEntry.className = `log-entry p-3 mb-2 rounded ${data.action.toLowerCase()}`;
+    // Copy token to clipboard
+    function copyToken(token) {
+        navigator.clipboard.writeText(token).then(() => {
+            showNotification('Token copied to clipboard');
+        });
+    }
 
-        const timestamp = new Date().toLocaleString();
-        logEntry.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <span class="fw-bold">${data.user || 'User'}</span>
-                    <span class="text-muted mx-1">•</span>
-                    <span class="token-badge">${data.token}</span>
-                    <span class="text-muted mx-1">•</span>
-                    <span class="text-muted">$${data.amount}</span>
-                </div>
-                <div>
-                    <span class="badge ${data.action === 'Generated' ? 'bg-primary' : 'bg-success'}">
-                        ${data.action}
-                    </span>
-                    <small class="text-muted ms-2">${timestamp}</small>
-                </div>
-            </div>
-        `;
+    // View token details
+    function viewTokenDetails(token) {
+        // You can implement a modal or expand view here
+        showNotification(`Viewing details for token: ${token}`);
+    }
 
-        if (tokenLogs.firstChild) {
-            tokenLogs.insertBefore(logEntry, tokenLogs.firstChild);
-        } else {
-            tokenLogs.appendChild(logEntry);
+    // Update metrics (you'll need to implement this endpoint)
+    async function updateMetrics() {
+        try {
+            const response = await fetch('/finance/metrics/');
+            const data = await response.json();
+
+            // Update metric values
+            document.querySelectorAll('.metric-value').forEach((el, index) => {
+                const values = [data.total_tokens, data.used_tokens, data.pending_tokens, `$${data.total_amount}`];
+                el.textContent = values[index];
+            });
+        } catch (error) {
+            console.error('Failed to update metrics:', error);
         }
     }
 
-    // Input formatting
+    // Update tokens table (you'll need to implement this endpoint)
+    async function updateTokensTable() {
+        // Reload the table or fetch new data
+        location.reload(); // Simple solution for now
+    }
+
+    // Search functionality
+    document.getElementById('tokenSearch').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('#tokensTableBody tr');
+
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
+        });
+    });
+
+    // Format token input
     document.getElementById('token').addEventListener('input', function() {
         this.value = this.value.slice(0, 6).toUpperCase();
     });
 
-    document.getElementById('amount').addEventListener('input', function() {
-        if (this.value.length > 0) {
+    // Format amount input
+    document.getElementById('amount').addEventListener('blur', function() {
+        if (this.value) {
             this.value = parseFloat(this.value).toFixed(2);
         }
     });

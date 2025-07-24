@@ -2,934 +2,226 @@
 {% block content %}
 {% load static %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  <style>
-/* CSS Variables for better maintainability */
-:root {
-    /* Color Palette */
-    --primary-color: #4f46e5;
-    --primary-hover: #4338ca;
-    --secondary-color: #64748b;
-    --success-color: #22c55e;
-    --warning-color: #eab308;
-    --danger-color: #ef4444;
-    --light-gray: #f1f5f9;
-    --border-color: #e2e8f0;
-
-    /* Spacing */
-    --spacing-xs: 0.5rem;
-    --spacing-sm: 1rem;
-    --spacing-md: 1.5rem;
-    --spacing-lg: 2rem;
-
-    /* Border Radius */
-    --border-radius-sm: 0.375rem;
-    --border-radius-md: 0.5rem;
-    --border-radius-lg: 0.75rem;
-
-    /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-}
-
-/* Enhanced Table Styles */
-.table {
-    margin: 0;
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-}
-
-.table th {
-    background-color: var(--light-gray);
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-bottom: 2px solid var(--border-color);
-}
-
-.table td {
-    padding: var(--spacing-sm) var(--spacing-md);
-    vertical-align: middle;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.table tbody tr:hover {
-    background-color: var(--light-gray);
-}
-
-/* Modern Form Controls */
-.form-control, .form-select {
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-sm);
-    padding: 0.75rem 1rem;
-    transition: all 0.2s ease;
-}
-
-.form-control:focus, .form-select:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
-}
-
-/* Enhanced Button Styles */
-.btn {
-    padding: 0.75rem 1.5rem;
-    border-radius: var(--border-radius-sm);
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.btn-primary {
-    background: var(--primary-color);
-    border: none;
-}
-
-.btn-primary:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-}
-.btn-action {
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border-radius: 6px;
-    border: none;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-}
-
-/* Download Button */
-.btn-download {
-    background: linear-gradient(135deg, #3B82F6, #2563EB);
-    color: white;
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
-}
-
-.btn-download:hover {
-    background: linear-gradient(135deg, #2563EB, #1D4ED8);
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
-}
-
-/* Track Button */
-.btn-track {
-    background: linear-gradient(135deg, #6B7280, #4B5563);
-    color: white;
-    box-shadow: 0 2px 4px rgba(107, 114, 128, 0.1);
-}
-
-.btn-track:hover {
-    background: linear-gradient(135deg, #4B5563, #374151);
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(107, 114, 128, 0.2);
-}
-
-/* Appeal Button */
-.btn-appeal {
-    background: linear-gradient(135deg, #F59E0B, #D97706);
-    color: white;
-    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);
-}
-
-.btn-appeal:hover {
-    background: linear-gradient(135deg, #D97706, #B45309);
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.2);
-}
-
-/* Active State */
-.btn-action:active {
-    transform: translateY(0);
-    box-shadow: none;
-}
-
-/* Icon Animations */
-.btn-action i {
-    transition: transform 0.2s ease;
-}
-
-.btn-action:hover i {
-    transform: translateX(2px);
-}
-.btn-view {
-    padding: 0.5rem 1rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    border-radius: 6px;
-    border: none;
-    background: linear-gradient(135deg, #6366F1, #4F46E5);
-    color: white;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    text-decoration: none;
-    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
-}
-
-.btn-view:hover {
-    background: linear-gradient(135deg, #4F46E5, #4338CA);
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);
-}
-
-.btn-view:active {
-    transform: translateY(0);
-    box-shadow: none;
-}
-
-.btn-view i {
-    font-size: 0.75rem;
-    transition: transform 0.2s ease;
-}
-
-.btn-view:hover i {
-    transform: translateX(2px);
-}
-
-.stat-footer span {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.875rem;
-}
-
-/* Table Card */
-.table-card {
-    padding: 0;
-}
-
-.table-card .card-header {
-    background: transparent;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 1.5rem;
-}
-
-.table-card .card-header h5 {
-    margin: 0;
-    font-weight: 600;
-    color: #1F2937;
-}
-
-.table-card .table {
-    margin: 0;
-}
-
-.table-card .table th {
-    border-top: none;
-    font-weight: 600;
-    color: #6B7280;
-    text-transform: uppercase;
-    font-size: 0.75rem;
-    letter-spacing: 0.05em;
-}
-
-.table-card .table td {
-    vertical-align: middle;
-    color: #374151;
-}
-
-.stat-card {
-    border: none;
-    border-radius: 16px;
-    transition: all 0.3s ease;
-    margin-bottom: 1.5rem;
-    position: relative;
-    overflow: hidden;
-    min-height: 160px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-/* Card Background Gradients */
-.stat-card.bg-primary {
-    background: linear-gradient(135deg, #4361ee, #3730a3);
-}
-
-.stat-card.bg-success {
-    background: linear-gradient(135deg, #10b981, #059669);
-}
-
-.stat-card.bg-warning {
-    background: linear-gradient(135deg, #f59e0b, #d97706);
-}
-
-.stat-card.bg-danger {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-/* Card Content Styles */
-.stat-card .card-body {
-    padding: 1.5rem;
-    position: relative;
-    z-index: 1;
-}
-
-.stat-card .card-title {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.stat-card .display-4 {
-    color: white;
-    font-size: 2.5rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    line-height: 1;
-}
-
-.stat-card .card-footer {
-    background: rgba(255, 255, 255, 0.1);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1rem 1.5rem;
-}
-
-.stat-card .card-footer small {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-/* Icon Styles */
-.stat-card .icon-background {
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    font-size: 8rem;
-    opacity: 0.1;
-    transform: rotate(-15deg);
-    transition: all 0.3s ease;
-}
-
-.stat-card:hover .icon-background {
-    transform: rotate(-5deg) scale(1.1);
-}
-
-/* Warning Card Text Color Override */
-.stat-card.bg-warning .card-title,
-.stat-card.bg-warning .display-4,
-.stat-card.bg-warning .card-footer small {
-    color: rgba(0, 0, 0, 0.9);
-}
-
-/* Animation */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.stat-card {
-    animation: fadeInUp 0.5s ease-out forwards;
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .stat-card {
-        margin-bottom: 1rem;
-    }
-
-    .stat-card .display-4 {
-        font-size: 2rem;
-    }
-
-    .stat-card .icon-background {
-        font-size: 6rem;
-    }
-}
-/* Modal Improvements */
-.modal-content {
-    border: none;
-    border-radius: var(--border-radius-lg);
-    box-shadow: var(--shadow-lg);
-}
-
-.modal-header {
-    border-bottom: 1px solid var(--border-color);
-    padding: var(--spacing-md);
-}
-
-.modal-body {
-    padding: var(--spacing-md);
-}
-
-/* Navigation Tabs */
-.nav-tabs {
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: var(--spacing-md);
-}
-
-.nav-tabs .nav-link {
-    border: none;
-    color: var(--secondary-color);
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-weight: 500;
-    position: relative;
-}
-
-.nav-tabs .nav-link.active {
-    color: var(--primary-color);
-    background: transparent;
-    border-bottom: 2px solid var(--primary-color);
-}
-
-/* Responsive Improvements */
-@media (max-width: 768px) {
-    .stat-card {
-        margin-bottom: var(--spacing-md);
-    }
-
-    .table-responsive {
-        margin: 0 calc(-1 * var(--spacing-sm));
-        padding: 0 var(--spacing-sm);
-    }
-
-    .btn {
-        width: 100%;
-        margin-bottom: var(--spacing-xs);
-    }
-}
-
-/* Utility Classes */
-.shadow-hover:hover {
-    box-shadow: var(--shadow-md);
-}
-
-.text-sm {
-    font-size: 0.875rem;
-}
-
-.text-xs {
-    font-size: 0.75rem;
-}
-
-/* Animation Classes */
-.fade-in {
-    animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-      .btn-create {
-    padding: 0.5rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 8px;
-    border: none;
-    background: linear-gradient(135deg, #4F46E5, #4338CA);
-    color: white;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-create:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);
-    background: linear-gradient(135deg, #4338CA, #3730A3);
-    color: white;
-}
-
-.btn-create:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 3px rgba(79, 70, 229, 0.1);
-}
-
-.btn-create i {
-    font-size: 0.875rem;
-    transition: transform 0.3s ease;
-}
-
-.btn-create:hover i {
-    transform: rotate(90deg);
-}
-
-/* Container Spacing */
-.button-container {
-    padding: 1rem 0;
-}
-      .certificate-modal .modal-content {
-    border: none;
-    border-radius: 16px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
-}
-
-.certificate-modal .modal-header {
-    background: linear-gradient(135deg, #4F46E5, #4338CA);
-    padding: 1.5rem;
-    border: none;
-}
-
-.certificate-modal .modal-title {
-    color: white;
-    font-size: 1.25rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.certificate-modal .modal-title i {
-    font-size: 1.25rem;
-}
-
-.certificate-modal .btn-close {
-    background-color: rgba(255, 255, 255, 0.8);
-    padding: 0.75rem;
-    transition: all 0.2s ease;
-}
-
-.certificate-modal .btn-close:hover {
-    background-color: white;
-    transform: rotate(90deg);
-}
-
-.certificate-modal .modal-body {
-    padding: 2rem;
-}
-
-/* Certificate Details Styling */
-.cert-details {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-}
-
-.cert-detail-item {
-    padding: 1rem;
-    background: #f8fafc;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-}
-
-.cert-detail-item:hover {
-    background: #f1f5f9;
-    transform: translateY(-2px);
-}
-
-.cert-detail-label {
-    font-size: 0.875rem;
-    color: #64748b;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-
-.cert-detail-value {
-    font-size: 1rem;
-    color: #1e293b;
-    font-weight: 500;
-}
-
-/* Modal Footer */
-.certificate-modal .modal-footer {
-    padding: 1.5rem;
-    border-top: 1px solid #e2e8f0;
-    background: #f8fafc;
-}
-
-/* Close Button */
-.btn-modal-close {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border-radius: 8px;
-    border: none;
-    background: linear-gradient(135deg, #64748b, #475569);
-    color: white;
-    transition: all 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn-modal-close:hover {
-    background: linear-gradient(135deg, #475569, #334155);
-    transform: translateY(-1px);
-}
-
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-    .cert-details {
-        grid-template-columns: 1fr;
-    }
-
-    .certificate-modal .modal-body {
-        padding: 1.5rem;
-    }
-}
-
-/* Add new styles for the portal header */
-.portal-header {
-    background: linear-gradient(135deg, #4F46E5, #4338CA);
-    padding: 2rem 1.5rem;
-    margin-bottom: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.portal-title {
-    color: white;
-    font-size: 2rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.user-name {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 1.1rem;
-    font-weight: 500;
-}
-.tracking-list {
-    max-width: 800px;
-    margin: 1.5rem auto;
-    position: relative;
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.tracking-item {
-    padding: 2rem 0;
-    border-left: 3px solid #dee2e6;
-    position: relative;
-    padding-left: 3.5rem;
-    margin-left: 1.5rem;
-}
-
-.tracking-item:last-child {
-    border-left: 3px solid transparent;
-}
-
-.tracking-item::before {
-    content: '';
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #fff;
-    border: 3px solid #dee2e6;
-    position: absolute;
-    left: -13px;
-    top: 2rem;
-    z-index: 1;
-}
-
-.tracking-item.completed::before {
-    background: #28a745;
-    border-color: #28a745;
-    box-shadow: 0 0 6px rgba(40, 167, 69, 0.6);
-}
-
-.tracking-item.rejected::before {
-    background: #dc3545;
-    border-color: #dc3545;
-    box-shadow: 0 0 6px rgba(220, 53, 69, 0.6);
-}
-
-.tracking-item.pending::before {
-    background: #ffc107;
-    border-color: #ffc107;
-    box-shadow: 0 0 6px rgba(255, 193, 7, 0.6);
-}
-
-.status-badge {
-    font-size: 0.85rem;
-    padding: 0.3rem 0.6rem;
-    border-radius: 12px;
-    font-weight: 600;
-    display: inline-block;
-    text-transform: capitalize;
-}
-
-.status-badge.completed {
-    background-color: #28a745;
-    color: #fff;
-}
-
-.status-badge.pending {
-    background-color: #ffc107;
-    color: #212529;
-}
-
-.status-badge.rejected {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-.btn-action {
-    padding: 0.4rem 0.8rem;
-    border-radius: 0.3rem;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-    background-color: #007bff;
-    border: 1px solid #0056b3;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-}
-
-.btn-action:hover {
-    background-color: #0056b3;
-    border-color: #003865;
-    color: #fff;
-}
-
-.btn-track i {
-    font-size: 1rem;
-    color: #fff;
-}
-
-.tracking-item p {
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
-    color: #6c757d;
-}
-
-.tracking-item h4 {
-    margin-bottom: 0.25rem;
-    font-size: 1.1rem;
-    color: #343a40;
-}
-
-.alert {
-    font-size: 0.9rem;
-    border-radius: 0.3rem;
-}
-
-</style>
- <div class="container">
-     <div class="portal-header">
-        <h1 class="portal-title">Certificate Requesting Portal</h1>
-        <div class="user-name">Welcome, {{ user.get_full_name }}</div>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+ <link href="{% static 'css/certificate_request.css' %}" rel="stylesheet">
+
+<div class="container">
+    <!-- Portal Header -->
+    <div class="portal-header">
+        <h1 class="portal-title">
+            <i class="fas fa-certificate"></i> Certificate Requesting Portal
+        </h1>
+        <div class="user-name">
+            <i class="fas fa-user"></i> Welcome, {{ user.get_full_name }}
+        </div>
     </div>
-        <!-- Add Certificate Request Button -->
-       <div class="button-container d-flex justify-content-end">
-            <button type="button" class="btn-create" data-bs-toggle="modal" data-bs-target="#certificateModal">
-                <i class="fas fa-plus"></i>
-                New Certificate
-            </button>
-        </div>
 
-        <!-- Enhanced Statistics Cards -->
-        <div class="row g-4">
-            <div class="col-md-3">
-                <div class="stat-card bg-primary">
-                    <div class="icon-background">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Total Applications</h5>
-                        <h2 class="display-4">{{ stats.total }}</h2>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <small>Updated today</small>
-                        <div><i class="fas fa-chevron-right"></i></div>
-                    </div>
-                </div>
-            </div>
+    <!-- New Certificate Button -->
+    <div class="d-flex justify-content-end mb-4">
+        <button type="button" class="btn-create" data-bs-toggle="modal" data-bs-target="#certificateModal">
+            <i class="fas fa-plus"></i> New Certificate
+        </button>
+    </div>
 
-            <div class="col-md-3">
-                <div class="stat-card bg-success">
-                    <div class="icon-background">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Approved</h5>
-                        <h2 class="display-4">{{ stats.approved }}</h2>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <small>{{ stats.approved_percentage }}% success rate</small>
-                        <div><i class="fas fa-chevron-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="stat-card bg-warning">
-                    <div class="icon-background">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Pending</h5>
-                        <h2 class="display-4">{{ stats.pending }}</h2>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <small>Average wait: 2 days</small>
-                        <div><i class="fas fa-chevron-right"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-3">
-                <div class="stat-card bg-danger">
-                    <div class="icon-background">
-                        <i class="fas fa-times-circle"></i>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Rejected</h5>
-                        <h2 class="display-4">{{ stats.rejected }}</h2>
-                    </div>
-                    <div class="card-footer d-flex align-items-center justify-content-between">
-                        <small>{{ stats.rejected_percentage }}% rejection rate</small>
-                        <div><i class="fas fa-chevron-right"></i></div>
-                    </div>
-                </div>
+    <!-- Enhanced Statistics Cards -->
+    <div class="stat-cards-container">
+        <div class="stat-card primary">
+            <i class="fas fa-file-alt stat-icon"></i>
+            <h3>Total Applications</h3>
+            <div class="display-4">{{ stats.total }}</div>
+            <div class="stat-footer">
+                <span>Updated today</span>
+                <i class="fas fa-arrow-right"></i>
             </div>
         </div>
 
-        <!-- Applications Table -->
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Recent Applications</h5>
-                <div class="d-flex gap-2">
-                    <input type="text" class="form-control" name="search" value="{{ search_query }}" placeholder="Search applications..." aria-label="Search applications">
-                    <select class="form-select" name="status" style="width: auto;">
-                        <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
-                        <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
-                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
-                        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
-                    </select>
-                </div>
+        <div class="stat-card success">
+            <i class="fas fa-check-circle stat-icon"></i>
+            <h3>Approved</h3>
+            <div class="display-4">{{ stats.approved }}</div>
+            <div class="stat-footer">
+                <span>{{ stats.approved_percentage }}% success rate</span>
+                <i class="fas fa-arrow-right"></i>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Applicant Name</th>
-                                <th>Certificate Type</th>
-                                <th>Submission Date</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for cert in certifications %}
-                            <tr>
-                                <td>#{{ cert.id }}</td>
-                                <td>{{ cert.applicant_name }}</td>
-                                <td>{{ cert.get_certificate_type_display }}</td>
-                                <td>{{ cert.submission_date|date:"Y-m-d" }}</td>
-                                <!-- Status Badge -->
-                                <td>
-                                    {% with status=cert.status %}
-                                        <span class="badge {% if status == 'pending' %}bg-warning text-dark{% elif status == 'approved' %}bg-success{% elif status == 'rejected' %}bg-danger{% else %}bg-secondary{% endif %}">
-                                            {{ cert.get_status_display }}
-                                        </span>
-                                    {% endwith %}
-                                </td>
-                                <td>
-                                   <!-- Button to Trigger Modal -->
-                                <a href="#" class="btn-view" data-bs-toggle="modal" data-bs-target="#certificateDetailModal{{ cert.pk }}">
-                                    <i class="fas fa-eye"></i>
-                                    View
-                                </a>
+        </div>
 
-                                    <div class="modal fade certificate-modal" id="certificateDetailModal{{ cert.pk }}" tabindex="-1" aria-labelledby="certificateDetailLabel{{ cert.pk }}" aria-hidden="true">
-                                    <div class="modal-dialog modal-lg">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title" id="certificateDetailLabel{{ cert.pk }}">
-                                                    <i class="fas fa-certificate"></i>
-                                                    Certificate Details
-                                                </h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="stat-card warning">
+            <i class="fas fa-clock stat-icon"></i>
+            <h3>Pending</h3>
+            <div class="display-4">{{ stats.pending }}</div>
+            <div class="stat-footer">
+                <span>Average wait: 2 days</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </div>
+
+        <div class="stat-card danger">
+            <i class="fas fa-times-circle stat-icon"></i>
+            <h3>Rejected</h3>
+            <div class="display-4">{{ stats.rejected }}</div>
+            <div class="stat-footer">
+                <span>{{ stats.rejected_percentage }}% rejection rate</span>
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications Table -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="fas fa-list"></i> Recent Applications</h5>
+            <div class="search-container">
+                <input type="text" class="form-control" id="searchApplications" name="search" value="{{ search_query }}" placeholder="Search applications..." aria-label="Search applications">
+                <select class="form-select" id="filterStatus" name="status">
+                    <option value="all" {% if status_filter == 'all' %}selected{% endif %}>All Status</option>
+                    <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> ID</th>
+                            <th><i class="fas fa-user"></i> Applicant Name</th>
+                            <th><i class="fas fa-file-alt"></i> Certificate Type</th>
+                            <th><i class="fas fa-calendar"></i> Submission Date</th>
+                            <th><i class="fas fa-info-circle"></i> Status</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cert in certifications %}
+                        <tr>
+                            <td>#{{ cert.id }}</td>
+                            <td>{{ cert.applicant_name }}</td>
+                            <td>{{ cert.get_certificate_type_display }}</td>
+                            <td>{{ cert.submission_date|date:"M d, Y" }}</td>
+                            <!-- Status Badge -->
+                            <td>
+                                {% with status=cert.status %}
+                                    <span class="badge {% if status == 'pending' %}bg-pending{% elif status == 'approved' %}bg-approved{% elif status == 'rejected' %}bg-rejected{% else %}bg-secondary{% endif %}">
+                                        {{ cert.get_status_display }}
+                                    </span>
+                                {% endwith %}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <!-- View Button -->
+                                    <button class="btn-view" data-bs-toggle="modal" data-bs-target="#certificateDetailModal{{ cert.pk }}">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+
+                                    {% if cert.status == 'approved' %}
+                                        <a href="{% url 'download_certificate' cert.pk %}" class="btn-download">
+                                            <i class="fas fa-download"></i> Download
+                                        </a>
+                                    {% elif cert.status == 'pending' %}
+                                        <button class="btn-track" data-bs-toggle="modal" data-bs-target="#trackingModal" data-cert-id="{{ cert.id }}">
+                                            <i class="fas fa-search"></i> Track
+                                        </button>
+                                    {% elif cert.status == 'rejected' %}
+                                        <a href="{% url 'appeal_certificate' cert.pk %}" class="btn-appeal">
+                                            <i class="fas fa-exclamation-circle"></i> Appeal
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Certificate Detail Modal -->
+                        <div class="modal fade" id="certificateDetailModal{{ cert.pk }}" tabindex="-1" aria-labelledby="certificateDetailLabel{{ cert.pk }}" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="certificateDetailLabel{{ cert.pk }}">
+                                            <i class="fas fa-certificate"></i> Certificate Details
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="cert-details">
+                                            <div class="cert-detail-item">
+                                                <span class="cert-detail-label">Certificate Type</span>
+                                                <div class="cert-detail-value">{{ cert.get_certificate_type_display }}</div>
                                             </div>
-                                            <div class="modal-body">
-                                                <div class="cert-details">
-                                                    <div class="cert-detail-item">
-                                                        <span class="cert-detail-label">Certificate Type</span>
-                                                        <div class="cert-detail-value">{{ cert.certificate_type }}</div>
-                                                    </div>
 
-                                                    <div class="cert-detail-item">
-                                                        <span class="cert-detail-label">Applicant Name</span>
-                                                        <div class="cert-detail-value">{{ cert.applicant_name }}</div>
-                                                    </div>
+                                            <div class="cert-detail-item">
+                                                <span class="cert-detail-label">Applicant Name</span>
+                                                <div class="cert-detail-value">{{ cert.applicant_name }}</div>
+                                            </div>
 
-                                                    <div class="cert-detail-item">
-                                                        <span class="cert-detail-label">Email Address</span>
-                                                        <div class="cert-detail-value">{{ cert.applicant_email }}</div>
-                                                    </div>
+                                            <div class="cert-detail-item">
+                                                <span class="cert-detail-label">Email Address</span>
+                                                <div class="cert-detail-value">{{ cert.applicant_email }}</div>
+                                            </div>
 
-                                                    <div class="cert-detail-item">
-                                                        <span class="cert-detail-label">Phone Number</span>
-                                                        <div class="cert-detail-value">{{ cert.applicant_phone }}</div>
-                                                    </div>
+                                            <div class="cert-detail-item">
+                                                <span class="cert-detail-label">Phone Number</span>
+                                                <div class="cert-detail-value">{{ cert.applicant_phone }}</div>
+                                            </div>
 
-                                                    <div class="cert-detail-item">
-                                                        <span class="cert-detail-label">Date of Request</span>
-                                                        <div class="cert-detail-value">{{ cert.submission_date|date:"M d, Y" }}</div>
-                                                    </div>
+                                            <div class="cert-detail-item">
+                                                <span class="cert-detail-label">Date of Request</span>
+                                                <div class="cert-detail-value">{{ cert.submission_date|date:"M d, Y" }}</div>
+                                            </div>
+
+                                            <div class="cert-detail-item">
+                                                <span class="cert-detail-label">Status</span>
+                                                <div class="cert-detail-value">
+                                                    <span class="badge {% if cert.status == 'pending' %}bg-pending{% elif cert.status == 'approved' %}bg-approved{% elif cert.status == 'rejected' %}bg-rejected{% else %}bg-secondary{% endif %}">
+                                                        {{ cert.get_status_display }}
+                                                    </span>
                                                 </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
-                                                    <i class="fas fa-times"></i>
-                                                    Close
-                                                </button>
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn-modal-close" data-bs-dismiss="modal">
+                                            <i class="fas fa-times"></i> Close
+                                        </button>
+
+                                        {% if cert.status == 'approved' %}
+                                            <a href="{% url 'download_certificate' cert.pk %}" class="btn-download">
+                                                <i class="fas fa-download"></i> Download Certificate
+                                            </a>
+                                        {% elif cert.status == 'pending' %}
+                                            <button class="btn-track" data-bs-toggle="modal" data-bs-target="#trackingModal" data-cert-id="{{ cert.id }}" data-bs-dismiss="modal">
+                                                <i class="fas fa-search"></i> Track Status
+                                            </button>
+                                        {% elif cert.status == 'rejected' %}
+                                            <a href="{% url 'appeal_certificate' cert.pk %}" class="btn-appeal">
+                                                <i class="fas fa-exclamation-circle"></i> Submit Appeal
+                                            </a>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                   {% if cert.status == 'approved' %}
-                                    <a href="{% url 'download_certificate' cert.pk %}" class="btn-action btn-download">
-                                        <i class="fas fa-download"></i>
-                                        Download
-                                    </a>
-                                {% elif cert.status == 'pending' %}
-                                    <button class="btn-action btn-track" data-bs-toggle="modal" data-bs-target="#trackingModal" data-cert-id="{{ cert.id }}">
-            <i class="fas fa-search"></i>
-            Track
-        </button>
-                                {% elif cert.status == 'rejected' %}
-                                    <a href="{% url 'appeal_certificate' cert.pk %}" class="btn-action btn-appeal">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        Appeal
-                                    </a>
-                                {% endif %}
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6" class="text-center">No certificates found.</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fas fa-folder-open"></i>
+                                    <h5>No applications found</h5>
+                                    <p>Start by creating a new certificate request.</p>
+                                    <button class="btn-create mt-3" data-bs-toggle="modal" data-bs-target="#certificateModal">
+                                        <i class="fas fa-plus"></i> New Certificate
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
                 </div>
 
         <!-- Pagination -->
         {% if certifications.has_other_pages %}
-        <div class="d-flex justify-content-between align-items-center mt-3">
+       <div class="pagination-container">
             <div class="text-muted">
                 Showing {{ start_index }} to {{ end_index }} of {{ total_count }} entries
             </div>

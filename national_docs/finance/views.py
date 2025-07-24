@@ -11,35 +11,41 @@ from django.db import transaction
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
-
+from django.template.loader import render_to_string
+from django.http import HttpResponse
 
 
 @login_required
 def token_management_view(request):
     """
-    Renders the token management page with dashboard statistics and transaction history.
+    Renders the token management page with dashboard statistics, token table, and transaction history.
     """
-    # Get basic data
-    logs = TokenLog.objects.all().order_by('-created_at')
+    from django.utils.timezone import now  # In case not already imported
+
+    # Get users for the dropdown
     users = User.objects.all()
 
-    # Pagination
-    paginator = Paginator(logs, 10)  # Show 10 logs per page
-    page_number = request.GET.get('page')
-    token_logs = paginator.get_page(page_number)
+    # Get all tokens directly for the table
+    all_tokens_query = Token.objects.all().order_by('-created_at')
 
-    # Calculate dashboard statistics
+    # Pagination for token table
+    tokens_paginator = Paginator(all_tokens_query, 20)  # Show 20 tokens per page
+    page_number = request.GET.get('page')
+    all_tokens = tokens_paginator.get_page(page_number)
+
+    # Get transaction logs for the history section
+    logs = TokenLog.objects.all().order_by('-created_at')[:10]  # Show last 10 for quick view
+
+    # Dashboard stats
     total_tokens = Token.objects.count()
     used_tokens = Token.objects.filter(is_used=True).count()
-    pending_tokens = Token.objects.filter(is_used=False).count()
-    total_amount = Token.objects.aggregate(
-        total=Sum('amount'))['total'] or 0
+    pending_tokens = Token.objects.filter(is_used=False, is_expired=False).count()
+    total_amount = Token.objects.aggregate(total=Sum('amount'))['total'] or 0
 
-    # Get chart data for the last 6 months
+    # Chart: last 6 months
     end_date = datetime.now()
     start_date = end_date - timedelta(days=180)
 
-    # Monthly token generation data
     monthly_tokens = Token.objects.filter(
         created_at__range=(start_date, end_date)
     ).annotate(
@@ -49,7 +55,7 @@ def token_management_view(request):
         amount=Sum('amount')
     ).order_by('month')
 
-    # Prepare chart data
+    # Chart data preparation
     chart_labels = []
     chart_tokens = []
     chart_amounts = []
@@ -59,21 +65,37 @@ def token_management_view(request):
         chart_tokens.append(entry['count'])
         chart_amounts.append(float(entry['amount']) if entry['amount'] else 0)
 
+    # Recent activity (optional)
+    recent_activity = TokenLog.objects.select_related('token').order_by('-created_at')[:5]
+
     context = {
         "users": users,
-        "token_logs": token_logs,  # This is now paginated
-        # Dashboard stats
+        "token_logs": logs,  # Recent logs
+        "all_tokens": all_tokens,  # This now refers to actual Token instances
         "total_tokens": total_tokens,
         "used_tokens": used_tokens,
         "pending_tokens": pending_tokens,
         "total_amount": total_amount,
-        # Chart data
         "chart_labels": json.dumps(chart_labels),
         "chart_tokens": json.dumps(chart_tokens),
-        "chart_amounts": json.dumps(chart_amounts)
+        "chart_amounts": json.dumps(chart_amounts),
+        "recent_activity": recent_activity,
     }
 
     return render(request, "finance/token_management.html", context)
+
+
+@login_required
+def token_logs_partial_view(request, token_value):
+    token = get_object_or_404(Token, token=token_value)
+    logs = TokenLog.objects.filter(token=token).order_by('-created_at')
+
+    html = render_to_string("finance/partials/token_logs_list.html", {
+        "logs": logs,
+        "token": token
+    }, request=request)
+
+    return HttpResponse(html)
 
 @login_required
 def generate_token(request):
